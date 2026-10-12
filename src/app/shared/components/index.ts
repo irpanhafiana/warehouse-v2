@@ -7,4 +7,5 @@ export * from './dialog-set-pic/dialog-set-pic.component';
 export * from './loader/loader.component';
 export * from './loader-force-close/loader-force-close.component';
 export * from './navbar/navbar.component';
+export * from './navbar-reqrec/navbar-reqrec.component';
 

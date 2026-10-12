@@ -52,10 +52,10 @@
       </div>
 
       <div class="overflow-x-auto text-white pb-1">
-        <div class="flex flex-row items-center gap-2">
+        <div class="flex flex-row items-center gap-1.5 min-w-max">
           @if (filteredSalesInvoices.length !== 0) {
           <button
-            class="px-2.5 h-8 bg-red-700 text-white font-bold rounded-md text-xs cursor-pointer shadow-xs"
+            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
             (click)="onSelectedAlphabet('~')"
           >
             Reset
@@ -64,10 +64,10 @@
           @for (item of alphabet; track item) {
           <button
             type="button"
-            class="font-bold text-lg px-2 rounded-md cursor-pointer"
+            class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
             [ngClass]="{
-              'bg-[#FF8B00] text-white': item === selectedAplhabet,
-              'text-white/80 hover:bg-white/20': item !== selectedAplhabet
+              'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAplhabet,
+              'text-white/80 hover:bg-white/10': item !== selectedAplhabet
             }"
             (click)="onSelectedAlphabet(item)"
           >
@@ -80,7 +80,7 @@
   </div>
 
   <!-- Bawah (container list + scrollable) -->
-  <div class="w-full flex-1 bg-[#F3F2F8] rounded-t-[40px] p-4 flex flex-col border-t-[12px] border-[#202B6D] overflow-hidden">
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
       @if (loading) {
       <div class="flex flex-col gap-3">
@@ -117,11 +117,11 @@
 <app-navbar></app-navbar>
 
 @if (isDialogDetailDocnum) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-  <div class="w-full max-w-lg bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-3 max-h-[85vh]">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4 max-h-[85vh]">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">DocNum</h2>
-      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="onCloseDialogDetailDocnum()">
+      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer" (click)="onCloseDialogDetailDocnum()">
         ✕
       </button>
     </div>
@@ -129,14 +129,14 @@
     <div class="flex-1 overflow-y-auto flex flex-col gap-3 py-1">
       @for (item of detailDocnumCustomer; track item.DocNum || $index) {
       <div
-        class="border-2 border-gray-300 hover:border-[#202B6D] w-full rounded-2xl p-4 cursor-pointer transition-all shadow-2xs"
+        class="border border-gray-200 hover:border-[#202B6D] bg-white w-full rounded-xl p-4 cursor-pointer transition-all shadow-xs"
         (click)="toChecklist(item.DocNum)"
       >
         <div class="flex justify-between items-center">
           <small class="font-semibold text-xs text-gray-500">
             {{ item.DocDate | date : 'dd MMMM yyyy' }}
           </small>
-          <small class="font-bold text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded">
+          <small class="font-bold text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-lg border border-gray-200">
             {{ item.Details }} Item
           </small>
         </div>
@@ -146,9 +146,9 @@
         }
         <div class="mt-2">
           @if (item.IsCash) {
-          <span class="font-bold text-xs bg-emerald-700 text-white px-2.5 py-1 rounded-md">Cash</span>
+          <span class="font-bold text-xs bg-emerald-600 text-white px-2.5 py-1 rounded-md">Cash</span>
           } @else {
-          <span class="font-bold text-xs bg-orange-500 text-white px-2.5 py-1 rounded-md">Credit</span>
+          <span class="font-bold text-xs bg-[#FF8B00] text-white px-2.5 py-1 rounded-md">Credit</span>
           }
         </div>
       </div>
@@ -158,7 +158,7 @@
     <div class="pt-2 border-t border-gray-200">
       <button
         type="button"
-        class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        class="btn-no-shadow-secondary w-full py-2.5 rounded-xl cursor-pointer"
         (click)="onCloseDialogDetailDocnum()"
       >
         Tutup

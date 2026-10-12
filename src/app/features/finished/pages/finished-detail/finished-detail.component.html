@@ -23,7 +23,7 @@
 
   <!-- Content Container -->
   <div
-    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-[32px] sm:rounded-t-[40px] p-4 flex flex-col border-t-2 border-[#202B6D]/30 shadow-inner overflow-hidden">
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-16">
       @if (loading) {
       <div class="flex flex-col gap-3">
@@ -32,7 +32,7 @@
       </div>
       } @else if (salesInvoice) {
       <!-- Summary Card -->
-      <div class="card border border-gray-200 shadow-sm">
+      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs">
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-start">
             <div class="flex flex-col">
@@ -62,7 +62,7 @@
       <div class="flex flex-col gap-3 mt-2">
         <h2 class="font-bold text-base text-slate-700 px-1">Daftar Item:</h2>
         @for (item of salesInvoice.Details; track item.Id || item.DetailId || $index) {
-        <div class="card relative border border-gray-200 shadow-xs transition-all"
+        <div class="w-full rounded-xl p-4 relative border shadow-xs transition-all"
           [ngClass]="{
             'bg-red-50 border-red-200': item.Remarks === '',
             'bg-orange-50 border-orange-200': item.Remarks === 'pick',

@@ -1,10 +1,10 @@
 <div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
-  <div class="w-full h-[10%] flex flex-col p-4 shrink-0">
-    <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
-        <h1 class="font-bold text-2xl text-start text-white">BON Tambahan</h1>
+  <div class="w-full flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="flex flex-col text-white">
+        <h1 class="font-bold text-2xl sm:text-3xl text-start tracking-tight">BON Tambahan</h1>
       </div>
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row items-center gap-2">
         <button
           type="button"
           (click)="fetchRouteGroups(dateString)"
@@ -15,7 +15,7 @@
         <button
           type="button"
           (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
         >
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
@@ -23,8 +23,8 @@
     </div>
   </div>
 
-  <div class="w-full flex-1 bg-[#F3F2F8] rounded-t-[40px] p-4 flex flex-col gap-4 border-t-[12px] border-[#202B6D] overflow-hidden">
-    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
       @if (loading) {
       <div class="flex flex-col gap-3">
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
@@ -36,10 +36,10 @@
         <div class="flex flex-col gap-3 pb-24">
           @for (item of filteredSalesInvoices; track item.DocNum) {
           <div
-            class="card border-2 p-4 rounded-2xl shadow-xs transition-all"
+            class="w-full rounded-xl p-4 transition-all border"
             [ngClass]="{
-              'bg-orange-100 border-orange-400': item.MarkBeforeRoute,
-              'bg-white border-gray-300': !item.MarkBeforeRoute
+              'bg-amber-50 border-amber-300': item.MarkBeforeRoute,
+              'bg-white border-gray-200': !item.MarkBeforeRoute
             }"
           >
             <div class="flex flex-col gap-2">
@@ -53,14 +53,14 @@
                 </div>
               </div>
 
-              <div class="flex justify-between items-start">
+              <div class="flex justify-between items-start mt-1">
                 <div class="flex flex-col">
-                  <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                  <small class="text-gray-500 text-xs font-medium">DocNum</small>
                   <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
                 </div>
 
                 <div class="flex flex-col items-end">
-                  <small class="text-gray-500 text-xs font-semibold">Total Item</small>
+                  <small class="text-gray-500 text-xs font-medium">Total Item</small>
                   <span class="px-2 py-0.5 bg-[#202B6D] text-white rounded-md text-xs font-bold">
                     {{ item.Details }}
                   </span>
@@ -68,14 +68,14 @@
               </div>
 
               <div class="flex flex-col">
-                <small class="text-gray-500 text-xs font-semibold">Customer</small>
+                <small class="text-gray-500 text-xs font-medium">Customer</small>
                 <p class="font-bold text-base text-slate-800">{{ item.Name }}</p>
               </div>
 
               @if (item.Note && item.Note !== '') {
-              <div class="flex flex-col">
-                <small class="text-gray-500 text-xs font-semibold">Catatan Kasir</small>
-                <p class="font-medium text-xs text-slate-700 bg-amber-50 p-2 rounded-lg border border-amber-200">
+              <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
+                <small class="text-gray-500 text-xs font-medium">Catatan Kasir</small>
+                <p class="font-medium text-xs text-slate-700 mt-0.5">
                   {{ item.Note }}
                 </p>
               </div>
@@ -85,7 +85,7 @@
                 @if (item.MarkBeforeRoute) {
                 <button
                   type="button"
-                  class="w-full py-2 bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  class="w-full btn-no-shadow-danger text-center cursor-pointer text-sm"
                   (click)="onRemarkBeforeAdd(item)"
                 >
                   Batalkan
@@ -93,7 +93,7 @@
                 } @else {
                 <button
                   type="button"
-                  class="w-full py-2 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  class="w-full btn-no-shadow-warning text-center cursor-pointer text-sm"
                   (click)="onRemarkBeforeAdd(item)"
                 >
                   Tandai
@@ -106,8 +106,8 @@
         </div>
         } @else {
         <div class="flex items-center justify-center flex-col pt-20">
-          <img src="new-assets/data-not-founds.png" class="w-40 mx-auto opacity-90" alt="" />
-          <p class="w-2/3 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
+          <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
             Ooops, tidak ada BON tambahan :(
           </p>
         </div>
@@ -119,10 +119,10 @@
 </div>
 
 @if (BONtoRoute.length > 0) {
-<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-40 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] border-t border-gray-200">
+<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-40 border-t border-gray-200 shadow-lg">
   <button
     type="button"
-    class="w-full py-3 bg-[#202B6D] hover:bg-[#19245a] active:scale-98 text-white font-bold rounded-xl text-base cursor-pointer shadow-md"
+    class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
     (click)="prikitiw()"
   >
     Tambah Ke Jalur Muatan ({{ BONtoRoute.length }} BON)
@@ -132,21 +132,21 @@
 
 <!-- Dialog Add To Route -->
 @if (isDialogAddToRoute) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-  <div class="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
-    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Tambah Ke Jalur Muatan</h2>
-      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="isDialogAddToRoute = false">
+      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer" (click)="isDialogAddToRoute = false">
         ✕
       </button>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label for="dropdown-route" class="font-semibold text-sm text-gray-700">Pilih Jalur Muatan</label>
+    <div class="flex flex-col gap-1.5">
+      <label for="dropdown-route" class="font-medium text-xs uppercase tracking-wider text-gray-700 pl-1">Pilih Jalur Muatan</label>
       <select
         id="dropdown-route"
         name="dropdown"
-        class="w-full p-2.5 border border-gray-300 rounded-xl text-base font-semibold"
+        class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-[#2F4ACD] rounded-xl text-base font-semibold text-gray-800 focus:outline-none shadow-xs"
         (change)="onSelectedJalurMuatan($event)"
       >
         <option value="">Pilih Jalur...</option>
@@ -159,7 +159,7 @@
     <div class="grid grid-cols-2 gap-3 mt-4">
       <button
         type="button"
-        class="py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        class="btn-no-shadow-secondary text-center cursor-pointer"
         (click)="isDialogAddToRoute = false"
       >
         Tutup
@@ -167,7 +167,7 @@
       @if (routeNameAlias !== '') {
       <button
         type="button"
-        class="py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl cursor-pointer"
+        class="btn-no-shadow-success text-center cursor-pointer"
         (click)="onSaveToJalurMuat()"
       >
         Simpan

@@ -1,0 +1,123 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Header (Fixed Top) -->
+  <div class="w-full flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between gap-2 items-center">
+      <div class="flex flex-col">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          {{ !loading && salesInvoice ? salesInvoice.DocNum : 'Loading...' }}
+        </p>
+        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
+          {{ !loading && salesInvoice?.CustomerModel ? salesInvoice?.CustomerModel?.CustomerName : 'Loading...' }}
+        </h1>
+      </div>
+      <div class="flex flex-row gap-2">
+        <button
+          type="button"
+          (click)="getDetail()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <button
+          type="button"
+          (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Body Container -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+      </div>
+      } @else if (salesInvoice) {
+      <div class="flex flex-col gap-3">
+        <!-- Summary Box -->
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs my-1 flex flex-col gap-2">
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col">
+              <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+              <p class="font-bold text-base sm:text-lg text-slate-800">{{ salesInvoice.DocNum }}</p>
+            </div>
+            <div class="flex flex-col text-end">
+              <small class="text-gray-500 text-xs font-semibold">Total Item</small>
+              <p class="font-bold text-base sm:text-lg text-slate-800">
+                {{ salesInvoice.Details.length }}
+              </p>
+            </div>
+          </div>
+          <div class="flex justify-between items-center">
+            <div class="flex flex-col">
+              <small class="text-gray-500 text-xs font-semibold">Nama Customer</small>
+              <p class="font-bold text-base sm:text-lg text-slate-800">
+                {{ salesInvoice.CustomerModel.CustomerName }}
+              </p>
+            </div>
+            <div class="flex flex-col text-end">
+              <small class="text-gray-500 text-xs font-semibold">DocDate</small>
+              <p class="font-bold text-base sm:text-lg text-slate-800">
+                {{ salesInvoice.DocDate | date : 'dd MMM yyyy' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detail Verification Cards -->
+        <div class="flex flex-col gap-3 pb-8">
+          @for (item of filteredData; track item.Id || item.LineNo || $index) {
+          <div class="w-full relative border border-emerald-300 bg-emerald-50 rounded-xl p-4 shadow-xs">
+            <img src="done.png" alt="Done" class="absolute top-3 right-3 w-[36px] sm:w-[40px]" />
+            <div class="flex flex-col gap-1 pr-10">
+              <p class="text-xs font-bold text-gray-600">
+                Checker: <span class="text-slate-800">{{ item.Remarks }}</span>
+              </p>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 leading-snug">
+                {{ item.ProductModel.Name }}
+              </h2>
+
+              <div class="mt-1">
+                @if (item.ProductModel.Description !== 'RECEH' && item.Quantity < item.OpenQuantity) {
+                <p class="text-sm sm:text-base font-bold text-slate-700 flex flex-wrap items-center gap-2">
+                  <span class="line-through text-gray-400">
+                    {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                  </span>
+                  <span class="text-slate-600">➜</span>
+                  <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold">
+                    {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
+                  </span>
+                </p>
+                } @else {
+                <p class="text-sm sm:text-base font-bold text-slate-800">
+                  {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                </p>
+                }
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-20">
+        <img
+          src="new-assets/data-not-founds.png"
+          class="w-1/2 max-w-[200px] mx-auto"
+          alt="Data Not Found"
+        />
+        <p class="w-3/4 text-center font-medium text-lg text-[#2F4ACD] mt-4">
+          Ooops, data detail riwayat tidak ditemukan :(
+        </p>
+      </div>
+      }
+    </div>
+  </div>
+</div>

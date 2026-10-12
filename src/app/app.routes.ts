@@ -61,6 +61,19 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'main-reqrec',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/request-receive/request-receive.routes').then(
+            (m) => m.requestReceiveRoutes
+          ),
+      },
+    ],
+  },
+  {
     path: '**',
     redirectTo: '',
   },

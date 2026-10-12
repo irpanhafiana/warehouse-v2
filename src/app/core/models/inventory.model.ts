@@ -21,6 +21,8 @@ export interface Inventory {
   DetailsCount: number;
 }
 
+export type Detail = InventoryDetail;
+
 export interface InventoryDetail {
   ApprovalQuantity: number;
   ApprovalBaseQuantity: number;

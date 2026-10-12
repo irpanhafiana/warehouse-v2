@@ -1,0 +1,363 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Header (Fixed Top) -->
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
+    <div class="flex flex-row justify-between gap-2 items-center">
+      <div class="flex flex-col">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          {{ !loading && inventoryRequest ? inventoryRequest.DocNum : 'Loading...' }}
+        </p>
+        <h1 class="font-bold text-lg sm:text-xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
+          {{ !loading && inventoryRequest ? inventoryRequest.Remarks : 'Loading...' }}
+        </h1>
+      </div>
+      <div class="flex flex-row gap-2">
+        <button
+          type="button"
+          (click)="onRefresh()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        @if (!isFilterAlphabet) {
+        <button
+          type="button"
+          (click)="openFilterAlphabet()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="filter-w.png" alt="Filter Alphabet" class="w-full h-full object-contain" />
+        </button>
+        } @else {
+        <button
+          type="button"
+          (click)="closeFilterAlphabet()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="close-w.png" alt="Close Filter" class="w-full h-full object-contain" />
+        </button>
+        }
+        <button
+          type="button"
+          (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
+      </div>
+    </div>
+
+    <!-- Alphabet Filter Strip -->
+    @if (isFilterAlphabet) {
+    <div class="overflow-x-auto text-white h-auto pt-3 pb-1">
+      <div class="flex flex-row items-center gap-1.5 min-w-max">
+        @if (filteredData.length !== 0) {
+        <button
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+          (click)="onSelectedAlphabet('~')"
+        >
+          Reset
+        </button>
+        }
+        @for (item of alphabet; track $index) {
+        <button
+          type="button"
+          class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
+          [ngClass]="{
+            'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAlphabet,
+            'text-white/80 hover:bg-white/10': item !== selectedAlphabet
+          }"
+          (click)="onSelectedAlphabet(item)"
+        >
+          {{ item }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Body Container -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col gap-3 overflow-hidden">
+    <!-- Catatan Kasir (jika ada) -->
+    @if (!loading && inventoryRequest?.Note && inventoryRequest?.Note !== '\r\n') {
+    <div class="w-full bg-amber-50 border border-amber-200 rounded-xl p-3 shadow-xs">
+      <p class="font-semibold text-xs text-amber-700 uppercase tracking-wider">Catatan Kasir</p>
+      <p class="font-bold text-sm leading-tight text-slate-800 mt-0.5">
+        {{ inventoryRequest?.Note }}
+      </p>
+    </div>
+    }
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto flex flex-col gap-3 pr-1 pb-36">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+      </div>
+      } @else {
+      <!-- PIC Selector & Actions -->
+      <div class="flex flex-col gap-3 mt-1">
+        <div class="flex flex-row justify-between w-full gap-2 items-center">
+          <div class="flex-1">
+            <select
+              id="dropdown"
+              name="dropdown"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2.5 font-semibold text-base bg-white text-slate-800 focus:outline-none focus:border-[#2F4ACD] shadow-xs"
+              (change)="onOptionSelect($event)"
+            >
+              <option value="">Pilih PIC</option>
+              @for (item of pickingPic; track $index) {
+              <option [value]="item" [selected]="item === picName">
+                {{ item }}
+              </option>
+              }
+              @if (pickingPic.length === 0) {
+              <option selected>Tidak ada PIC</option>
+              }
+            </select>
+          </div>
+          <div class="flex flex-row gap-2">
+            <button
+              type="button"
+              class="w-[44px] h-[44px] bg-[#202B6D] hover:bg-[#19245a] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer shadow-xs p-2 transition-all"
+              (click)="openDialogAddPic()"
+              title="Tambah / Pilih PIC"
+            >
+              <img src="add-w.png" alt="Add PIC" class="w-full h-full object-contain" />
+            </button>
+            <button
+              type="button"
+              class="w-[44px] h-[44px] bg-[#2F4ACD] hover:bg-[#202B6D] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer shadow-xs p-2 transition-all"
+              (click)="openDialogBarcode()"
+              title="Bagikan QR"
+            >
+              <img src="shared-w.png" alt="Share QR" class="w-full h-full object-contain" />
+            </button>
+          </div>
+        </div>
+
+        @if (picName.length > 0) {
+        <!-- Summary Box -->
+        @if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs my-1 flex flex-col gap-1.5">
+          <div class="flex justify-between items-center">
+            <small class="text-gray-500 text-xs font-semibold">DocNum:</small>
+            <p class="font-bold text-base text-slate-800">{{ inventoryRequest.DocNum }}</p>
+          </div>
+          <div class="flex justify-between items-center">
+            <small class="text-gray-500 text-xs font-semibold">Pengiriman Dari:</small>
+            <p class="font-bold text-base text-slate-800">{{ inventoryRequest.Remarks }}</p>
+          </div>
+          <div class="flex justify-between items-center">
+            <small class="text-gray-500 text-xs font-semibold">Tanggal Dikirim:</small>
+            <p class="font-bold text-sm sm:text-base text-slate-800">
+              {{ inventoryRequest.DocDate | date : 'dd MMM yyyy' }}
+            </p>
+          </div>
+        </div>
+        }
+
+        <!-- Checklist Item Cards -->
+        <div class="flex flex-col gap-3 mb-24">
+          @for (item of filteredData; track item.Id || item.LineNo || $index) {
+          <div
+            class="w-full relative border rounded-xl p-4 shadow-xs transition-all duration-200"
+            [ngClass]="getCardClass(item)"
+          >
+            @if (item.LineStatus === 'Close') {
+            <span class="inline-block bg-red-600 text-xs font-bold px-2.5 py-0.5 text-white rounded-md mb-2">
+              Sudah diterima
+            </span>
+            }
+
+            @if (item.Remarks) {
+            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              {{ item.Remarks }}
+            </p>
+            }
+
+            <div class="my-1">
+              @if (item.Remarks && item.Remarks.includes(picName)) {
+              <h2 class="font-bold tracking-tight text-lg sm:text-xl text-slate-900 leading-snug">
+                {{ item.ProductModel.Name }}
+              </h2>
+              } @else {
+              <h2
+                class="font-bold tracking-tight text-lg sm:text-xl text-slate-900 leading-snug select-none cursor-pointer"
+                [class.opacity-50]="isLoading(item.Id)"
+                [class.cursor-not-allowed]="isLoading(item.Id)"
+                (click)="!isLoading(item.Id) && onSubmit(item)"
+              >
+                {{ isLoading(item.Id) ? 'Proses Menyimpan Data...' : item.ProductModel.Name }}
+              </h2>
+              }
+            </div>
+
+            <p class="text-base font-bold text-slate-700 my-1">
+              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+            </p>
+
+            @if (item.LineStatus === 'Open') {
+            <div class="mt-2 pt-2 border-t border-gray-200/60">
+              @if (item.Remarks && item.Remarks.includes(picName)) {
+              <button
+                type="button"
+                class="btn-no-shadow-danger w-full py-2 font-bold text-sm rounded-xl cursor-pointer"
+                (click)="onCancel(item.Id)"
+              >
+                Batalkan
+              </button>
+              } @else {
+              <div class="flex justify-end items-center gap-3">
+                <button
+                  type="button"
+                  (click)="decreaseQty($index)"
+                  class="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 transition-all shadow-xs"
+                  [disabled]="item.Quantity <= 1"
+                >
+                  -
+                </button>
+
+                <span class="text-lg font-bold text-slate-800 min-w-[24px] text-center">
+                  {{ item.Quantity }}
+                </span>
+
+                <button
+                  type="button"
+                  (click)="increaseQty($index)"
+                  class="w-8 h-8 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-lg cursor-pointer active:scale-95 transition-all shadow-xs"
+                >
+                  +
+                </button>
+              </div>
+              }
+            </div>
+            }
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 text-center my-4">
+          <p class="text-amber-800 font-semibold text-sm sm:text-base">
+            Silakan pilih atau tambahkan PIC terlebih dahulu untuk memulai checklist.
+          </p>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Sticky Action: Konfirmasi Item Diterima -->
+<div class="fixed bottom-0 left-0 right-0 z-40 w-full bg-white border-t border-gray-200 p-3 flex items-center justify-center shadow-sm">
+  <button
+    type="button"
+    class="btn-no-shadow-primary w-full py-3 text-base font-bold text-center rounded-xl cursor-pointer"
+    (click)="onConfirmReceive()"
+  >
+    Konfirmasi Item Diterima
+  </button>
+</div>
+
+<!-- Modal Shared: Dialog Set PIC -->
+<app-dialog-set-pic
+  [isOpen]="isDialogAddPic"
+  [picList]="pickingPic"
+  [currentPic]="picName"
+  [title]="'Tambah / Pilih PIC'"
+  (saved)="onPicSaved($event)"
+  (closed)="isDialogAddPic = false"
+></app-dialog-set-pic>
+
+<!-- Modal Barcode / QR Share -->
+@if (isDialogOpenBarcode) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card shadow-2xl flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-[#202B6D]">Bagikan BON</h2>
+      <button
+        class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="closeDialogBarcode()"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="flex justify-center items-center py-4">
+      <qrcode [qrdata]="QRCodes" [width]="220" [errorCorrectionLevel]="'M'"></qrcode>
+    </div>
+    <div class="mt-2">
+      <button
+        type="button"
+        class="btn-no-shadow-secondary w-full py-2.5 text-center rounded-xl font-bold cursor-pointer"
+        (click)="closeDialogBarcode()"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal Contra Peringatan (Belum 2 Orang) -->
+@if (isContra) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-red-200 animate-modal-card shadow-2xl flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-red-600">Peringatan!</h2>
+      <button
+        class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="isContra = false"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="my-2">
+      <p class="text-slate-800 font-semibold text-base text-center leading-relaxed">
+        Ada item yang belum dikontra oleh minimal 2 orang petugas!
+      </p>
+    </div>
+    <div class="mt-2">
+      <button
+        type="button"
+        class="btn-no-shadow-secondary w-full py-2.5 text-center rounded-xl font-bold cursor-pointer"
+        (click)="isContra = false"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal Error Umum / PIC Belum Dipilih -->
+@if (isErrorPicSebagian) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card shadow-2xl flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-[#202B6D]">Perhatian</h2>
+      <button
+        class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="isErrorPicSebagian = false"
+      >
+        ✕
+      </button>
+    </div>
+    <div class="my-2">
+      <p class="text-slate-700 font-medium text-base text-center leading-relaxed">
+        {{ msgError }}
+      </p>
+    </div>
+    <div class="mt-2">
+      <button
+        type="button"
+        class="btn-no-shadow-secondary w-full py-2.5 text-center rounded-xl font-bold cursor-pointer"
+        (click)="isErrorPicSebagian = false"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}
