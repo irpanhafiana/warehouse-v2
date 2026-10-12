@@ -1,0 +1,297 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Top Bar & Controls -->
+  <div class="w-full flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
+        BON Picking
+        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ filteredSalesInvoices.length }})</span>
+      </h1>
+      <div class="flex flex-row items-center gap-2">
+        <button type="button" (click)="fetchPickingData()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <app-button-home></app-button-home>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-col gap-2 mt-2">
+      <div class="grid grid-cols-2 gap-3 items-end">
+        <div class="flex flex-col items-start gap-1">
+          <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
+          <input type="date"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            [(ngModel)]="date" (change)="onDateChange($event)" />
+        </div>
+
+        <div class="flex flex-col items-start gap-1">
+          <label for="dropdown" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Area</label>
+          <select id="dropdown" [(ngModel)]="areaSelected" name="dropdown"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            (change)="onOptionSelect($event)">
+            @if (area.length > 0) {
+            <option value="">Semua Area</option>
+            }
+            @for (item of area; track $index) {
+            <option [value]="item.Code">{{ item.Code }}</option>
+            }
+            @if (area.length === 0) {
+            <option value="" selected>Tidak ada Area</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Alphabet Initial Filter Bar -->
+      <div class="flex flex-row items-center gap-2 text-white py-1 min-w-0">
+        @if (filteredSalesInvoices.length !== 0) {
+        <button
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+          (click)="onSelectedAlphabet('~')">
+          Reset
+        </button>
+        }
+        <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+          <div class="flex flex-row items-center gap-1">
+            @for (item of alphabet; track $index) {
+            <button type="button"
+              class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
+                'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAlphabet,
+                'text-white/80 hover:bg-white/10': item !== selectedAlphabet
+              }" (click)="onSelectedAlphabet(item)">
+              {{ item }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card List -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+      </div>
+      } @else {
+      <!-- Section BON Checkout -->
+      @if (bonCheckout.length > 0) {
+      <div class="flex flex-col gap-3 mb-2">
+        @for (item of bonCheckout; track $index) {
+        <div class="w-full bg-emerald-50 border border-emerald-300 rounded-xl p-4 transition-all">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-row gap-2 items-center">
+              <img src="location.png" class="w-7 h-7 object-contain" alt="Area" />
+              <div class="flex flex-col">
+                <p class="text-xl font-bold text-slate-800">{{ item.Area }}</p>
+                <div class="flex flex-row gap-3 text-xs font-semibold text-gray-500">
+                  <span>{{ item.DocDate | date:'dd MMM yyyy' }}</span>
+                  <span>{{ item.DateCreated | date:'dd MMM yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-start mt-1">
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs font-medium">DocNum</small>
+                <p class="font-bold text-lg text-slate-800">{{ item.DocNum }}</p>
+              </div>
+              <div class="flex flex-col gap-1 items-end">
+                <span class="px-2 py-0.5 bg-[#FF8B00] text-white rounded-md text-xs font-bold">
+                  {{ item.Receh }} Receh
+                </span>
+                <span class="px-2 py-0.5 bg-green-700 text-white rounded-md text-xs font-bold">
+                  {{ item.NonReceh }} NonRch
+                </span>
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <small class="text-gray-500 text-xs font-medium">Customer</small>
+              <p class="font-bold text-lg text-slate-800">{{ item.Name }}</p>
+            </div>
+
+            @if (item.Note) {
+            <div class="bg-white/80 rounded-xl p-2.5 border border-emerald-200">
+              <small class="text-gray-500 text-xs font-medium">Catatan Kasir</small>
+              <p class="font-medium text-sm text-slate-800">{{ item.Note }}</p>
+            </div>
+            }
+
+            @if (item.Remarks) {
+            <div class="mt-1">
+              <p class="text-xs font-semibold text-slate-700">
+                BON dikerjakan oleh <span class="font-bold text-emerald-800 uppercase">{{ item.Remarks }}</span>
+              </p>
+            </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="mt-2">
+              @if (!item.Remarks) {
+              <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer"
+                (click)="openDialogAmbilBON(item.DocNum)">
+                Ambil BON
+              </button>
+              } @else {
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" class="btn-no-shadow-success text-center cursor-pointer"
+                  (click)="openDialogBantu(item.DocNum, item.Remarks)">
+                  Bantu
+                </button>
+                <button type="button" class="btn-no-shadow-danger text-center cursor-pointer"
+                  (click)="openDialogGantiPIC(item.DocNum)">
+                  Ganti PIC
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      <hr class="h-px bg-gray-300 border-0 my-1" />
+      }
+
+      <!-- Section Filtered Sales Invoices -->
+      @if (filteredSalesInvoices.length > 0) {
+      <div class="flex flex-col gap-2">
+        @for (item of filteredSalesInvoices; track $index) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-row gap-2 items-center">
+              <img src="location.png" class="w-7 h-7 object-contain" alt="Area" />
+              <div class="flex flex-col">
+                <p class="text-xl font-bold text-slate-800">{{ item.Area }}</p>
+                <div class="flex flex-row gap-3 text-xs font-semibold text-gray-500">
+                  <span>{{ item.DocDate | date:'dd MMM yyyy' }}</span>
+                  <span>{{ item.DateCreated | date:'HH:mm:ss' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-start mt-1">
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs font-medium">DocNum</small>
+                <p class="font-bold text-lg text-slate-800">{{ item.DocNum }}</p>
+              </div>
+              <div class="flex flex-col gap-1 items-end">
+                <span class="px-2 py-0.5 bg-[#FF8B00] text-white rounded-md text-xs font-bold">
+                  {{ item.Receh }} Receh
+                </span>
+                <span class="px-2 py-0.5 bg-green-700 text-white rounded-md text-xs font-bold">
+                  {{ item.NonReceh }} NonRch
+                </span>
+              </div>
+            </div>
+
+            <div class="flex flex-col">
+              <small class="text-gray-500 text-xs font-medium">Customer</small>
+              <div class="flex items-center gap-2">
+                @if (item.IsCash) {
+                <span class="px-2 py-0.5 bg-green-700 text-white text-xs font-bold rounded-md">Cash</span>
+                } @else {
+                <span class="px-2 py-0.5 bg-[#FF8B00] text-white text-xs font-bold rounded-md">Credit</span>
+                }
+                <p class="font-bold text-lg text-slate-800">{{ item.Name }}</p>
+              </div>
+            </div>
+
+            @if (item.Note) {
+            <div class="bg-gray-50 rounded-xl p-2.5 border border-gray-100">
+              <small class="text-gray-500 text-xs font-medium">Catatan Kasir</small>
+              <p class="font-medium text-sm text-slate-800">{{ item.Note }}</p>
+            </div>
+            }
+
+            @if (item.Remarks) {
+            <div class="mt-1">
+              <p class="text-xs font-semibold text-slate-700">
+                BON dikerjakan oleh <span class="font-bold text-[#257180] uppercase">{{ item.Remarks }}</span>
+              </p>
+            </div>
+            }
+
+            <!-- Action Buttons -->
+            <div class="mt-2">
+              @if (!item.Remarks) {
+              <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer"
+                (click)="openDialogAmbilBON(item.DocNum)">
+                Ambil BON
+              </button>
+              } @else {
+              <div class="grid grid-cols-2 gap-2">
+                <button type="button" class="btn-no-shadow-success text-center cursor-pointer"
+                  (click)="openDialogBantu(item.DocNum, item.Remarks)">
+                  Bantu
+                </button>
+                <button type="button" class="btn-no-shadow-danger text-center cursor-pointer"
+                  (click)="openDialogGantiPIC(item.DocNum)">
+                  Ganti PIC
+                </button>
+              </div>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-16">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
+        <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          Ooops, tidak ada BON picking di tanggal ini :(
+        </p>
+      </div>
+      }
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<app-navbar></app-navbar>
+
+<!-- Dialog Bantu -->
+@if (isDialogBantu) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+      <h2 class="text-xl font-bold text-[#202B6D]">Bantu {{ remarksSelected }}?</h2>
+      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
+        (click)="closeDialogBantu()">
+        ✕
+      </button>
+    </div>
+    <div class="mt-4">
+      <p class="font-normal text-gray-600 text-sm leading-relaxed">
+        Pastikan kamu telah berkoordinasi dengan
+        <span class="font-bold text-[#202B6D] bg-blue-50 px-2 py-0.5 rounded-md">{{ remarksSelected }}</span>
+        sebelum membantunya.
+      </p>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <button class="btn-no-shadow-secondary" (click)="closeDialogBantu()">
+        Tutup
+      </button>
+      <button class="btn-no-shadow-success" (click)="onBantu()">
+        Bantu
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Shared Dialog for Ambil BON -->
+<app-dialog-set-pic [isOpen]="isDialogAmbilBON" [title]="'Ambil BON'" [confirmText]="'Ambil'" [picList]="pickingPic"
+  (saved)="onAmbilBon($event)" (closed)="closeDialogAmbilBON()"></app-dialog-set-pic>
+
+<!-- Shared Dialog for Ganti PIC -->
+<app-dialog-set-pic [isOpen]="isDialogGantiPIC" [title]="'Ganti BON PIC'" [confirmText]="'Ganti PIC'"
+  [picList]="pickingPic" (saved)="onGantiPIC($event)" (closed)="closeDialogGantiPIC()"></app-dialog-set-pic>

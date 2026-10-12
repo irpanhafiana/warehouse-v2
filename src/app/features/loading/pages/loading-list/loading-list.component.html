@@ -1,0 +1,141 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Top Bar & Controls -->
+  <div class="w-full flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
+        BON Loading
+        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ filteredSalesInvoices.length }})</span>
+      </h1>
+      <div class="flex flex-row items-center gap-2">
+        <button type="button" (click)="getLoadingList()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <app-button-home></app-button-home>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="flex flex-col gap-2 mt-2">
+      <div class="grid grid-cols-2 gap-3 items-end">
+        <div class="flex flex-col items-start gap-1">
+          <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
+          <input type="date"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            [(ngModel)]="date" (change)="onDateChange($event)" />
+        </div>
+
+        <div class="flex flex-col items-start gap-1">
+          <label for="dropdown" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Area</label>
+          <select id="dropdown" [(ngModel)]="areaSelected" name="dropdown"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            (change)="onOptionSelect($event)">
+            @if (area.length > 0) {
+            <option value="">Semua Area</option>
+            }
+            @for (item of area; track $index) {
+            <option [value]="item.Code">{{ item.Code }}</option>
+            }
+            @if (area.length === 0) {
+            <option value="" selected>Tidak ada Area</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <!-- Alphabet Initial Filter Bar -->
+      <div class="flex flex-row items-center gap-2 text-white py-1 min-w-0">
+        @if (filteredSalesInvoices.length !== 0) {
+        <button
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+          (click)="onSelectedAlphabet('~')">
+          Reset
+        </button>
+        }
+        <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+          <div class="flex flex-row items-center gap-1">
+            @for (item of alphabet; track $index) {
+            <button type="button"
+              class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
+                'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAlphabet,
+                'text-white/80 hover:bg-white/10': item !== selectedAlphabet
+              }" (click)="onSelectedAlphabet(item)">
+              {{ item }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Card List -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+      </div>
+      } @else {
+      @if (groupResult.length > 0) {
+      <div class="flex flex-col gap-3">
+        @for (item of groupResult; track $index) {
+        <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item"
+          (dialogOpen)="openDialogDetailDocnum(item.customerCode, item.data[0].DocNum)">
+        </app-card>
+        }
+      </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-16">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
+        <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          Ooops, tidak ada BON Loading di tanggal ini :(
+        </p>
+      </div>
+      }
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<app-navbar></app-navbar>
+
+<!-- Dialog Detail Docnum -->
+@if (isDialogDetailDocnum) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+      <h2 class="text-xl font-bold text-[#202B6D]">BON Siap Loading</h2>
+      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
+        (click)="onCloseDialogDetailDocnum()">
+        ✕
+      </button>
+    </div>
+    <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">
+      @for (item of detailDocnumCustomer; track $index) {
+      <div
+        class="border border-gray-200 hover:border-[#2F4ACD] w-full rounded-xl p-3 cursor-pointer transition-all"
+        (click)="toChecklist(item.DocNum)">
+        <div class="flex justify-between items-center">
+          <div class="flex flex-col">
+            <small class="font-medium text-gray-500 text-xs">{{ item.DocDate | date:'dd MMMM yyyy' }}</small>
+            <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
+          </div>
+          <span class="font-bold text-sm text-[#2F4ACD] bg-blue-50 px-2 py-1 rounded-lg">
+            {{ item.Details }} Item
+          </span>
+        </div>
+      </div>
+      }
+    </div>
+    <div class="mt-6">
+      <button class="w-full btn-no-shadow-secondary text-center cursor-pointer" (click)="onCloseDialogDetailDocnum()">
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}

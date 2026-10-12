@@ -1,0 +1,290 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <div class="w-full h-[10%] flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between gap-2 items-center">
+      <div class="flex flex-col">
+        <p class="font-bold text-sm text-white/80">Tambah</p>
+        <h1 class="font-bold text-2xl text-start text-white">Jalur Muatan Baru</h1>
+      </div>
+      <div class="flex flex-row gap-2">
+        <button
+          type="button"
+          (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full flex-1 bg-[#F3F2F8] rounded-t-[40px] p-4 flex flex-col gap-4 border-t-[12px] border-[#202B6D] overflow-hidden">
+    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+      <form [formGroup]="routeGroupForm" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-4">
+          <div class="flex flex-col gap-1">
+            <label class="font-bold text-gray-700 pl-2 text-sm">Nama Jalur Muatan</label>
+            <input
+              type="text"
+              formControlName="RouteName"
+              class="w-full p-3 border border-gray-300 focus:border-[#202B6D] focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+              placeholder="Masukkan nama jalur muatan"
+            />
+            @if (routeGroupForm.get('RouteName')?.invalid && routeGroupForm.get('RouteName')?.touched) {
+            <div class="text-red-700 font-semibold text-xs pl-2 mt-1">
+              Nama Jalur Harus diisi.
+            </div>
+            }
+          </div>
+
+          @if (details.controls.length > 0) {
+          <div class="flex flex-col gap-3">
+            <label class="font-semibold text-center my-3 text-gray-600 text-sm">BON yang akan dimuat</label>
+            <div formArrayName="Details" class="flex flex-col gap-2">
+              @for (detail of details.controls; let i = $index; let first = $first; let last = $last; track detail.value.DocNum || i) {
+              <div [formGroupName]="i" class="flex flex-col gap-3">
+                <div class="card border-2 border-gray-300 bg-white p-4 rounded-2xl shadow-xs">
+                  <div class="flex flex-col gap-2">
+                    <div class="grid grid-cols-12 w-full gap-2">
+                      <div class="col-span-8">
+                        <div class="flex flex-col w-full">
+                          <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                          <input
+                            formControlName="DocNum"
+                            readonly
+                            class="font-bold text-lg text-slate-800 w-full bg-transparent outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-span-4 text-end">
+                        <div class="flex flex-col w-full items-end">
+                          <small class="text-gray-500 text-xs font-semibold">Item</small>
+                          <input
+                            formControlName="Details"
+                            readonly
+                            class="font-bold text-lg text-slate-800 w-16 text-end bg-transparent outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex justify-start items-start w-full">
+                      <div class="flex flex-col w-full">
+                        <small class="text-gray-500 text-xs font-semibold">Nama Customer</small>
+                        <input
+                          formControlName="Name"
+                          readonly
+                          class="font-bold text-lg text-slate-800 w-full bg-transparent outline-none"
+                        />
+                      </div>
+                    </div>
+                    <div class="flex justify-center flex-row items-center gap-3 mt-2">
+                      @if (!first) {
+                      <button
+                        type="button"
+                        (click)="moveUp(i)"
+                        class="w-12 h-12 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2.5 cursor-pointer shadow-xs"
+                      >
+                        <img src="up.png" alt="Up" class="w-full h-full object-contain" />
+                      </button>
+                      }
+
+                      @if (!last) {
+                      <button
+                        type="button"
+                        (click)="moveDown(i)"
+                        class="w-12 h-12 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2.5 cursor-pointer shadow-xs"
+                      >
+                        <img src="down.png" alt="Down" class="w-full h-full object-contain" />
+                      </button>
+                      }
+
+                      <button
+                        type="button"
+                        (click)="removeDetail(i)"
+                        class="w-12 h-12 flex items-center justify-center bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl p-2.5 cursor-pointer shadow-xs"
+                      >
+                        <img src="close-w.png" alt="Delete" class="w-full h-full object-contain" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+          </div>
+          }
+
+          <div class="grid grid-cols-2 gap-3 mt-2">
+            <button
+              type="button"
+              (click)="isDialogOpenBarcode = true"
+              [disabled]="routeGroupForm.get('RouteName')?.invalid"
+              class="py-3 px-4 rounded-xl font-bold text-white shadow-sm transition-all cursor-pointer text-base"
+              [ngClass]="{
+                'bg-gray-400 cursor-not-allowed': routeGroupForm.get('RouteName')?.invalid,
+                'bg-emerald-600 hover:bg-emerald-700 active:scale-98': routeGroupForm.get('RouteName')?.valid
+              }"
+            >
+              Lihat BON
+            </button>
+            <button
+              type="submit"
+              [disabled]="routeGroupForm.get('RouteName')?.invalid"
+              class="py-3 px-4 rounded-xl font-bold text-white shadow-sm transition-all cursor-pointer text-base"
+              [ngClass]="{
+                'bg-gray-400 cursor-not-allowed': routeGroupForm.get('RouteName')?.invalid,
+                'bg-[#202B6D] hover:bg-[#19245a] active:scale-98': routeGroupForm.get('RouteName')?.valid
+              }"
+            >
+              Simpan
+            </button>
+          </div>
+
+          @if (routeGroupForm.value.Details.length === 0) {
+          <p class="text-center font-bold text-red-700 text-sm mt-2">
+            Pilih setidaknya 1 BON untuk membuat jalur muat
+          </p>
+          }
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- dialog Barcode/Pilih BON -->
+@if (isDialogOpenBarcode) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-lg bg-white rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-[#202B6D]">Pilih BON</h2>
+      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="isDialogOpenBarcode = false">
+        ✕
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto py-3">
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-2">
+            <h1 class="text-black font-bold text-2xl tracking-wide">
+              [{{ filteredSalesInvoices ? filteredSalesInvoices.length : 0 }}]
+            </h1>
+            <span class="text-black font-bold text-lg">Loading</span>
+          </div>
+          <button
+            type="button"
+            class="px-3 py-1.5 bg-[#202B6D] text-white rounded-lg text-sm font-semibold cursor-pointer"
+            (click)="getLoadingList()"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col">
+            <label class="font-medium text-xs text-gray-700">Tanggal</label>
+            <input
+              type="date"
+              class="w-full p-2 border border-gray-300 rounded-lg text-sm font-semibold"
+              [(ngModel)]="date"
+              (change)="onDateChange($event)"
+            />
+          </div>
+
+          <div class="flex flex-col">
+            <label for="dropdown-area" class="font-medium text-xs text-gray-700">Area</label>
+            <select
+              id="dropdown-area"
+              class="w-full p-2 border border-gray-300 rounded-lg text-sm font-semibold"
+              (change)="onOptionSelect($event)"
+            >
+              <option value="">Lihat Semua</option>
+              @for (item of area; track $index) {
+              <option [value]="item.Code">{{ item.Code }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto pb-1">
+          <div class="flex flex-row items-center gap-2">
+            @if (filteredSalesInvoices.length !== 0) {
+            <button
+              class="px-2.5 h-7 bg-red-700 text-white rounded-md text-xs font-semibold cursor-pointer"
+              (click)="onSelectedAlphabet('~')"
+            >
+              Reset
+            </button>
+            }
+            @for (item of alphabet; track $index) {
+            <button
+              type="button"
+              class="font-bold text-lg px-2 rounded-md cursor-pointer"
+              [ngClass]="{
+                'bg-red-700 text-white': item === selectedAplhabet,
+                'text-gray-700': item !== selectedAplhabet
+              }"
+              (click)="onSelectedAlphabet(item)"
+            >
+              {{ item }}
+            </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 mt-2">
+          @if (loading) {
+          <div class="flex justify-center items-center py-10">
+            <app-loader></app-loader>
+          </div>
+          } @else if (filteredSalesInvoices.length > 0) {
+          <div class="flex flex-col gap-2.5">
+            @for (item of filteredSalesInvoices; track item.DocNum) {
+            <div
+              (click)="onSelectedHeaderRes(item)"
+              class="border-2 p-3 rounded-xl cursor-pointer transition-all shadow-2xs"
+              [ngClass]="{
+                'bg-emerald-100 border-emerald-500': isSelectedItem(item),
+                'bg-white border-gray-300 hover:border-gray-400': !isSelectedItem(item)
+              }"
+            >
+              <div class="flex justify-between items-start">
+                <div class="flex flex-col">
+                  <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                  <p class="font-bold text-base text-gray-900">{{ item.DocNum }}</p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <small class="text-gray-500 text-xs font-semibold">Item</small>
+                  <p class="font-bold text-base text-gray-900">{{ item.Details }}</p>
+                </div>
+              </div>
+              <div class="flex flex-col mt-1">
+                <small class="text-gray-500 text-xs font-semibold">Customer</small>
+                <p class="font-bold text-sm text-gray-800">{{ item.Name }}</p>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="flex justify-center items-center py-10">
+            <p class="text-center font-medium text-sm text-gray-600">
+              Data tidak ditemukan, silakan pilih tanggal atau filter lain
+            </p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-gray-200">
+      <button
+        type="button"
+        class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        (click)="isDialogOpenBarcode = false"
+      >
+        Selesai Memilih
+      </button>
+    </div>
+  </div>
+</div>
+}
+

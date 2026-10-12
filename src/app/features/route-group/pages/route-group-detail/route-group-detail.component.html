@@ -1,0 +1,655 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <div class="w-full flex flex-col p-4 shrink-0" [ngClass]="{ 'h-[16%]': isFilterAlphabet, 'h-[10%]': !isFilterAlphabet }">
+    <div class="grid grid-cols-2 justify-between gap-2 items-center">
+      <div class="flex flex-col">
+        <h1 class="font-bold text-2xl text-start text-white truncate">
+          {{ data ? data.RouteName : 'undefined' }}
+        </h1>
+      </div>
+      <div class="flex flex-row justify-end gap-1.5">
+        <button
+          type="button"
+          (click)="getLoading()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+
+        @if (!isFilterAlphabet) {
+        <button
+          type="button"
+          (click)="openFilterAlphabet()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
+        </button>
+        } @else {
+        <button
+          type="button"
+          (click)="closeFilterAlphabet()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
+        </button>
+        }
+
+        <button
+          type="button"
+          (click)="onBack()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
+      </div>
+    </div>
+
+    @if (isFilterAlphabet) {
+    <div class="overflow-x-auto text-white pt-2 pb-1">
+      <div class="flex flex-row items-center gap-2">
+        @if (availableLetters.length !== 0) {
+        <button
+          class="px-2.5 h-8 bg-red-700 text-white font-bold rounded-md text-xs cursor-pointer shadow-xs"
+          (click)="resetFilter()"
+        >
+          Reset
+        </button>
+        }
+        @for (item of availableLetters; track item) {
+        <button
+          type="button"
+          class="font-bold text-lg px-2 rounded-md cursor-pointer"
+          [ngClass]="{
+            'bg-[#FF8B00] text-white': item === selectedAplhabet,
+            'text-white/80 hover:bg-white/20': item !== selectedAplhabet
+          }"
+          (click)="filterByLetter(item)"
+        >
+          {{ item }}
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Bawah (container list + scrollable) -->
+  <div class="w-full flex-1 bg-[#F3F2F8] rounded-t-[40px] p-4 flex flex-col gap-4 border-t-[12px] border-[#202B6D] overflow-hidden">
+    <div class="flex-1 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
+      @if (isLoading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+      </div>
+      } @else {
+      <div class="flex flex-col gap-2 pb-8">
+        <div class="flex flex-row justify-end gap-2">
+          @if (isUrutkan) {
+          <button
+            type="button"
+            class="py-2 px-4 rounded-xl font-bold text-white bg-[#202B6D] hover:bg-[#19245a] active:scale-95 text-sm cursor-pointer shadow-sm"
+            (click)="onSubmit()"
+          >
+            Simpan Urutan
+          </button>
+          } @else {
+          @if (!isCanRekap) {
+          <button
+            type="button"
+            class="py-2 px-4 rounded-xl font-bold text-white bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-sm cursor-pointer shadow-sm"
+            (click)="isCanRekap = true"
+          >
+            Rekap Sebagian
+          </button>
+          } @else {
+          <button
+            type="button"
+            class="py-2 px-4 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 active:scale-95 text-sm cursor-pointer shadow-sm"
+            (click)="onCancelRecap()"
+          >
+            Batal Rekap
+          </button>
+          }
+
+          <button
+            type="button"
+            class="py-2 px-4 rounded-xl font-bold text-white bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 text-sm cursor-pointer shadow-sm"
+            (click)="isUrutkan = true"
+          >
+            Ubah Urutan
+          </button>
+          }
+        </div>
+
+        @if (!isUrutkan) {
+        <div class="flex flex-col gap-3 mt-1">
+          @for (item of filteredDetails; track item.Id || item.DocNum || $index) {
+          <div
+            class="card border-2 p-4 rounded-2xl shadow-xs transition-all"
+            [ngClass]="{
+              'bg-orange-100 border-orange-400': item.newlyAdded,
+              'bg-green-100 border-green-500': item.IsFinishLoad,
+              'bg-white border-gray-300': !item.newlyAdded && !item.IsFinishLoad
+            }"
+          >
+            <div class="flex flex-col gap-2">
+              <div class="flex justify-between items-center">
+                <div class="flex flex-row items-center gap-1.5">
+                  <img src="location.png" class="w-6 h-6 object-contain" alt="" />
+                  <p class="font-bold uppercase text-lg text-slate-800">
+                    {{ item.Area }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex justify-between items-start">
+                <div class="flex flex-col">
+                  <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                  <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <small class="text-gray-500 text-xs font-semibold">Items</small>
+                  <p class="font-bold text-base text-slate-800">
+                    {{ item.Details ? item.Details : '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs font-semibold">Customer</small>
+                <p class="font-bold text-base text-slate-800">{{ item.Name }}</p>
+              </div>
+
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs font-semibold">Tanggal</small>
+                <p class="font-semibold text-sm text-slate-700">
+                  {{ item.DocDate | date : 'dd MMM yyyy' }}
+                </p>
+              </div>
+
+              @if (item.isCanRekap) {
+              <div class="py-1">
+                <span class="text-xs font-bold text-red-700 bg-red-100 px-2.5 py-1 rounded-md">
+                  BON AKAN DIREKAP
+                </span>
+              </div>
+              }
+
+              @if (item.IsDelivered) {
+              <div class="py-1">
+                <span class="text-xs font-bold text-white bg-red-700 px-2.5 py-1 rounded-md">
+                  BON SUDAH DIREKAP
+                </span>
+              </div>
+              }
+
+              @if (!item.IsFinishLoad) {
+              <div class="grid grid-cols-2 gap-2 mt-2">
+                @if (item.newlyAdded) {
+                <p class="col-span-2 text-center font-bold text-red-700 text-xs">
+                  *Penambahan ini belum disimpan
+                </p>
+                } @else {
+                <button
+                  type="button"
+                  class="py-2 bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  (click)="toHapusDariJalur(item.Id, item.Name)"
+                >
+                  Hapus
+                </button>
+                <button
+                  type="button"
+                  class="py-2 bg-[#202B6D] hover:bg-[#19245a] active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  (click)="toDetail(item.Code, item.DocDate, item.DocNum)"
+                >
+                  Lihat Detail
+                </button>
+                }
+              </div>
+              } @else {
+              <div class="mt-2">
+                @if (item.newlyAdded) {
+                <p class="text-center font-bold text-red-700 text-xs">
+                  *Penambahan ini belum disimpan
+                </p>
+                } @else if (isCanRekap && !item.IsDelivered) {
+                @if (!item.isCanRekap) {
+                <button
+                  type="button"
+                  class="w-full py-2 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  (click)="toAddMarkRecap(item)"
+                >
+                  Tandai
+                </button>
+                } @else {
+                <button
+                  type="button"
+                  class="w-full py-2 bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  (click)="toCancelMarkRecap(item)"
+                >
+                  Batal Tandai
+                </button>
+                }
+                } @else {
+                <button
+                  type="button"
+                  class="w-full py-2 bg-[#202B6D] hover:bg-[#19245a] active:scale-98 text-white font-bold rounded-xl text-sm cursor-pointer shadow-xs"
+                  (click)="toDetail(item.Code, item.DocDate, item.DocNum)"
+                >
+                  Lihat Detail
+                </button>
+                }
+              </div>
+              }
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="flex flex-col gap-3 mt-1">
+          @for (item of filteredDetails; let i = $index; let first = $first; let last = $last; track item.Id || i) {
+          <div class="card border-2 bg-gray-100 border-gray-400 p-4 rounded-2xl shadow-xs">
+            <div class="flex flex-col gap-2">
+              <div class="flex justify-between items-center">
+                <p class="font-bold uppercase text-lg text-slate-800">
+                  {{ item.Area }}
+                </p>
+              </div>
+
+              <div class="flex justify-between items-start">
+                <div class="flex flex-col">
+                  <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                  <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <small class="text-gray-500 text-xs font-semibold">Items</small>
+                  <p class="font-bold text-base text-slate-800">
+                    {{ item.Details ? item.Details : '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs font-semibold">Customer</small>
+                <p class="font-bold text-base text-slate-800">{{ item.Name }}</p>
+              </div>
+
+              <div class="flex justify-between items-center">
+                <div class="flex flex-col">
+                  <small class="text-gray-500 text-xs font-semibold">Tanggal</small>
+                  <p class="font-semibold text-sm text-slate-700">
+                    {{ item.DocDate | date : 'dd MMM yyyy' }}
+                  </p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <small class="text-gray-700 text-xs font-bold">Urutan</small>
+                  <span class="font-bold text-base px-2 py-0.5 bg-gray-300 rounded-md">
+                    {{ i + 1 }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="flex flex-row gap-2 justify-center items-center mt-2">
+                @if (!first) {
+                <button
+                  type="button"
+                  (click)="moveUp(i)"
+                  class="w-12 h-12 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2.5 cursor-pointer shadow-xs"
+                >
+                  <img src="up.png" alt="Up" class="w-full h-full object-contain" />
+                </button>
+                }
+                @if (!last) {
+                <button
+                  type="button"
+                  (click)="moveDown(i)"
+                  class="w-12 h-12 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2.5 cursor-pointer shadow-xs"
+                >
+                  <img src="down.png" alt="Down" class="w-full h-full object-contain" />
+                </button>
+                }
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+@if (data && filteredDetails && filteredDetails.length > initialLength) {
+<div class="fixed bottom-[130px] right-3 z-30">
+  <button
+    type="button"
+    class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-full shadow-lg border-2 border-white text-sm cursor-pointer"
+    (click)="onSubmit()"
+  >
+    ✔ Simpan Perubahan
+  </button>
+</div>
+}
+
+<div class="fixed bottom-[80px] right-3 z-30">
+  <button
+    type="button"
+    class="bg-[#FF8B00] hover:bg-[#e07b00] text-white font-bold px-4 py-2.5 rounded-full shadow-lg border-2 border-white text-sm cursor-pointer"
+    (click)="isDialogOpenBarcode = true"
+  >
+    + BON Baru
+  </button>
+</div>
+
+<!-- dialog Pilih BON Baru -->
+@if (isDialogOpenBarcode) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-lg bg-white rounded-3xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-black">Pilih BON</h2>
+      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="isDialogOpenBarcode = false">
+        ✕
+      </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto py-3">
+      <div class="flex flex-col gap-3">
+        <div class="flex justify-between items-center">
+          <h1 class="text-black font-bold text-xl">
+            BON Loading ({{ filteredSalesInvoices ? filteredSalesInvoices.length : 0 }})
+          </h1>
+          <button
+            type="button"
+            class="px-3 py-1.5 bg-[#202B6D] text-white rounded-lg text-sm font-semibold cursor-pointer"
+            (click)="getLoadingList()"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div class="flex flex-col">
+            <label class="font-medium text-xs text-gray-700">Tanggal</label>
+            <input
+              type="date"
+              class="w-full p-2 border border-gray-300 rounded-lg text-sm font-semibold"
+              [(ngModel)]="date"
+              (change)="onDateChange($event)"
+            />
+          </div>
+
+          <div class="flex flex-col">
+            <label for="dropdown-area-detail" class="font-medium text-xs text-gray-700">Area</label>
+            <select
+              id="dropdown-area-detail"
+              class="w-full p-2 border border-gray-300 rounded-lg text-sm font-semibold"
+              (change)="onOptionSelect($event)"
+            >
+              <option value="">Lihat Semua</option>
+              @for (item of area; track item.Code) {
+              <option [value]="item.Code">{{ item.Code }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto pb-1">
+          <div class="flex flex-row items-center gap-2">
+            @if (filteredSalesInvoices.length !== 0) {
+            <button
+              class="px-2.5 h-7 bg-red-700 text-white rounded-md text-xs font-semibold cursor-pointer"
+              (click)="onSelectedAlphabet('~')"
+            >
+              Reset
+            </button>
+            }
+            @for (item of alphabet; track item) {
+            <button
+              type="button"
+              class="font-bold text-lg px-2 rounded-md cursor-pointer"
+              [ngClass]="{
+                'bg-red-700 text-white': item === selectedAplhabet,
+                'text-gray-700': item !== selectedAplhabet
+              }"
+              (click)="onSelectedAlphabet(item)"
+            >
+              {{ item }}
+            </button>
+            }
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2 mt-2">
+          @if (isLoading) {
+          <div class="flex justify-center items-center py-10">
+            <app-loader></app-loader>
+          </div>
+          } @else if (filteredSalesInvoices.length > 0) {
+          <div class="flex flex-col gap-2.5">
+            @for (item of filteredSalesInvoices; track item.DocNum) {
+            <div
+              (click)="onSelectedHeaderRes(item)"
+              class="border-2 p-3 rounded-xl cursor-pointer transition-all shadow-2xs"
+              [ngClass]="{
+                'bg-emerald-100 border-emerald-500': isSelectedItem(item),
+                'bg-white border-gray-300 hover:border-gray-400': !isSelectedItem(item)
+              }"
+            >
+              <div class="flex justify-between items-start">
+                <div class="flex flex-col">
+                  <small class="text-gray-500 text-xs font-semibold">DocNum</small>
+                  <p class="font-bold text-base text-gray-900">{{ item.DocNum }}</p>
+                </div>
+                <div class="flex flex-col items-end">
+                  <small class="text-gray-500 text-xs font-semibold">Item</small>
+                  <p class="font-bold text-base text-gray-900">{{ item.Details ? item.Details : '-' }}</p>
+                </div>
+              </div>
+              <div class="flex flex-col mt-1">
+                <small class="text-gray-500 text-xs font-semibold">Customer</small>
+                <p class="font-bold text-sm text-gray-800">{{ item.Name }}</p>
+              </div>
+              <div class="flex flex-col mt-1">
+                <small class="text-gray-500 text-xs font-semibold">Status</small>
+                <p class="font-bold text-xs text-gray-700">
+                  {{ item.IsCheckout ? 'Sudah Checkout' : 'Belum Checkout' }}
+                </p>
+              </div>
+            </div>
+            }
+          </div>
+          } @else {
+          <div class="flex justify-center items-center py-10">
+            <p class="text-center font-medium text-sm text-gray-600">
+              Ooops, tidak ada BON Loading di tanggal ini :(
+            </p>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-3 border-t border-gray-200">
+      <button
+        type="button"
+        class="w-full py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        (click)="isDialogOpenBarcode = false"
+      >
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Dialog Rekap / Mobil Siap Jalan -->
+@if (isDialogConfirm) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
+    @if (dataBONSelesai.length > 0) {
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      @if (isStatusDialog === 'HALF') {
+      <h2 class="text-xl font-bold text-[#202B6D]">Rekap BON Sebagian</h2>
+      } @else {
+      <h2 class="text-xl font-bold text-[#202B6D]">Rekap Semua BON</h2>
+      }
+      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="closeDialogRekap()">
+        ✕
+      </button>
+    </div>
+
+    @if (isLoading) {
+    <div class="py-10 flex justify-center"><app-loader></app-loader></div>
+    } @else {
+    <div class="flex flex-col gap-3">
+      @if (vehicles.length > 0) {
+      <div class="flex flex-col gap-1">
+        <label for="select-vehicle" class="text-xs font-bold text-gray-600">Mobil / Truck</label>
+        <select
+          id="select-vehicle"
+          [(ngModel)]="selectedVehicle"
+          (change)="onSelectedVehicle()"
+          class="w-full p-2.5 border border-gray-300 rounded-xl font-semibold text-sm"
+        >
+          <option [ngValue]="null">Pilih Mobil</option>
+          @for (item of vehicles; track item.vehicleNo) {
+          <option [ngValue]="item">{{ item.vehicleNo }} - {{ item.description }}</option>
+          }
+        </select>
+      </div>
+      }
+
+      @if (drivers.length > 0) {
+      <div class="flex flex-col gap-1">
+        <label for="select-driver" class="text-xs font-bold text-gray-600">Sopir / Driver</label>
+        <select
+          id="select-driver"
+          (change)="onSelectedDriver($event)"
+          class="w-full p-2.5 border border-gray-300 rounded-xl font-semibold text-sm"
+        >
+          <option value="">Pilih Sopir / Driver</option>
+          @for (item of drivers; track item.alias || item.loginName || $index) {
+          <option [value]="item.firstName + ' ' + (item.lastName !== '-' ? item.lastName : '')">
+            {{ item.firstName + ' ' + (item.lastName !== '-' ? item.lastName : '') }}
+          </option>
+          }
+        </select>
+      </div>
+      }
+    </div>
+    }
+
+    @if (selectedDriverName && selectedVehicle) {
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <button
+        type="button"
+        class="py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        (click)="closeDialogRekap()"
+      >
+        Tutup
+      </button>
+
+      @if (isStatusDialog === 'HALF') {
+      <button
+        type="button"
+        [disabled]="isDisabledButton"
+        class="py-2.5 bg-[#202B6D] hover:bg-[#19245a] text-white font-bold rounded-xl cursor-pointer"
+        (click)="onRekapSebagian()"
+      >
+        {{ isDisabledButton ? 'Mohon Tunggu...' : 'Simpan' }}
+      </button>
+      } @else if (isStatusDialog === 'ALL') {
+      <button
+        type="button"
+        [disabled]="isDisabledButton"
+        class="py-2.5 bg-[#202B6D] hover:bg-[#19245a] text-white font-bold rounded-xl cursor-pointer"
+        (click)="onRouteFinish(alias)"
+      >
+        {{ isDisabledButton ? 'Mohon Tunggu...' : 'Simpan' }}
+      </button>
+      }
+    </div>
+    }
+    } @else {
+    <div class="p-2 text-center">
+      <h2 class="text-xl font-bold text-red-700 mb-2">Peringatan!</h2>
+      <p class="font-medium text-sm text-gray-600">Tidak ada BON yang bisa direkap di jalur ini!</p>
+      <button
+        type="button"
+        class="w-full py-2.5 mt-4 bg-gray-200 text-gray-800 font-bold rounded-xl cursor-pointer"
+        (click)="isDialogConfirm = false"
+      >
+        Tutup
+      </button>
+    </div>
+    }
+  </div>
+</div>
+}
+
+<!-- Dialog Confirm Delete -->
+@if (isDialogConfirmDelete) {
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl p-5 shadow-2xl flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-[#202B6D]">Konfirmasi</h2>
+      <button class="text-gray-500 hover:text-gray-700 text-xl font-bold cursor-pointer" (click)="isDialogConfirmDelete = false">
+        ✕
+      </button>
+    </div>
+    <div class="flex flex-col gap-2">
+      <p class="text-gray-700 font-medium text-base">
+        Apakah kamu yakin BON dari <br />
+        <span class="font-bold text-[#202B6D]">{{ customerNameDeleted }}</span> <br />
+        akan dihapus dari jalur ini?
+      </p>
+    </div>
+    <div class="grid grid-cols-2 gap-3 mt-4">
+      <button
+        type="button"
+        class="py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-xl cursor-pointer"
+        (click)="isDialogConfirmDelete = false"
+      >
+        Tutup
+      </button>
+      <button
+        type="button"
+        class="py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl cursor-pointer"
+        (click)="onHapusBON()"
+      >
+        Yakin
+      </button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Bottom Fixed Action -->
+<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.1)] border-t border-gray-200">
+  @if (isAllBonDone) {
+  <button
+    type="button"
+    class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white font-bold rounded-xl text-base cursor-pointer shadow-md"
+    (click)="onRouteFinishManual(alias)"
+  >
+    Selesaikan jalur ini
+  </button>
+  } @else if (!isCanRekap) {
+  <button
+    type="button"
+    class="w-full py-3 bg-[#202B6D] hover:bg-[#19245a] active:scale-98 text-white font-bold rounded-xl text-base cursor-pointer shadow-md"
+    (click)="onOpenDialog('ALL')"
+  >
+    Rekap semua BON Selesai
+  </button>
+  } @else {
+  <button
+    type="button"
+    class="w-full py-3 bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold rounded-xl text-base cursor-pointer shadow-md"
+    (click)="onOpenDialog('HALF')"
+  >
+    Rekap BON yang ditandai
+  </button>
+  }
+</div>
+

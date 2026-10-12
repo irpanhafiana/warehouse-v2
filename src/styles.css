@@ -1,0 +1,254 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Poppins', sans-serif;
+  --color-primary: #257180;
+  --color-secondary: #CB6040;
+  --color-accent: #ed7233;
+  --color-light: #E7F6FF;
+  --color-dark: #232323;
+
+  --color-picking: #257180;
+  --color-loading: #CB6040;
+  --color-selesai: #15803d;
+  --color-checkout: #2F4ACD;
+
+  --animate-custom-pulse: scalepulse 0.5s ease-in-out infinite;
+}
+
+@keyframes scalepulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  user-select: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+.card {
+  @apply w-full bg-white p-4 rounded-3xl;
+}
+
+.bottomsheet {
+  @apply w-full bg-white p-4 border-2 border-black rounded-t-2xl;
+}
+
+.card-no-click {
+  @apply w-full bg-white p-4 border-2 border-black rounded-xl cursor-pointer;
+}
+
+.btn-success {
+  @apply text-xl bg-green-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-warning {
+  @apply text-xl bg-accent text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-primary {
+  @apply text-xl bg-primary text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-secondary {
+  @apply text-xl bg-gray-600 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-disabled {
+  @apply text-xl bg-gray-400 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-danger {
+  @apply text-xl bg-red-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.nav-primary {
+  @apply bg-primary py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
+  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
+  transition: transform 0.1s ease;
+}
+
+.nav-danger {
+  @apply bg-red-700 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
+  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
+  transition: transform 0.1s ease;
+}
+
+.nav-success {
+  @apply bg-green-700 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
+  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
+  transition: transform 0.1s ease;
+}
+
+.nav-accent {
+  @apply bg-accent py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
+  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
+  transition: transform 0.1s ease;
+}
+
+.nav-secondary {
+  @apply bg-gray-500 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
+  transition: transform 0.1s ease;
+}
+
+.input-name {
+  @apply w-full border-2 border-black rounded-xl p-3 focus:outline-none;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  transition: transform 0.2s ease;
+}
+
+.input-name-no-shadow {
+  @apply w-full border border-gray-300 focus:border-[#2F4ACD] rounded-xl p-3 focus:outline-none text-gray-800;
+  transition: border-color 0.2s ease;
+}
+
+.nav-wrap {
+  @apply bg-white w-full pt-4 mx-auto text-center items-center p-3 fixed left-0 right-0 bottom-0 text-black border-t border-gray-200 shadow-md;
+}
+
+.input-date {
+  @apply w-full text-base p-2.5 border border-[#202B6D]/40 focus:border-[#202B6D] focus:outline-none rounded-xl bg-white text-gray-800 font-medium;
+  transition: border-color 0.2s ease;
+}
+
+.label-pic {
+  @apply inline-flex m-1 text-xl font-semibold border-2 rounded-xl border-black px-4 py-2;
+  transition: transform 0.2s ease;
+}
+
+.fix-top {
+  @apply fixed top-0 w-full z-10 shadow-lg bg-white;
+}
+
+.btn-sm-success {
+  @apply text-base bg-green-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-sm-warning {
+  @apply text-base bg-accent text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-sm-primary {
+  @apply text-base bg-primary text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-sm-secondary {
+  @apply text-base bg-gray-600 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-sm-disabled {
+  @apply text-base bg-gray-400 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-sm-danger {
+  @apply text-base bg-red-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
+  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+}
+
+.btn-no-shadow-success {
+  @apply text-base bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
+}
+
+.btn-no-shadow-warning {
+  @apply text-base bg-[#FF8B00] hover:bg-[#e67d00] text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
+}
+
+.btn-no-shadow-primary {
+  @apply text-base bg-[#2F4ACD] hover:bg-[#202B6D] text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
+}
+
+.btn-no-shadow-secondary {
+  @apply text-base bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
+}
+
+.btn-no-shadow-disabled {
+  @apply text-base bg-gray-400 text-white rounded-xl font-semibold px-4 py-2.5 cursor-not-allowed;
+}
+
+.btn-no-shadow-danger {
+  @apply text-base bg-red-700 hover:bg-red-800 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
+}
+
+.btn-sm-no-shadow-success {
+  @apply text-xs sm:text-sm bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
+}
+
+.btn-sm-no-shadow-warning {
+  @apply text-xs sm:text-sm bg-accent text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
+}
+
+.btn-sm-no-shadow-primary {
+  @apply text-xs sm:text-sm bg-[#2F4ACD] hover:bg-[#202B6D] text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
+}
+
+.btn-sm-no-shadow-secondary {
+  @apply text-xs sm:text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
+}
+
+.btn-sm-no-shadow-disabled {
+  @apply text-xs sm:text-sm bg-gray-400 text-white rounded-xl font-semibold px-3 py-2 cursor-not-allowed;
+}
+
+.btn-sm-no-shadow-danger {
+  @apply text-xs sm:text-sm bg-red-700 hover:bg-red-800 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Modal Animation Keyframes */
+@keyframes modalBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalContentIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-backdrop {
+  animation: modalBackdropIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-modal-card {
+  animation: modalContentIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

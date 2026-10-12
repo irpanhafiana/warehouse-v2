@@ -1,0 +1,107 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Top Bar -->
+  <div class="w-full flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="flex flex-row items-center gap-3">
+        <button type="button" (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+          <img src="/arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
+        <div class="flex flex-col">
+          <p class="font-medium text-xs uppercase tracking-wider text-white/80">Detail Selesai</p>
+          <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
+            BON: {{ docnum }}
+          </h1>
+        </div>
+      </div>
+      <button type="button" (click)="getDetail()"
+        class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+        <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <div
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-[32px] sm:rounded-t-[40px] p-4 flex flex-col border-t-2 border-[#202B6D]/30 shadow-inner overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-16">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+      </div>
+      } @else if (salesInvoice) {
+      <!-- Summary Card -->
+      <div class="card border border-gray-200 shadow-sm">
+        <div class="flex flex-col gap-3">
+          <div class="flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-xs font-semibold uppercase">DocNum</span>
+              <p class="font-bold text-xl text-slate-800">{{ salesInvoice.DocNum }}</p>
+            </div>
+            <div class="flex flex-col items-end">
+              <span class="text-gray-500 text-xs font-semibold uppercase">Total Item</span>
+              <p class="font-bold text-xl text-slate-800">{{ salesInvoice.Details.length }}</p>
+            </div>
+          </div>
+
+          <div class="border-t border-gray-100 pt-2 flex justify-between items-start">
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-xs font-semibold uppercase">Nama Customer</span>
+              <p class="font-bold text-base text-slate-800">{{ salesInvoice.CustomerModel.CustomerName }}</p>
+            </div>
+            <div class="flex flex-col items-end">
+              <span class="text-gray-500 text-xs font-semibold uppercase">DocDate</span>
+              <p class="font-bold text-base text-slate-800">{{ salesInvoice.DocDate | date:'dd MMM yyyy' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Items List -->
+      <div class="flex flex-col gap-3 mt-2">
+        <h2 class="font-bold text-base text-slate-700 px-1">Daftar Item:</h2>
+        @for (item of salesInvoice.Details; track item.Id || item.DetailId || $index) {
+        <div class="card relative border border-gray-200 shadow-xs transition-all"
+          [ngClass]="{
+            'bg-red-50 border-red-200': item.Remarks === '',
+            'bg-orange-50 border-orange-200': item.Remarks === 'pick',
+            'bg-green-50 border-green-200': item.Remarks === 'load'
+          }">
+          @if (item.Remarks === 'load') {
+          <img src="/done.png" alt="Done" class="absolute top-2 right-2 w-[40px] z-10" />
+          } @else if (item.Remarks === 'pick') {
+          <img src="/pick.png" alt="Pick" class="absolute top-2 right-2 w-[40px] z-10" />
+          }
+
+          <div class="flex flex-col gap-1 pr-10">
+            <h3 class="font-bold text-base sm:text-lg text-slate-800">
+              {{ item.ProductModel.Name }}
+            </h3>
+
+            <div class="text-sm font-semibold text-gray-600 mt-1">
+              @if (item.Quantity !== item.SAPDocEntry) {
+              <p>
+                <span class="line-through text-gray-400">
+                  {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                </span>
+                ➜
+                <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold ml-1">
+                  {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
+                </span>
+              </p>
+              } @else {
+              <p class="text-slate-700">
+                {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+              </p>
+              }
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+

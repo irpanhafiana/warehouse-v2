@@ -1,0 +1,101 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <div class="w-full h-[23%] flex flex-col p-4 shrink-0">
+    <div class="flex flex-row justify-between gap-2 items-center">
+      <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
+        Pengiriman
+        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ goodsDeliveries ? goodsDeliveries.length : 0 }})</span>
+      </h1>
+      <div class="flex flex-row gap-2">
+        <button
+          type="button"
+          (click)="getGoodsDeliveries(dateString, statusSelected)"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+        >
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <app-button-home></app-button-home>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4 mt-4">
+      <div class="grid grid-cols-2 gap-2 items-end">
+        <div class="flex flex-col items-start gap-1">
+          <label class="font-semibold text-lg text-white pl-2">Tanggal</label>
+          <input
+            type="date"
+            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base shadow-xs"
+            [(ngModel)]="date"
+            (change)="onDateChange($event)"
+          />
+        </div>
+        <div class="flex flex-col items-start gap-1">
+          <label for="dropdown-gd-status" class="font-semibold text-lg text-white pl-2">Status</label>
+          <select
+            id="dropdown-gd-status"
+            [(ngModel)]="statusSelected"
+            name="dropdown"
+            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base shadow-xs"
+            (change)="onSelectedType($event)"
+          >
+            <option value="HISTORY">History</option>
+            <option value="ONGOING">On Going</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w-full flex-1 bg-[#F3F2F8] rounded-t-[40px] p-4 flex flex-col border-t-[12px] border-[#202B6D] overflow-hidden">
+    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+      @if (loading) {
+      <div class="flex flex-col gap-3">
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+      </div>
+      } @else {
+      <div class="h-full pb-8">
+        @if (goodsDeliveries.length > 0) {
+        <div class="flex flex-col gap-3">
+          @for (item of goodsDeliveries; track item.TransportUnit || $index) {
+          <div class="card border-2 bg-white border-gray-300 p-4 rounded-2xl shadow-xs">
+            <div class="flex justify-between items-start">
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-sm font-semibold">Mobil / Truck</small>
+                <p class="font-bold text-xl text-slate-800">
+                  {{ item.TransportUnit }}
+                </p>
+              </div>
+              <div class="flex flex-col items-end">
+                <small class="text-gray-500 text-sm font-semibold">Total BON</small>
+                <p class="font-bold text-xl text-slate-800 text-center">
+                  {{ item.BasedSalesInvoiceCount }}
+                </p>
+              </div>
+            </div>
+            <div class="flex justify-between w-full mt-4">
+              <button
+                type="button"
+                class="w-full py-2.5 px-4 rounded-xl font-bold text-white bg-[#202B6D] hover:bg-[#19245a] active:scale-98 transition-all cursor-pointer shadow-sm text-base"
+                (click)="toDetail(dateString, item.TransportUnit)"
+              >
+                Lihat Detail
+              </button>
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="flex items-center justify-center flex-col pt-20">
+          <img src="new-assets/data-not-founds.png" class="w-40 mx-auto opacity-90" alt="" />
+          <p class="w-2/3 text-center font-medium text-base text-[#2F4ACD] mt-3">
+            Ooops, tidak ada data {{ statusSelected }} pengiriman :(
+          </p>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>
+
+<app-navbar></app-navbar>
+

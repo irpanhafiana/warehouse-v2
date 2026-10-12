@@ -1,0 +1,93 @@
+import { Area } from './area.model';
+import { Customer } from './customer.model';
+import { ProductModel } from './product.model';
+import { SalesPickingModel } from './sales-picking.model';
+import { UoMmodel } from './uom.model';
+import { Warehouse } from './warehouse.model';
+import { WarehouseBinModel } from './warehouse-bin.model';
+
+export interface SalesInvoicesModel {
+  IsCash?: boolean;
+  Details: Detail[];
+  CashModel: any;
+  TransferModel: any;
+  ChequeModel: any;
+  ExchangeAmountModel: any;
+  CashPayment: number;
+  SalesPickingModel: SalesPickingModel;
+  LimitType: string;
+  SalesCreditMemoesModel: any;
+  isGeneratePayment: boolean;
+  BoxUsed: number;
+  isValidateNonRokokPercentagePerInvoice: boolean;
+  PromotionAlias: any;
+  isLocked: boolean;
+  LastUpdatedBy: any;
+  DocDiscAmount: number;
+  DocTotal: number;
+  DocDueTotal: number;
+  CustomerModel: Customer;
+  VendorModel: any;
+  Phone: any;
+  Fax: any;
+  Mobile: any;
+  AddressLine1: any;
+  AddressLine2: any;
+  AddressLine3: any;
+  PostalCode: any;
+  City: any;
+  Note: string;
+  AreaModel: Area;
+  Point: number;
+  SalesmanNIK: string;
+  PickingDocNum: any;
+  Longitude: number;
+  Latitude: number;
+  Accuracy: number;
+  DocNum: string;
+  DocDate: string;
+  DocDueDate: string;
+  DeliveryDate: string;
+  DocStatus: string;
+  DeliveryStatus: string;
+  Remarks: string;
+  POSDocNum: string;
+  Id: number;
+}
+
+export interface Detail {
+  Alias: string;
+  isScanned: boolean;
+  BasedSalesOrderDetailModel: any;
+  SAPDocEntry: number;
+  SAPDocNum: string;
+  DetailId: string;
+  HighestPrice: number;
+  Price: number;
+  LineDiscAmount: number;
+  LineTotal: number;
+  BasePrice: number;
+  LineNo: number;
+  DocType: string;
+  BasedDocType: string;
+  TargetDocType: string;
+  LineStatus: string;
+  ProductModel: ProductModel;
+  Quantity: number;
+  OpenQuantity: number;
+  QuantityScanned: number;
+  BaseQuantity: number;
+  UoMModel: UoMmodel;
+  WarehouseModel: Warehouse;
+  WarehouseBinModel: WarehouseBinModel;
+  Id: number;
+  Remarks: any;
+  activeStates: boolean[];
+  activeStatesLoading: boolean[];
+  isSebagian: boolean;
+  isDone: boolean;
+
+  sebagianValue: number;
+  isSelected?: boolean;
+}
+
