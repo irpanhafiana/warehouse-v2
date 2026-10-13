@@ -66,7 +66,7 @@
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
       @if (isLoading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
@@ -87,7 +87,7 @@
         }
 
         @if (filteredSalesInvoices.length > 0) {
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
           @for (item of filteredSalesInvoices; track item.Alias || $index) {
           <div class="w-full border rounded-xl p-4 transition-all" [ngClass]="{
               'bg-emerald-50 border-emerald-300': item.Remarks.toLowerCase() === 'done',
@@ -131,14 +131,14 @@
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
       @if (isLoading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
       </div>
       } @else {
       <div>
         @if (filteredSalesInvoices.length > 0) {
-        <div class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
           @for (item of filteredSalesInvoices; track item.Alias || $index) {
           <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
             <div class="flex justify-between items-start">

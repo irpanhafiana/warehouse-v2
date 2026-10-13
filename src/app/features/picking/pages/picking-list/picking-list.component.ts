@@ -249,8 +249,9 @@ export class PickingListComponent implements OnInit, OnDestroy {
   }
 
   onAmbilBon(picName: string): void {
+    const targetDocNum = this.docNumSelected;
     const payload = {
-      DocNum: this.docNumSelected,
+      DocNum: targetDocNum,
       PIC: picName.toUpperCase(),
     };
 
@@ -260,7 +261,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.closeDialogAmbilBON();
-          this.toChecklist(this.docNumSelected);
+          this.toChecklist(targetDocNum);
         },
         error: (err) => {
           console.error('Failed to take BON:', err);
@@ -269,8 +270,9 @@ export class PickingListComponent implements OnInit, OnDestroy {
   }
 
   onGantiPIC(newPic: string): void {
+    const targetDocNum = this.docNumSelected;
     const payloadUnlocked = {
-      DocNum: this.docNumSelected,
+      DocNum: targetDocNum,
       PIC: newPic.toUpperCase(),
     };
 
@@ -280,7 +282,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.closeDialogGantiPIC();
-          this.toChecklist(this.docNumSelected);
+          this.toChecklist(targetDocNum);
         },
         error: (err) => {
           console.error('Failed to change PIC:', err);

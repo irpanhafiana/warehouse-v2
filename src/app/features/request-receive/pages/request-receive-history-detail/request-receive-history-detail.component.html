@@ -28,13 +28,13 @@
     <!-- Scrollable Content -->
     <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
       @if (loading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
       </div>
       } @else if (salesInvoice) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <!-- Summary Box -->
         <div class="w-full bg-white border border-gray-200 rounded-xl p-4 my-1 flex flex-col gap-2">
           <div class="flex justify-between items-center">

@@ -61,7 +61,7 @@
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
       @if (isLoading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
       </div>
@@ -296,7 +296,7 @@
     </div>
 
     <div class="flex-1 overflow-y-auto py-3">
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <div class="flex justify-between items-center">
           <h1 class="text-slate-800 font-bold text-lg">
             BON Loading ({{ filteredSalesInvoices ? filteredSalesInvoices.length : 0 }})
@@ -433,7 +433,7 @@
     @if (isLoading) {
     <div class="py-10 flex justify-center"><app-loader></app-loader></div>
     } @else {
-    <div class="flex flex-col gap-3">
+    <div class="flex flex-col gap-2">
       @if (vehicles.length > 0) {
       <div class="flex flex-col gap-1.5">
         <label for="select-vehicle" class="font-medium text-xs uppercase tracking-wider text-gray-700 pl-1">Mobil /

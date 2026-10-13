@@ -73,14 +73,14 @@
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
       @if (loading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
       </div>
       } @else {
       @if (groupResult.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         @for (item of groupResult; track $index) {
         <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item"
           (dialogOpen)="openDialogDetailDocnum(item.customerCode, item.data[0].DocNum)">

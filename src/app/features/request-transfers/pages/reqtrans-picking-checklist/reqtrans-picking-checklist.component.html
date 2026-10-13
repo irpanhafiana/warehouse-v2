@@ -67,7 +67,7 @@
       <!-- TAB RECEH -->
       @if (selectedTab === 'receh') {
       @if (arrReceh.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         @for (item of arrReceh; track item.Id) {
         @if (item.ProductModel.Name.toLowerCase() !== 'receh') {
         <div class="card relative border-4 border-gray-400 transition-colors" [ngClass]="{
@@ -127,7 +127,7 @@
       <!-- TAB NON RECEH -->
       @if (selectedTab === 'non-receh') {
       @if (arrNonReceh.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         @for (item of arrNonReceh; track item.Id) {
         <div class="card relative border-4 border-gray-400 transition-colors" [ngClass]="{
                     'bg-green-100 border-green-500': item.Remarks,
