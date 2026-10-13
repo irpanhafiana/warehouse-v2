@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderRes } from '../../../core/models';
 
@@ -7,6 +7,7 @@ import { HeaderRes } from '../../../core/models';
   imports: [CommonModule],
   templateUrl: './card.component.html',
   styleUrl: './card.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {
   @Input() dataFrom: string = 'LOADING';

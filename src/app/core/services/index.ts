@@ -1,5 +1,4 @@
 export * from './auth.service';
-export * from './delivery.service';
 export * from './goods-delivery.service';
 export * from './idempotency.service';
 export * from './sales-invoice.service';

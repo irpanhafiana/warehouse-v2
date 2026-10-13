@@ -1,10 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule, DatePipe, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.service';
+import { StorageService } from '../../../../core/services/storage.service';
 import { Detail, SalesInvoicesModel } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { ToastrService } from 'ngx-toastr';
@@ -25,9 +27,11 @@ export class CheckoutDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private service = inject(SalesInvoiceService);
   private goodsDeliveryService = inject(GoodsDeliveryService);
+  private storageService = inject(StorageService);
   private router = inject(Router);
   private location = inject(Location);
   private toastr = inject(ToastrService);
+  private destroyRef = inject(DestroyRef);
 
   docnum = '';
   salesInvoice!: SalesInvoicesModel;
@@ -52,7 +56,7 @@ export class CheckoutDetailComponent implements OnInit {
 
   constructor() {
     this.docnum = this.route.snapshot.params['docnum'] || '';
-    const storedItems = localStorage.getItem('selectedItems');
+    const storedItems = this.storageService.getItemSync('selectedItems');
     this.selectedItems = storedItems ? JSON.parse(storedItems) : [];
   }
 
@@ -63,41 +67,47 @@ export class CheckoutDetailComponent implements OnInit {
   }
 
   getCheckBON(docnum: string): void {
-    this.goodsDeliveryService.getCheckBON(docnum).subscribe({
-      next: (data) => {
-        (data || []).forEach((element: any) => {
-          (element?.Details || []).forEach((el: any) => {
-            try {
-              this.itemLoaded.push(
-                typeof el.Data === 'string' ? JSON.parse(el.Data) : el.Data
-              );
-            } catch (err) {
-              console.error('Error parsing loaded item Data:', err);
-            }
+    this.goodsDeliveryService
+      .getCheckBON(docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          (data || []).forEach((element: any) => {
+            (element?.Details || []).forEach((el: any) => {
+              try {
+                this.itemLoaded.push(
+                  typeof el.Data === 'string' ? JSON.parse(el.Data) : el.Data
+                );
+              } catch (err) {
+                console.error('Error parsing loaded item Data:', err);
+              }
+            });
           });
-        });
 
-        this.itemLoadedMap = this.itemLoaded.map((item: Detail) => ({
-          id: item.Id,
-        }));
+          this.itemLoadedMap = this.itemLoaded.map((item: Detail) => ({
+            id: item.Id,
+          }));
 
-        this.itemLoadedMapLength = this.itemLoadedMap.length;
-      },
-      error: () => {
-        this.toastr.error('Gagal memeriksa status muatan BON.', 'Error');
-      },
-      complete: () => {
-        this.isShowAddDelivery = true;
-      },
-    });
+          this.itemLoadedMapLength = this.itemLoadedMap.length;
+        },
+        error: () => {
+          this.toastr.error('Gagal memeriksa status muatan BON.', 'Error');
+        },
+        complete: () => {
+          this.isShowAddDelivery = true;
+        },
+      });
   }
 
   getDetail(): void {
     this.loading = true;
-    this.service.getCheckoutDetail(this.docnum).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.salesInvoice = data;
+    this.service
+      .getCheckoutDetail(this.docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.salesInvoice = data;
         this.initialData = data.Details || [];
         const alphabet = Array.from(
           new Set(
@@ -235,7 +245,7 @@ export class CheckoutDetailComponent implements OnInit {
     }
 
     const storageKey = this.docnum ? `GOODS${this.docnum}` : 'GOODS_TEMP';
-    localStorage.setItem(storageKey, JSON.stringify(this.selectedItems));
+    void this.storageService.set(storageKey, JSON.stringify(this.selectedItems));
   }
 
   onSelectAll(): void {
@@ -251,7 +261,7 @@ export class CheckoutDetailComponent implements OnInit {
     });
 
     const storageKey = this.docnum ? `GOODS${this.docnum}` : 'GOODS_TEMP';
-    localStorage.setItem(storageKey, JSON.stringify(this.selectedItems));
+    void this.storageService.set(storageKey, JSON.stringify(this.selectedItems));
   }
 
   toGoodsDelivery(): void {
@@ -259,7 +269,7 @@ export class CheckoutDetailComponent implements OnInit {
   }
 
   onBack(): void {
-    localStorage.removeItem(`GOODS${this.docnum}`);
+    void this.storageService.remove(`GOODS${this.docnum}`);
     this.location.back();
   }
 

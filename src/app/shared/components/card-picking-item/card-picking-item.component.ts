@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 import { Detail } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './card-picking-item.component.html',
   styleUrl: './card-picking-item.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardPickingItemComponent {
   @Input() salesInvoiceDetail!: Detail;

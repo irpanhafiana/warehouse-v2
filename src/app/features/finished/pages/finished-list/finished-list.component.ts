@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SalesInvoiceService } from '../../../../core/services';
 import { HeaderRes, Area, SalesInvoicesModel } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
@@ -30,6 +31,7 @@ export class FinishedListComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private destroyRef = inject(DestroyRef);
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -80,20 +82,23 @@ export class FinishedListComponent implements OnInit {
 
   getFinishedList() {
     this.loading = true;
-    this.service.getFinishedList(this.dateString).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes;
-        this.createArrArea(this.headerRes);
-        this.createArrAlphabet(this.headerRes);
-        this.groupCustomerData(this.filteredSalesInvoices);
-      },
-      error: () => {
-        this.loading = false;
-        this.toastr.error('Gagal mengambil daftar BON selesai.', 'Error');
-      },
-    });
+    this.service
+      .getFinishedList(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes;
+          this.createArrArea(this.headerRes);
+          this.createArrAlphabet(this.headerRes);
+          this.groupCustomerData(this.filteredSalesInvoices);
+        },
+        error: () => {
+          this.loading = false;
+          this.toastr.error('Gagal mengambil daftar BON selesai.', 'Error');
+        },
+      });
   }
 
   onDateChange(e: Event) {

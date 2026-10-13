@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.service';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
@@ -24,6 +25,7 @@ import { ButtonHomeComponent } from '../../../../shared/components/button-home/b
 export class GoodsDeliveryListComponent implements OnInit {
   private service = inject(GoodsDeliveryService);
   private router = inject(Router);
+  private destroyRef = inject(DestroyRef);
 
   dateString = '';
   date = '';
@@ -53,7 +55,7 @@ export class GoodsDeliveryListComponent implements OnInit {
         ? this.service.getGoodsDeliveryList(date)
         : this.service.getGoodsDeliveryHistoryList(date);
 
-    request$.subscribe({
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (data) => {
         this.loading = false;
         this.goodsDeliveries = data || [];

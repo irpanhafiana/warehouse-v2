@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ToastrService } from 'ngx-toastr';
 import { RouteGroupService } from '../../services';
@@ -26,6 +27,7 @@ export class RouteGroupListComponent implements OnInit {
   private routeGroupService = inject(RouteGroupService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private destroyRef = inject(DestroyRef);
 
   routeGroups: RouteGroup[] = [];
   filteredSalesInvoices: RouteGroup[] = [];
@@ -99,7 +101,7 @@ export class RouteGroupListComponent implements OnInit {
         ? this.routeGroupService.getRouteGroupHistories(date)
         : this.routeGroupService.getRouteGroups(date);
 
-    request$.subscribe({
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response: any[]) => {
         this.routeGroups = response || [];
         this.filteredSalesInvoices = this.routeGroups;
