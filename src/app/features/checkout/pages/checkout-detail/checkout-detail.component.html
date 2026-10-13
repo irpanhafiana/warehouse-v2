@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Atas (fix) -->
   <div class="w-full flex flex-col p-4 shrink-0"
     [ngClass]="{ 'h-[15%]': isFilterAlphabet, 'h-[10%]': !isFilterAlphabet }">
@@ -36,24 +36,26 @@
     </div>
 
     @if (isFilterAlphabet) {
-    <div class="overflow-x-auto text-white pt-2 pb-1">
-      <div class="flex flex-row items-center gap-1.5 min-w-max">
-        @if (filteredData.length !== 0) {
-        <button
-          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-          (click)="onSelectedAlphabet('~')">
-          Reset
-        </button>
-        }
-        @for (item of alphabet; track $index) {
-        <button type="button" class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-          [ngClass]="{
-            'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
-            'text-white/80 hover:bg-white/10': item !== selectedAplhabet
-          }" (click)="onSelectedAlphabet(item)">
-          {{ item }}
-        </button>
-        }
+    <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
+      @if (filteredData.length !== 0) {
+      <button
+        class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+        (click)="onSelectedAlphabet('~')">
+        Reset
+      </button>
+      }
+      <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+        <div class="flex flex-row items-center gap-1">
+          @for (item of alphabet; track $index) {
+          <button type="button" class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
+            [ngClass]="{
+              'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
+              'text-white/80 hover:bg-white/10': item !== selectedAplhabet
+            }" (click)="onSelectedAlphabet(item)">
+            {{ item }}
+          </button>
+          }
+        </div>
       </div>
     </div>
     }

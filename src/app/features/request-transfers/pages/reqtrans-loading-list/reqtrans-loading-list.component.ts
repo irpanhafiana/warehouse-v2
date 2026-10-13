@@ -45,9 +45,7 @@ export class ReqtransLoadingListComponent implements OnInit {
   dateString: string = '';
   area: Area[] = [];
   detailDocnumCustomer: SalesInvoicesModel[] = [];
-  selectedAlphabet: string = '';
   areaSelected: string = '';
-  alphabet: string[] = [];
 
   constructor() {
     this.setDefaultDate();
@@ -82,7 +80,6 @@ export class ReqtransLoadingListComponent implements OnInit {
         this.headerRes = data || [];
         this.filteredSalesInvoices = this.headerRes;
         this.createArrArea(this.headerRes);
-        this.createArrAlphabet(this.headerRes);
         this.groupCustomerData(this.filteredSalesInvoices);
         this.cdr.markForCheck();
       },
@@ -106,22 +103,6 @@ export class ReqtransLoadingListComponent implements OnInit {
     }));
   }
 
-  createArrAlphabet(data: HeaderRes[]): void {
-    const letters = Array.from(
-      new Set(
-        data
-          .map((item) => {
-            const trimmed = item.Name?.trim() || '';
-            if (!trimmed) return '';
-            const char = trimmed.startsWith('~') ? trimmed.charAt(1) : trimmed.charAt(0);
-            return char.toUpperCase();
-          })
-          .filter(Boolean)
-      )
-    );
-    this.alphabet = letters.sort((a, b) => a.localeCompare(b));
-  }
-
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     if (input.value) {
@@ -134,32 +115,19 @@ export class ReqtransLoadingListComponent implements OnInit {
   onOptionSelect(e: Event): void {
     const target = e.target as HTMLSelectElement;
     this.areaSelected = target.value;
-    this.selectedAlphabet = '';
-    this.applyFilter();
-  }
-
-  onSelectedAlphabet(char: string): void {
-    this.selectedAlphabet = char === '~' ? '' : char;
     this.applyFilter();
   }
 
   applyFilter(): void {
     this.filteredSalesInvoices = this.headerRes.filter((invoice) => {
-      const matchesAlphabet = this.selectedAlphabet
-        ? invoice.Name.replace(/^~+/, '')
-            .trim()
-            .toLowerCase()
-            .startsWith(this.selectedAlphabet.toLowerCase())
-        : true;
-
       const matchesArea = this.areaSelected
         ? invoice.Area.includes(this.areaSelected)
         : true;
 
-      return matchesAlphabet && matchesArea;
+      return matchesArea;
     });
 
-    if (this.filteredSalesInvoices.length === 0 && !this.selectedAlphabet && !this.areaSelected) {
+    if (this.filteredSalesInvoices.length === 0 && !this.areaSelected) {
       this.filteredSalesInvoices = this.headerRes;
     }
 

@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -35,6 +35,30 @@
           </select>
         </div>
       </div>
+
+      <!-- Alphabet Initial Filter Bar -->
+      <div class="flex flex-row items-center gap-2 text-white py-1 min-w-0">
+        @if (filteredSalesInvoices.length !== 0) {
+        <button
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+          (click)="onSelectedAlphabet('~')">
+          Reset
+        </button>
+        }
+        <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+          <div class="flex flex-row items-center gap-1">
+            @for (item of alphabet; track item) {
+            <button type="button"
+              class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
+                'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
+                'text-white/80 hover:bg-white/10': item !== selectedAplhabet
+              }" (click)="onSelectedAlphabet(item)">
+              {{ item }}
+            </button>
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -49,29 +73,6 @@
       </div>
       } @else {
       <div>
-        <!-- Alphabet Initial Filter Bar -->
-        <div class="flex flex-row items-center gap-2 text-slate-800 py-1 mb-2 min-w-0">
-          @if (filteredSalesInvoices.length !== 0) {
-          <button
-            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')">
-            Reset
-          </button>
-          }
-          <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
-            <div class="flex flex-row items-center gap-1">
-              @for (item of alphabet; track item) {
-              <button type="button"
-                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
-                  'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
-                  'text-gray-600 hover:bg-gray-200': item !== selectedAplhabet
-                }" (click)="onSelectedAlphabet(item)">
-                {{ item }}
-              </button>
-              }
-            </div>
-          </div>
-        </div>
 
         @if (isDone) {
         <div class="w-full bg-red-50 border border-red-200 mb-3 p-3.5 rounded-xl">
@@ -136,30 +137,6 @@
       </div>
       } @else {
       <div>
-        <!-- Alphabet Initial Filter Bar -->
-        <div class="flex flex-row items-center gap-2 text-slate-800 py-1 mb-2 min-w-0">
-          @if (filteredSalesInvoices.length !== 0) {
-          <button
-            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')">
-            Reset
-          </button>
-          }
-          <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
-            <div class="flex flex-row items-center gap-1">
-              @for (item of alphabet; track $index) {
-              <button type="button"
-                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
-                  'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
-                  'text-gray-600 hover:bg-gray-200': item !== selectedAplhabet
-                }" (click)="onSelectedAlphabet(item)">
-                {{ item }}
-              </button>
-              }
-            </div>
-          </div>
-        </div>
-
         @if (filteredSalesInvoices.length > 0) {
         <div class="flex flex-col gap-3">
           @for (item of filteredSalesInvoices; track item.Alias || $index) {

@@ -29,9 +29,6 @@ export class RequestReceiveHistoryDetailComponent implements OnInit {
   loading: boolean = false;
   initialData: Detail[] = [];
   filteredData: Detail[] = [];
-  selectedAlphabet: string = '';
-  alphabet: string[] = [];
-  isFilterAlphabet: boolean = false;
 
   constructor() {
     this.docnum = this.route.snapshot.params['docnum'] || '';
@@ -53,22 +50,6 @@ export class RequestReceiveHistoryDetailComponent implements OnInit {
         this.salesInvoice = data;
         this.initialData = (data?.Details || []).map((d) => ({ ...d }));
 
-        const letters = Array.from(
-          new Set(
-            this.initialData
-              .map((product) => {
-                const name = product.ProductModel?.Name?.trim();
-                if (!name) return '';
-                const firstValidChar = name.startsWith('~')
-                  ? name.charAt(1)
-                  : name.charAt(0);
-                return firstValidChar.toUpperCase();
-              })
-              .filter((char) => Boolean(char))
-          )
-        );
-
-        this.alphabet = letters.sort((a, b) => a.localeCompare(b));
         this.applyFilter();
         this.cdr.markForCheck();
       },
@@ -81,36 +62,8 @@ export class RequestReceiveHistoryDetailComponent implements OnInit {
     });
   }
 
-  onSelectedAlphabet(char: string): void {
-    if (char === '~') {
-      this.selectedAlphabet = '';
-    } else {
-      this.selectedAlphabet = char;
-    }
-    this.applyFilter();
-  }
-
   applyFilter(): void {
-    this.filteredData = this.initialData
-      .map((product) => ({
-        ...product,
-        ProductModel: {
-          ...product.ProductModel,
-          Name: product?.ProductModel?.Name?.replace(/^~+/, '').trim() || '',
-        },
-      }))
-      .filter((product) => {
-        if (!this.selectedAlphabet) return true;
-        return (
-          product.ProductModel?.Name?.toLowerCase().startsWith(
-            this.selectedAlphabet.toLowerCase()
-          ) ?? false
-        );
-      });
-
-    if (this.filteredData.length === 0) {
-      this.filteredData = this.initialData;
-    }
+    this.filteredData = this.initialData;
     this.cdr.markForCheck();
   }
 

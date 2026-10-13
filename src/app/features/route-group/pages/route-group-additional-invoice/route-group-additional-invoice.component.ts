@@ -27,8 +27,6 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
   dateString = '';
   date = '';
   area: Area[] = [];
-  alphabet: string[] = [];
-  selectedAplhabet = '';
   areaSelected = '';
   groupResult: any;
 
@@ -86,7 +84,6 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
         this.filteredSalesInvoices = [...this.headerRes];
         this.createArrArea(this.headerRes);
-        this.createArrAlphabet(this.headerRes);
       },
       error: () => {
         this.loading = false;
@@ -129,7 +126,6 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
   onOptionSelect(e: any): void {
     this.areaSelected = e.target.value;
-    this.selectedAplhabet = '';
     this.applyFilter();
   }
 
@@ -140,54 +136,18 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
     }
   }
 
-  onSelectedAlphabet(i: string): void {
-    if (i === '~') {
-      this.selectedAplhabet = '';
-    } else {
-      this.selectedAplhabet = i;
-    }
-    this.applyFilter();
-  }
-
   applyFilter(): void {
     this.filteredSalesInvoices = this.headerRes.filter((invoice: HeaderRes) => {
-      const matchesAlphabet = this.selectedAplhabet
-        ? (invoice.Name || '')
-            .replace(/^~+/, '')
-            .trim()
-            .toLowerCase()
-            .startsWith(this.selectedAplhabet.toLowerCase())
-        : true;
-
       const matchesDropdown = this.areaSelected
         ? (invoice.Area || '').includes(this.areaSelected)
         : true;
 
-      return matchesAlphabet && matchesDropdown;
+      return matchesDropdown;
     });
 
     if (this.filteredSalesInvoices.length === 0) {
       this.filteredSalesInvoices = this.headerRes;
     }
-  }
-
-  createArrAlphabet(data: HeaderRes[]): void {
-    const datas = Array.from(
-      new Set(
-        data
-          .map((customer: any) => {
-            const customerName = customer?.Name?.trim() || '';
-            if (!customerName) return '';
-            const firstValidChar = customerName.startsWith('~')
-              ? customerName.charAt(1)
-              : customerName.charAt(0);
-            return firstValidChar.toUpperCase();
-          })
-          .filter((char) => Boolean(char))
-      )
-    );
-
-    this.alphabet = datas.sort((a, b) => a.localeCompare(b));
   }
 
   createArrArea(data: HeaderRes[]): void {
