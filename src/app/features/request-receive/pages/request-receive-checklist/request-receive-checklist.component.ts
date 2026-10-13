@@ -4,14 +4,16 @@ import {
   OnDestroy,
   inject,
   ChangeDetectorRef,
+  DestroyRef,
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { Inventory, InventoryDetail } from '../../../../core/models';
-import { SignalrService } from '../../../../core/services/signalr.service';
+import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { DialogSetPicComponent, LoaderComponent } from '../../../../shared/components';
 import { RequestReceiveService } from '../../services/request-receive.service';
@@ -36,6 +38,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   docnum: string = '';
   selectedBON: string = '';
@@ -59,13 +62,10 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   QRCodes: string = '';
 
   private notifyNewReceiveLoadingHandler = (salesInvoiceModel: string): void => {
-    try {
-      const parsed = JSON.parse(salesInvoiceModel);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        this.updateDetails(parsed[0]);
-      }
-    } catch (e) {
-      console.warn('SignalR parse error:', e);
+    const parsed = parseSignalRPayload<InventoryDetail | InventoryDetail[]>(salesInvoiceModel);
+    const detail = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (detail) {
+      this.updateDetails(detail);
     }
   };
 
@@ -80,6 +80,10 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
     this.initPic();
     this.fetchRequestReceiveChecklist();
     this.signalRService.on('NotifyNewReceiveLoading', this.notifyNewReceiveLoadingHandler);
+
+    this.signalRService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.fetchRequestReceiveChecklist());
   }
 
   ngOnDestroy(): void {

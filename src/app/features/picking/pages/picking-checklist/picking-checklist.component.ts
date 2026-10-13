@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -35,6 +35,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
   private signalrService = inject(SignalrService);
   private storageService = inject(StorageService);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   docnum = '';
   dateString = '';
@@ -105,6 +106,14 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.on('NotifyNewPicking', this.notifyNewPickingHandler);
     this.signalrService.on('NotifyNewReturn', this.notifyNewReturnHandler);
     this.signalrService.on('NotifyPickingLockedUnlocked', this.notifyPickingLockedUnlockedHandler);
+
+    this.signalrService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.docnum) {
+          this.getDetail();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -301,6 +310,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     updateArray(this.arrNonReceh, detailsIncoming);
     this.arrReceh = [...this.arrReceh];
     this.arrNonReceh = [...this.arrNonReceh];
+    this.cdr.markForCheck();
   }
 
   private updateDetails(detailIncoming: Detail): void {
@@ -314,6 +324,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     updateInList(this.arrNonReceh);
     this.arrReceh = [...this.arrReceh];
     this.arrNonReceh = [...this.arrNonReceh];
+    this.cdr.markForCheck();
   }
 
   setLoadingState(itemId: number, state: boolean): void {

@@ -25,7 +25,11 @@ export function authInterceptor(
   }
 
   // Tentukan jenis target URL (jangan attach Bearer token untuk endpoint request token)
-  if (!isTokenRequest && req.url.startsWith(environment.is4urlCloud)) {
+  if (!isTokenRequest && req.url.startsWith(environment.api)) {
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
+    }
+  } else if (!isTokenRequest && req.url.startsWith(environment.is4urlCloud)) {
     if (cloudToken) {
       headers['Authorization'] = `Bearer ${cloudToken}`;
     }
@@ -36,10 +40,6 @@ export function authInterceptor(
   } else if (req.url.startsWith(environment.is4urlTOKEN)) {
     const credentials = btoa(`${environment.is4ClientID}:${environment.is4ClientSecret}`);
     headers['Authorization'] = `Basic ${credentials}`;
-  } else if (!isTokenRequest && req.url.startsWith(environment.api)) {
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-    }
   }
 
   if (Object.keys(headers).length > 0) {

@@ -101,7 +101,8 @@ export class SalesInvoiceService {
   putPickingListDetails(payload: any): Observable<any> {
     return this.http.put(
       `${this.apiUrl}api/v1/SalesInvoices/Tab/Picking/Queue`,
-      payload
+      payload,
+      { responseType: 'text' as 'json' }
     );
   }
 

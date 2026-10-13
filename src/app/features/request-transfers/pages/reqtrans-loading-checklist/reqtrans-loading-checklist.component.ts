@@ -1,13 +1,14 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
 import JsBarcode from 'jsbarcode';
 import { Detail, HeaderRes, SalesInvoicesModel } from '../../../../core/models';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
-import { SignalrService } from '../../../../core/services/signalr.service';
+import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { DialogSetPicComponent, LoaderComponent } from '../../../../shared/components';
 import { ReqTransLoadingService } from '../../services/reqtrans-loading.service';
@@ -33,6 +34,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   salesInvoice: SalesInvoicesModel | null = null;
   initialData: Detail[] = [];
@@ -66,35 +68,23 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   itemLoaded: any[] = [];
 
   private notifyNewLoadingHandler = (data: string): void => {
-    try {
-      const parsed = JSON.parse(data);
-      const detail = Array.isArray(parsed) ? parsed[0] : parsed;
-      if (detail) {
-        this.updateDetails(detail);
-      }
-    } catch (e) {
-      console.warn('SignalR NotifyNewDeliveryLoading error:', e);
+    const parsed = parseSignalRPayload<Detail | Detail[]>(data);
+    const detail = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (detail) {
+      this.updateDetails(detail);
     }
   };
 
   private notifyAdditionalInvoiceHandler = (data: string): void => {
-    try {
-      const newBon = JSON.parse(data);
-      this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
-      this.toastr.success(`BON baru dari: ${newBon?.Name || ''}`, 'Success');
-    } catch (e) {
-      console.warn('SignalR NotifyAdditionalInvoice error:', e);
-    }
+    const newBon = parseSignalRPayload<HeaderRes>(data);
+    this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
+    this.toastr.success(`BON baru dari: ${newBon?.Name || ''}`, 'Success');
   };
 
   private notifyNewReturnHandler = (data: string): void => {
-    try {
-      const parsed = JSON.parse(data);
-      if (Array.isArray(parsed)) {
-        this.updateDetailsArray(parsed);
-      }
-    } catch (e) {
-      console.warn('SignalR NotifyNewReturn error:', e);
+    const parsed = parseSignalRPayload<Detail[]>(data);
+    if (Array.isArray(parsed)) {
+      this.updateDetailsArray(parsed);
     }
   };
 
@@ -122,6 +112,10 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     this.signalRService.on('NotifyNewDeliveryLoading', this.notifyNewLoadingHandler);
     this.signalRService.on('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
     this.signalRService.on('NotifyNewReturn', this.notifyNewReturnHandler);
+
+    this.signalRService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.onRefresh());
   }
 
   ngOnDestroy(): void {
@@ -305,13 +299,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   updateDetailsArray(updates: Detail[]): void {
-    updates.forEach((item) => {
-      const found = this.filteredData.find((d) => d.Id === item.Id);
-      if (found) {
-        Object.assign(found, item);
-      }
-    });
-    this.cdr.markForCheck();
+    updates.forEach((item) => this.updateDetails(item));
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {

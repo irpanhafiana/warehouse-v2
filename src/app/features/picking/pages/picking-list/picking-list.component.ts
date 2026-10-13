@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -46,6 +46,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   private sharedDataService = inject(SharedDataService);
   private storageService = inject(StorageService);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
   headerRes: HeaderRes[] = [];
   bonCheckout: HeaderRes[] = [];
@@ -93,6 +94,14 @@ export class PickingListComponent implements OnInit, OnDestroy {
 
     this.signalrService.on('NotifyNewInvoice', this.notifyNewInvoiceHandler);
     this.signalrService.on('NotifyPickingLockedUnlocked', this.notifyPickingLockedUnlockedHandler);
+
+    this.signalrService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.dateString) {
+          this.fetchPickingData();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -103,11 +112,17 @@ export class PickingListComponent implements OnInit, OnDestroy {
   private handleNewInvoiceSignalR(data: string): void {
     try {
       const model: HeaderRes = typeof data === 'string' ? JSON.parse(data) : data;
+      if (!model) return;
+      if (this.updateFilteredInvoices(model)) {
+        this.cdr.markForCheck();
+        return;
+      }
       if (model.IsCheckout) {
         this.bonCheckout = [model, ...this.bonCheckout];
       } else {
         this.filteredSalesInvoices = [model, ...this.filteredSalesInvoices];
       }
+      this.cdr.markForCheck();
     } catch (e) {
       console.error('SignalR parse error:', e);
     }
@@ -117,6 +132,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
     try {
       const updateInvoice: HeaderRes = typeof data === 'string' ? JSON.parse(data) : data;
       this.updateFilteredInvoices(updateInvoice);
+      this.cdr.markForCheck();
     } catch (e) {
       console.error('SignalR parse error:', e);
     }

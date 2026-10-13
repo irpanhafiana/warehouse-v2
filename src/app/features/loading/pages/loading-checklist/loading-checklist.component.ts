@@ -137,6 +137,10 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.on('NotifyNewLoading', this.notifyNewLoadingHandler);
     this.signalrService.on('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
     this.signalrService.on('NotifyNewReturn', this.notifyNewReturnHandler);
+
+    this.signalrService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.onRefresh());
   }
 
   ngOnDestroy(): void {
@@ -404,6 +408,12 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       if (item.sebagianValue > 0) item.sebagianValue--;
     } else if (indicator === '+') {
       if (item.sebagianValue < item.OpenQuantity) item.sebagianValue++;
+    }
+
+    // Sinkronkan ke initialData agar tidak ter-reset saat applyFilter() dipicu event SignalR
+    const source = this.initialData.find((i) => i.Id === id);
+    if (source) {
+      source.sebagianValue = item.sebagianValue;
     }
   }
 

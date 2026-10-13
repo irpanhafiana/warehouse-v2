@@ -5,8 +5,9 @@ import {
   HttpRequest,
   HttpHandlerFn,
   HttpInterceptorFn,
+  HttpResponse,
 } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
@@ -21,6 +22,16 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // Jika status HTTP 200 tapi masuk catchError, berarti server mengembalikan string non-JSON (sukses)
+      if (error.status === 200) {
+        return of(new HttpResponse({
+          body: error.error?.text ?? error.message ?? null,
+          status: 200,
+          statusText: 'OK',
+          url: req.url,
+        }));
+      }
+
       // Ambil path URL target
       const targetUrl = req.url;
 

@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { Detail, SalesInvoicesModel } from '../../../../core/models';
-import { SignalrService } from '../../../../core/services/signalr.service';
+import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { DialogSetPicComponent, LoaderComponent } from '../../../../shared/components';
 import { ReqtransPickingService } from '../../services/reqtrans-picking.service';
@@ -22,6 +23,7 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   docnum: string = '';
   dateString: string = '';
@@ -41,48 +43,32 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   boxQty: string = '';
 
   private notifyNewDeliveryPickingHandler = (salesInvoiceModel: string): void => {
-    try {
-      const parsed = JSON.parse(salesInvoiceModel);
-      const detail = Array.isArray(parsed) ? parsed[0] : parsed;
-      if (detail) {
-        this.updateDetails(detail);
-      }
-    } catch (e) {
-      console.warn('SignalR NotifyNewDeliveryPicking parse error:', e);
+    const parsed = parseSignalRPayload<Detail | Detail[]>(salesInvoiceModel);
+    const detail = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (detail) {
+      this.updateDetails(detail);
     }
   };
 
   private notifyNewDeliveryBoxUsedHandler = (salesInvoiceModel: string): void => {
-    try {
-      const resp = JSON.parse(salesInvoiceModel);
-      if (resp?.DocNum === this.docnum) {
-        this.getDetail();
-      }
-    } catch (e) {
-      console.warn('SignalR NotifyNewDeliveryBoxUsed parse error:', e);
+    const resp = parseSignalRPayload<{ DocNum?: string }>(salesInvoiceModel);
+    if (resp?.DocNum === this.docnum) {
+      this.getDetail();
     }
   };
 
   private notifyNewDeliveryReturnHandler = (salesInvoiceModel: string): void => {
-    try {
-      const parsedData = JSON.parse(salesInvoiceModel);
-      if (Array.isArray(parsedData)) {
-        this.updateDetailsArray(parsedData);
-      }
-    } catch (error) {
-      console.warn('SignalR NotifyNewDeliveryReturn parse error:', error);
+    const parsedData = parseSignalRPayload<Detail[]>(salesInvoiceModel);
+    if (Array.isArray(parsedData)) {
+      this.updateDetailsArray(parsedData);
     }
   };
 
   private notifyDeliveryPickingLockedUnlockedHandler = (salesInvoiceModel: string): void => {
-    try {
-      const parsed = JSON.parse(salesInvoiceModel);
-      const detail = Array.isArray(parsed) ? parsed[0] : parsed;
-      if (detail) {
-        this.updateDetails(detail);
-      }
-    } catch (e) {
-      console.warn('SignalR NotifyDeliveryPickingLockedUnlocked parse error:', e);
+    const parsed = parseSignalRPayload<Detail | Detail[]>(salesInvoiceModel);
+    const detail = Array.isArray(parsed) ? parsed[0] : parsed;
+    if (detail) {
+      this.updateDetails(detail);
     }
   };
 
@@ -111,6 +97,14 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
     this.signalRService.on('NotifyNewDeliveryBoxUsed', this.notifyNewDeliveryBoxUsedHandler);
     this.signalRService.on('NotifyNewDeliveryReturn', this.notifyNewDeliveryReturnHandler);
     this.signalRService.on('NotifyDeliveryPickingLockedUnlocked', this.notifyDeliveryPickingLockedUnlockedHandler);
+
+    this.signalRService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.docnum) {
+          this.getDetail();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -189,6 +183,8 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
     };
     updateArr(this.arrReceh);
     updateArr(this.arrNonReceh);
+    this.arrReceh = [...this.arrReceh];
+    this.arrNonReceh = [...this.arrNonReceh];
     this.cdr.markForCheck();
   }
 
@@ -201,6 +197,8 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
     if (idxNon !== -1) {
       this.arrNonReceh[idxNon] = { ...this.arrNonReceh[idxNon], ...detailIncoming };
     }
+    this.arrReceh = [...this.arrReceh];
+    this.arrNonReceh = [...this.arrNonReceh];
     this.cdr.markForCheck();
   }
 

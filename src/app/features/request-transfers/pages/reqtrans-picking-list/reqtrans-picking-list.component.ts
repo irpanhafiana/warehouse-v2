@@ -1,7 +1,8 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { Area, HeaderRes } from '../../../../core/models';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
@@ -38,6 +39,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   headerRes: HeaderRes[] = [];
   bonCheckout: HeaderRes[] = [];
@@ -82,6 +84,14 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
       this.fetchPickingData();
     }
     this.signalRService.on('NotifyCancelDelivery', this.notifyCancelDeliveryHandler);
+
+    this.signalRService.reconnected$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.dateString) {
+          this.fetchPickingData();
+        }
+      });
   }
 
   ngOnDestroy(): void {
