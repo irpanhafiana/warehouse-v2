@@ -1,12 +1,9 @@
-<div class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2">
-  <div
-    routerLink="/main/picking/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main/picking'),
+<div
+  class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2">
+  <div routerLink="/main/picking/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main/picking'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main/picking')
-    }"
-    class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/pick-list.png" alt="Picking" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main/picking')) {
@@ -15,14 +12,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main/route-group/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main/loading') || isActive('/main/route-group'),
+  <div routerLink="/main/route-group/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main/loading') || isActive('/main/route-group'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main/loading') && !isActive('/main/route-group')
-    }"
-    class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/delivery-truck.png" alt="Loading" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main/loading') || isActive('/main/route-group')) {
@@ -31,14 +24,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main/goods-delivery/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main/finished') || isActive('/main/goods-delivery'),
+  <div routerLink="/main/goods-delivery/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main/finished') || isActive('/main/goods-delivery'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main/finished') && !isActive('/main/goods-delivery')
-    }"
-    class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/load.png" alt="Selesai" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main/finished') || isActive('/main/goods-delivery')) {
@@ -47,14 +36,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main/checkout/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main/checkout'),
+  <div routerLink="/main/checkout/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main/checkout'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main/checkout')
-    }"
-    class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-4 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/shopping-cart.png" alt="Checkout" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main/checkout')) {
@@ -63,4 +48,3 @@
     </div>
   </div>
 </div>
-

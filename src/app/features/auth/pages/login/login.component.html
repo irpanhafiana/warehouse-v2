@@ -1,4 +1,4 @@
-@if (!isProcessForceClose) {
+﻿@if (!isProcessForceClose) {
 <div class="w-full h-screen flex flex-col bg-[#2F4ACD]">
   <div class="w-full h-[25%] flex flex-col justify-between p-4"
     [ngClass]="{ 'h-[28%]': phoneName ? phoneName.length > 10 : false }">
@@ -9,7 +9,7 @@
       </div>
       <div class="flex flex-col items-center gap-1">
         <img src="new-assets/force-close-w.png" alt="Force Close"
-          class="w-[50px] bg-red-700 border border-red-800 active:scale-90 rounded-xl p-2 cursor-pointer shadow-sm"
+          class="w-[50px] bg-red-700 border border-red-800 active:scale-90 rounded-xl p-2 cursor-pointer"
           (click)="isDialogForceClose = true" />
         <p class="font-bold text-xs text-red-100">Force Close</p>
       </div>
@@ -30,7 +30,7 @@
     class="w-full flex-1 bg-[#F3F2F8] rounded-t-[36px] p-4 flex flex-col border-t-4 border-[#202B6D] overflow-y-auto">
     <div class="flex flex-col py-4 gap-2">
       <div
-        class="flex items-center bg-white border border-gray-200 shadow-sm rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300 hover:shadow"
+        class="flex items-center bg-white border border-gray-200 rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300"
         (click)="toUrl('picking')">
         <div class="flex flex-row items-center gap-4">
           <img src="warehouse.png" alt="" class="w-[75px] object-contain" />
@@ -44,7 +44,7 @@
       </div>
 
       <div
-        class="flex items-center bg-white border border-gray-200 shadow-sm rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300 hover:shadow"
+        class="flex items-center bg-white border border-gray-200 rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300"
         (click)="toReqTrans()">
         <div class="flex flex-row items-center justify-between w-full gap-4">
           <div class="flex flex-col gap-0.5">
@@ -60,7 +60,7 @@
       </div>
 
       <div
-        class="flex items-center bg-white border border-gray-200 shadow-sm rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300 hover:shadow"
+        class="flex items-center bg-white border border-gray-200 rounded-2xl p-4 h-[130px] active:scale-98 transition-all cursor-pointer hover:border-gray-300"
         (click)="toReqRec()">
         <div class="flex flex-row items-center gap-4">
           <img src="req-receive.png" alt="" class="w-[75px] object-contain" />

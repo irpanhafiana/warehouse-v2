@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -15,7 +15,7 @@
         <button
           type="button"
           (click)="onRefresh()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
@@ -24,7 +24,7 @@
         <button
           type="button"
           (click)="isFilterAlphabet = true"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-red-600 hover:bg-red-700 border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-red-600 hover:bg-red-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
         </button>
@@ -32,7 +32,7 @@
         <button
           type="button"
           (click)="isFilterAlphabet = false"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-gray-600 hover:bg-gray-700 border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-gray-600 hover:bg-gray-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
         </button>
@@ -41,7 +41,7 @@
         <button
           type="button"
           (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
@@ -53,7 +53,7 @@
     <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
       @if (filteredData.length !== 0) {
       <button
-        class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+        class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
         (click)="onSelectedAlphabet('~')"
       >
         Reset
@@ -66,7 +66,7 @@
             type="button"
             class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
             [ngClass]="{
-              'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAlphabet,
+              'bg-[#FF8B00] text-white scale-105': item === selectedAlphabet,
               'text-white/80 hover:bg-white/10': item !== selectedAlphabet
             }"
             (click)="onSelectedAlphabet(item)"
@@ -98,7 +98,7 @@
           <select
             id="dropdown"
             name="dropdown"
-            class="w-full p-2.5 bg-white border border-gray-300 rounded-xl font-bold text-sm sm:text-base text-gray-800 focus:outline-none focus:border-[#2F4ACD] shadow-xs"
+            class="w-full p-2.5 bg-white border border-gray-300 rounded-xl font-bold text-sm sm:text-base text-gray-800 focus:outline-none focus:border-[#2F4ACD]"
             (change)="onOptionSelect($event)"
           >
             <option value="">Pilih PIC</option>
@@ -216,8 +216,8 @@
                 <span class="line-through text-gray-400">
                   {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
                 </span>
-                <span class="text-gray-500 font-bold">➜</span>
-                <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-xs font-bold shadow-xs">
+                <span class="text-gray-500 font-bold">âžœ</span>
+                <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-xs font-bold">
                   {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
                 </span>
               </div>
@@ -278,7 +278,7 @@
 
 <!-- Bottom Sticky Bar -->
 @if (salesInvoice) {
-<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 shadow-lg z-30 flex justify-between items-center">
+<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 z-30 flex justify-between items-center">
   @if (salesInvoice.SalesPickingModel == null) {
   <span class="text-sm font-semibold text-gray-700">BON Sudah di Checkout</span>
   <button
@@ -309,7 +309,7 @@
   <button
     type="button"
     (click)="toAddDelivery()"
-    class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold text-sm py-3 px-5 rounded-full shadow-lg active:scale-95 transition-all cursor-pointer border border-green-600"
+    class="flex items-center gap-2 bg-green-700 hover:bg-green-800 text-white font-semibold text-sm py-3 px-5 rounded-full active:scale-95 transition-all cursor-pointer border border-green-600"
   >
     <img src="delivery.png" class="w-5 h-5 object-contain" alt="Delivery" />
     <span>Muat Ke Mobil</span>
@@ -336,7 +336,7 @@
         class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
         (click)="isDialogOpenBarcode = false"
       >
-        ✕
+        âœ•
       </button>
     </div>
     <div class="my-4 p-2 bg-white rounded-xl border border-gray-100">
@@ -363,7 +363,7 @@
         class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
         (click)="isErrorPicSebagian = false"
       >
-        ✕
+        âœ•
       </button>
     </div>
     <p class="font-normal text-gray-700 text-sm mt-4 leading-relaxed">
@@ -392,7 +392,7 @@
         class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
         (click)="isBonNotFinishPick = false"
       >
-        ✕
+        âœ•
       </button>
     </div>
     <p class="font-normal text-gray-700 text-sm mt-4 leading-relaxed">

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,7 +6,8 @@
         <p class="font-bold text-xs uppercase tracking-wider text-white/80">
           {{ !loading && inventoryRequest ? inventoryRequest.DocNum : "Loading ... " }}
         </p>
-        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
+        <h1
+          class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
           @if (loading) {
           <span>Loading...</span>
           } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
@@ -16,18 +17,12 @@
         </h1>
       </div>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="fetchDetailInventoryRequest(docnum)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="fetchDetailInventoryRequest(docnum)"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
-        <button
-          type="button"
-          (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -51,7 +46,7 @@
             Item yang dikirim:
           </p>
           @for (item of inventoryRequest.Details; track item.Id || item.LineNo || $index) {
-          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs transition-all flex flex-col gap-1.5">
+          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-1.5">
             @if (item.Remarks) {
             <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
               {{ item.Remarks }}
@@ -69,11 +64,7 @@
       </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-20">
-        <img
-          src="new-assets/data-not-founds.png"
-          class="w-1/2 max-w-[200px] mx-auto"
-          alt="Data Not Found"
-        />
+        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-[200px] mx-auto" alt="Data Not Found" />
         <p class="w-3/4 text-center font-medium text-lg text-[#2F4ACD] mt-4">
           Ooops, tidak ada item pada BON ini :(
         </p>
@@ -85,12 +76,11 @@
 
 <!-- Bottom Action Button -->
 @if (!loading && inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-<div class="fixed bottom-0 left-0 right-0 z-40 w-full bg-white border-t border-gray-200 p-3 flex items-center justify-center shadow-sm">
-  <button
-    type="button"
+<div
+  class="fixed bottom-0 left-0 right-0 z-40 w-full bg-white border-t border-gray-200 p-3 flex items-center justify-center  ">
+  <button type="button"
     class="btn-no-shadow-primary w-full py-3 text-base font-bold text-center rounded-xl cursor-pointer"
-    (click)="isConfirmDialogOpen = true"
-  >
+    (click)="isConfirmDialogOpen = true">
     Proses Penerimaan Dari {{ inventoryRequest.Details[0].WarehouseModel.Description }}
   </button>
 </div>
@@ -98,15 +88,15 @@
 
 <!-- Modal Konfirmasi Yakin -->
 @if (isConfirmDialogOpen) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card shadow-2xl flex flex-col gap-4">
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div
+    class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Kamu yakin?</h2>
-      <button
-        class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
-        (click)="isConfirmDialogOpen = false"
-      >
-        ✕
+      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="isConfirmDialogOpen = false">
+        âœ•
       </button>
     </div>
 
@@ -121,19 +111,14 @@
     </div>
 
     <div class="grid grid-cols-2 gap-3 mt-2">
-      <button
-        type="button"
+      <button type="button"
         class="btn-no-shadow-secondary w-full py-2.5 text-center rounded-xl font-bold cursor-pointer"
-        (click)="isConfirmDialogOpen = false"
-      >
+        (click)="isConfirmDialogOpen = false">
         Tutup
       </button>
-      <button
-        type="button"
-        [disabled]="loadingSubmitted"
+      <button type="button" [disabled]="loadingSubmitted"
         class="btn-no-shadow-success w-full py-2.5 text-center rounded-xl font-bold cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
-        (click)="onSubmit()"
-      >
+        (click)="onSubmit()">
         @if (loadingSubmitted) {
         <span>Tunggu...</span>
         } @else {

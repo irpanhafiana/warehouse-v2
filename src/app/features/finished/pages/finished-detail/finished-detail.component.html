@@ -1,10 +1,10 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-row items-center gap-3">
         <button type="button" (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
         <div class="flex flex-col">
@@ -15,7 +15,7 @@
         </div>
       </div>
       <button type="button" (click)="getDetail()"
-        class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+        class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
         <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
       </button>
     </div>
@@ -32,7 +32,7 @@
       </div>
       } @else if (salesInvoice) {
       <!-- Summary Card -->
-      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs">
+      <div class="w-full bg-white border border-gray-200 rounded-xl p-4">
         <div class="flex flex-col gap-3">
           <div class="flex justify-between items-start">
             <div class="flex flex-col">
@@ -62,7 +62,7 @@
       <div class="flex flex-col gap-3 mt-2">
         <h2 class="font-bold text-base text-slate-700 px-1">Daftar Item:</h2>
         @for (item of salesInvoice.Details; track item.Id || item.DetailId || $index) {
-        <div class="w-full rounded-xl p-4 relative border shadow-xs transition-all"
+        <div class="w-full rounded-xl p-4 relative border transition-all"
           [ngClass]="{
             'bg-red-50 border-red-200': item.Remarks === '',
             'bg-orange-50 border-orange-200': item.Remarks === 'pick',
@@ -85,7 +85,7 @@
                 <span class="line-through text-gray-400">
                   {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
                 </span>
-                ➜
+                âžœ
                 <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold ml-1">
                   {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
                 </span>

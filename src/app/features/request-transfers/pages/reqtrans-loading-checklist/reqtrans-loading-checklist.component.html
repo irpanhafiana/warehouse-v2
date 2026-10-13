@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Header Atas (Fixed) -->
   <div class="w-full shrink-0 flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -99,7 +99,7 @@
         <select
           id="picSelect"
           name="picSelect"
-          class="input-name-no-shadow w-full font-bold text-base py-2.5 bg-white border-2 border-gray-300 rounded-xl px-3"
+          class="input-name-no- w-full font-bold text-base py-2.5 bg-white border-2 border-gray-300 rounded-xl px-3"
           (change)="onOptionSelect($event)"
         >
           <option value="">Pilih PIC</option>
@@ -140,7 +140,7 @@
               (click)="getLoadingDetail(item.DocNum)"
               class="card border-4 rounded-2xl p-3 min-w-[150px] text-left transition-all cursor-pointer"
               [ngClass]="{
-                'bg-green-100 border-green-500 shadow-md': selectedBON === item.DocNum,
+                'bg-green-100 border-green-500': selectedBON === item.DocNum,
                 'bg-white border-gray-300': selectedBON !== item.DocNum
               }"
             >
@@ -264,7 +264,7 @@
     <div class="fixed bottom-28 right-6 z-40">
       <button
         type="button"
-        class="bg-green-700 hover:bg-green-800 text-white font-bold px-6 py-3 rounded-full border-4 border-green-800 shadow-xl text-base active:scale-95 transition-all cursor-pointer"
+        class="bg-green-700 hover:bg-green-800 text-white font-bold px-6 py-3 rounded-full border-4 border-green-800 text-base active:scale-95 transition-all cursor-pointer"
         (click)="toAddDelivery()"
       >
         Muat Kedalam Mobil
@@ -276,7 +276,7 @@
     @if (!isShowMenu) {
       <button
         type="button"
-        class="w-16 h-16 bg-[#FF8B00] border-4 border-[#cc7f22] rounded-full flex items-center justify-center p-3 shadow-xl active:scale-90 transition-transform cursor-pointer"
+        class="w-16 h-16 bg-[#FF8B00] border-4 border-[#cc7f22] rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
         (click)="isShowMenu = true"
         aria-label="Menu"
       >
@@ -285,7 +285,7 @@
     } @else {
       <button
         type="button"
-        class="w-16 h-16 bg-red-700 border-4 border-red-800 rounded-full flex items-center justify-center p-3 shadow-xl active:scale-90 transition-transform cursor-pointer"
+        class="w-16 h-16 bg-red-700 border-4 border-red-800 rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
         (click)="isShowMenu = false"
         aria-label="Tutup Menu"
       >
@@ -298,7 +298,7 @@
 <!-- Dialog Confirm Keluar -->
 @if (isDialogConfirmKeluar) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-md bg-white rounded-3xl p-6 border-4 border-gray-400 shadow-xl">
+    <div class="w-full max-w-md bg-white rounded-3xl p-6 border-4 border-gray-400">
       <div class="flex justify-between items-center pb-4 border-b">
         <h2 class="text-2xl font-bold text-slate-800">Apakah kamu yakin?</h2>
         <button
@@ -306,7 +306,7 @@
           class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
           (click)="isDialogConfirmKeluar = false"
         >
-          ✕
+          âœ•
         </button>
       </div>
       <p class="text-center mt-6 text-base text-slate-700 leading-relaxed">
@@ -327,7 +327,7 @@
 <!-- Dialog Barcode -->
 @if (isDialogOpenBarcode) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-gray-400 shadow-xl">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-gray-400">
       <div class="flex justify-between items-center pb-4 border-b">
         <h2 class="text-xl font-bold text-slate-800">Bagikan BON</h2>
         <button
@@ -335,7 +335,7 @@
           class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
           (click)="isDialogOpenBarcode = false"
         >
-          ✕
+          âœ•
         </button>
       </div>
       <div class="flex justify-center p-4">
@@ -366,7 +366,7 @@
 <!-- Dialog Error Alert -->
 @if (isErrorPicSebagian) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500 shadow-xl">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500">
       <h2 class="text-xl font-bold text-red-600 border-b pb-2">Oops, Perhatian!</h2>
       <p class="text-slate-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
       <button
@@ -383,7 +383,7 @@
 <!-- Dialog Pengingat Item Belum Di Pick -->
 @if (isBonNotFinishPick) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-amber-500 shadow-xl">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-amber-500">
       <h2 class="text-xl font-bold text-amber-700 border-b pb-2">Pengingat!</h2>
       <p class="text-slate-800 text-sm mt-4 leading-relaxed">
         Ada

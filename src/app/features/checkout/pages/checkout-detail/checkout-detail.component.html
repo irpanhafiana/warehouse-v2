@@ -1,45 +1,35 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Atas (fix) -->
-  <div class="w-full flex flex-col p-4 shrink-0" [ngClass]="{ 'h-[15%]': isFilterAlphabet, 'h-[10%]': !isFilterAlphabet }">
+  <div class="w-full flex flex-col p-4 shrink-0"
+    [ngClass]="{ 'h-[15%]': isFilterAlphabet, 'h-[10%]': !isFilterAlphabet }">
     <div class="flex flex-row justify-between gap-2 items-center">
       <div class="flex flex-col">
-        <p class="font-bold text-xs text-white/80">{{ loading ? 'loading' : (salesInvoice ? salesInvoice.DocNum : '') }}</p>
+        <p class="font-bold text-xs text-white/80">{{ loading ? 'loading' : (salesInvoice ? salesInvoice.DocNum : '') }}
+        </p>
         <h1 class="font-bold text-xl text-start text-white truncate max-w-[220px]">
           {{ getShortName(loading ? 'loading' : (salesInvoice ? salesInvoice.CustomerModel.CustomerName : '')) }}
         </h1>
       </div>
       <div class="flex flex-row gap-1.5">
-        <button
-          type="button"
-          (click)="getDetail()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="getDetail()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
         @if (!isFilterAlphabet) {
-        <button
-          type="button"
-          (click)="openFilterAlphabet()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="openFilterAlphabet()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
         </button>
         } @else {
-        <button
-          type="button"
-          (click)="closeFilterAlphabet()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="closeFilterAlphabet()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
         </button>
         }
 
-        <button
-          type="button"
-          (click)="onBack()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="onBack()"
+          class="w-[48px] h-[48px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -50,22 +40,17 @@
       <div class="flex flex-row items-center gap-1.5 min-w-max">
         @if (filteredData.length !== 0) {
         <button
-          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
-          (click)="onSelectedAlphabet('~')"
-        >
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+          (click)="onSelectedAlphabet('~')">
           Reset
         </button>
         }
         @for (item of alphabet; track $index) {
-        <button
-          type="button"
-          class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
+        <button type="button" class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
           [ngClass]="{
-            'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAplhabet,
+            'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
             'text-white/80 hover:bg-white/10': item !== selectedAplhabet
-          }"
-          (click)="onSelectedAlphabet(item)"
-        >
+          }" (click)="onSelectedAlphabet(item)">
           {{ item }}
         </button>
         }
@@ -75,9 +60,10 @@
   </div>
 
   <!-- Bawah (container list + scrollable) -->
-  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col gap-3 overflow-hidden">
+  <div
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col gap-3 overflow-hidden">
     @if (!loading && salesInvoice && salesInvoice.Note && salesInvoice.Note.trim() !== '') {
-    <div class="w-full bg-amber-50 border border-amber-200 rounded-xl p-3 shadow-xs">
+    <div class="w-full bg-amber-50 border border-amber-200 rounded-xl p-3">
       <p class="font-semibold text-xs text-amber-800">Catatan Kasir:</p>
       <p class="font-bold text-sm text-slate-800 mt-0.5">
         {{ salesInvoice.Note }}
@@ -92,7 +78,7 @@
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
       </div>
       } @else if (salesInvoice) {
-      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs">
+      <div class="w-full bg-white border border-gray-200 rounded-xl p-4">
         <div class="flex flex-col gap-2">
           <div class="flex justify-between items-start">
             <div class="flex flex-col">
@@ -120,28 +106,21 @@
       </div>
 
       <div class="flex justify-end pr-1">
-        <button
-          type="button"
-          (click)="onSelectAll()"
-          class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#202B6D] hover:bg-gray-50 active:scale-95 transition-all shadow-xs cursor-pointer"
-        >
+        <button type="button" (click)="onSelectAll()"
+          class="px-3 py-1.5 bg-white border border-gray-200 rounded-lg text-xs font-bold text-[#202B6D] hover:bg-gray-50 active:scale-95 transition-all cursor-pointer">
           Pilih Semua
         </button>
       </div>
 
       <div class="flex flex-col gap-3 pb-8">
         @for (item of filteredData; track item.Id || $index) {
-        <div
-          (click)="handleClick(item)"
-          class="w-full p-4 rounded-xl transition-all shadow-xs relative border"
-          [class.cursor-pointer]="!isItemLoaded(item)"
-          [ngClass]="{
+        <div (click)="handleClick(item)" class="w-full p-4 rounded-xl transition-all relative border"
+          [class.cursor-pointer]="!isItemLoaded(item)" [ngClass]="{
             'bg-blue-50 border-blue-400': item.isSelected && !isItemLoaded(item),
             'bg-white border-gray-200': !item.isSelected && !isItemLoaded(item) && item.Remarks !== 'pick' && !item.Remarks?.includes('load by'),
             'bg-orange-50 border-orange-300': item.Remarks === 'pick' && !item.isSelected,
             'bg-emerald-50 border-emerald-300': (item.Remarks?.includes('load by') || isItemLoaded(item)) && !item.isSelected
-          }"
-        >
+          }">
           @if (item.Remarks?.includes('load by')) {
           <img src="done.png" alt="" class="absolute top-3 right-3 w-8 h-8 z-10" />
           } @else if (item.Remarks === 'pick') {
@@ -161,7 +140,7 @@
                 <span class="line-through text-gray-400 mr-1">
                   {{ item.Quantity }}{{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
                 </span>
-                ➜
+                âžœ
                 <span class="bg-red-600 text-white px-2 py-0.5 rounded text-sm ml-1 font-semibold">
                   {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
                 </span>
@@ -182,12 +161,9 @@
 </div>
 
 @if (isShowAddDelivery) {
-<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-30 border-t border-gray-200 shadow-sm">
-  <button
-    type="button"
-    class="w-full py-3 btn-no-shadow-primary text-base font-bold rounded-xl cursor-pointer"
-    (click)="toGoodsDelivery()"
-  >
+<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-30 border-t border-gray-200  ">
+  <button type="button" class="w-full py-3 btn-no-shadow-primary text-base font-bold rounded-xl cursor-pointer"
+    (click)="toGoodsDelivery()">
     Tambah ke Pengiriman
   </button>
 </div>

@@ -1,14 +1,9 @@
 <div
-  class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2"
->
-  <div
-    routerLink="/main-reqtrans/picking/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqtrans/picking'),
+  class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2">
+  <div routerLink="/main-reqtrans/picking/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqtrans/picking'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqtrans/picking')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/pick-list.png" alt="Picking" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqtrans/picking')) {
@@ -17,14 +12,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main-reqtrans/loading/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqtrans/loading'),
+  <div routerLink="/main-reqtrans/loading/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqtrans/loading'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqtrans/loading')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/delivery-truck.png" alt="Loading" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqtrans/loading')) {
@@ -33,14 +24,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main-reqtrans/goods-delivery/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqtrans/goods-delivery'),
+  <div routerLink="/main-reqtrans/goods-delivery/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqtrans/goods-delivery'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqtrans/goods-delivery')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/load.png" alt="Pengiriman" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqtrans/goods-delivery')) {
@@ -49,4 +36,3 @@
     </div>
   </div>
 </div>
-

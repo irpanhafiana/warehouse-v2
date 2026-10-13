@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <div class="w-full h-[23%] flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
       <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
@@ -9,7 +9,7 @@
         <button
           type="button"
           (click)="getGoodsDeliveries(dateString, statusSelected)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
@@ -22,7 +22,7 @@
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
           <input
             type="date"
-            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base shadow-xs"
+            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base"
             [(ngModel)]="date"
             (change)="onDateChange($event)"
           />
@@ -33,7 +33,7 @@
             id="dropdown-gd-status"
             [(ngModel)]="statusSelected"
             name="dropdown"
-            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base shadow-xs"
+            class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base"
             (change)="onSelectedType($event)"
           >
             <option value="HISTORY">History</option>
@@ -56,7 +56,7 @@
         @if (goodsDeliveries.length > 0) {
         <div class="flex flex-col gap-3">
           @for (item of goodsDeliveries; track item.TransportUnit || $index) {
-          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs transition-all">
+          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
             <div class="flex justify-between items-start">
               <div class="flex flex-col">
                 <small class="text-gray-500 text-xs font-semibold">Mobil / Truck</small>

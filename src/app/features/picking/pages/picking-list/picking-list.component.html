@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -8,7 +8,7 @@
       </h1>
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="fetchPickingData()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer">
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -21,14 +21,14 @@
         <div class="flex flex-col items-start gap-1">
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
           <input type="date"
-            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
             [(ngModel)]="date" (change)="onDateChange($event)" />
         </div>
 
         <div class="flex flex-col items-start gap-1">
           <label for="dropdown" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Area</label>
           <select id="dropdown" [(ngModel)]="areaSelected" name="dropdown"
-            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
             (change)="onOptionSelect($event)">
             @if (area.length > 0) {
             <option value="">Semua Area</option>
@@ -47,7 +47,7 @@
       <div class="flex flex-row items-center gap-2 text-white py-1 min-w-0">
         @if (filteredSalesInvoices.length !== 0) {
         <button
-          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+          class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
           (click)="onSelectedAlphabet('~')">
           Reset
         </button>
@@ -57,7 +57,7 @@
             @for (item of alphabet; track $index) {
             <button type="button"
               class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
-                'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAlphabet,
+                'bg-[#FF8B00] text-white scale-105': item === selectedAlphabet,
                 'text-white/80 hover:bg-white/10': item !== selectedAlphabet
               }" (click)="onSelectedAlphabet(item)">
               {{ item }}
@@ -266,7 +266,7 @@
       <h2 class="text-xl font-bold text-[#202B6D]">Bantu {{ remarksSelected }}?</h2>
       <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
         (click)="closeDialogBantu()">
-        ✕
+        âœ•
       </button>
     </div>
     <div class="mt-4">

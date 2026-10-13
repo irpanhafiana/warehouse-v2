@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full h-[10%] flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -9,7 +9,7 @@
         <img
           src="refresh-w.png"
           alt="Refresh"
-          class="w-[50px] sm:w-[60px] bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer shadow-sm"
+          class="w-[50px] sm:w-[60px] bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer"
           (click)="onRefresh()"
         />
         <app-button-home></app-button-home>
@@ -35,7 +35,7 @@
         <div class="flex flex-col gap-3 pb-48">
           @for (item of inventoryRequests; track item.DocNum || $index) {
           <div
-            class="card flex flex-col gap-2 bg-white border-4 border-gray-400 rounded-3xl p-4 shadow-sm"
+            class="card flex flex-col gap-2 bg-white border-4 border-gray-400 rounded-3xl p-4"
           >
             <div class="flex flex-row justify-between items-center">
               <div class="flex flex-col">

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Atas (fix) -->
   <div class="w-full shrink-0 flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -51,7 +51,7 @@
         (click)="onSelectedTab('receh')"
         class="py-2.5 rounded-xl font-bold text-center transition-all cursor-pointer"
         [ngClass]="{
-          'bg-[#2F4ACD] text-white shadow': selectedTab === 'receh',
+          'bg-[#2F4ACD] text-white': selectedTab === 'receh',
           'text-gray-600 hover:text-gray-900': selectedTab !== 'receh'
         }"
       >
@@ -62,7 +62,7 @@
         (click)="onSelectedTab('non-receh')"
         class="py-2.5 rounded-xl font-bold text-center transition-all cursor-pointer"
         [ngClass]="{
-          'bg-[#2F4ACD] text-white shadow': selectedTab === 'non-receh',
+          'bg-[#2F4ACD] text-white': selectedTab === 'non-receh',
           'text-gray-600 hover:text-gray-900': selectedTab !== 'non-receh'
         }"
       >
@@ -95,7 +95,7 @@
                     <div class="flex flex-col">
                       @if (item.Remarks) {
                         <small class="font-bold text-green-800 tracking-wide">
-                          ✓ Dikerjakan oleh: {{ item.Remarks }}
+                          âœ“ Dikerjakan oleh: {{ item.Remarks }}
                         </small>
                       }
                       <h2 class="font-bold text-xl text-slate-800 leading-snug">
@@ -168,7 +168,7 @@
                   <div class="flex flex-col">
                     @if (item.Remarks) {
                       <small class="font-bold text-green-800 tracking-wide">
-                        ✓ Dikerjakan oleh: {{ item.Remarks }}
+                        âœ“ Dikerjakan oleh: {{ item.Remarks }}
                       </small>
                     }
                     <h2 class="font-bold text-xl text-slate-800 leading-snug">
@@ -232,7 +232,7 @@
   <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-40">
     <button
       type="button"
-      class="btn-no-shadow-primary w-full py-3 text-lg font-bold shadow-lg"
+      class="btn-no-shadow-primary w-full py-3 text-lg font-bold"
       (click)="toLoadingDetail()"
     >
       BON Siap Dimuat

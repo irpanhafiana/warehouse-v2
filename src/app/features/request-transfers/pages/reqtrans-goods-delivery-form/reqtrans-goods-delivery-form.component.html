@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Header Atas (Fixed) -->
   <div class="w-full shrink-0 flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -40,7 +40,7 @@
       } @else {
         <div class="flex flex-col gap-6">
           <!-- Card Form Pemilihan Mobil & Driver -->
-          <div class="flex flex-col gap-4 p-5 card border-4 border-gray-400 bg-white rounded-3xl shadow-sm">
+          <div class="flex flex-col gap-4 p-5 card border-4 border-gray-400 bg-white rounded-3xl">
             <div class="flex flex-col gap-4">
               <!-- Select Mobil -->
               <div class="flex flex-col gap-1.5">
@@ -102,7 +102,7 @@
             </h2>
             <div class="flex flex-col gap-3">
               @for (item of itemLoaded; track item.Id) {
-                <div class="bg-white rounded-2xl border-2 border-amber-200 p-3 shadow-xs">
+                <div class="bg-white rounded-2xl border-2 border-amber-200 p-3">
                   <p class="font-bold text-base text-slate-800 leading-snug">
                     {{ item.ProductModel.Name }}
                   </p>
@@ -132,7 +132,7 @@
 <!-- Modal Error Notice -->
 @if (isItemsNull) {
   <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500 shadow-xl">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500">
       <h2 class="text-xl font-bold text-red-600 border-b pb-2">Oops, Perhatian!</h2>
       <p class="text-slate-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
       <button

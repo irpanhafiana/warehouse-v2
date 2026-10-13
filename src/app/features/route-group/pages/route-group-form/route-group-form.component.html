@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col text-white">
@@ -9,7 +9,7 @@
         <button
           type="button"
           (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
         >
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
@@ -26,7 +26,7 @@
             <input
               type="text"
               formControlName="RouteName"
-              class="w-full p-3 border border-gray-300 focus:border-[#2F4ACD] focus:ring-2 focus:ring-[#2F4ACD]/20 focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
+              class="w-full p-3 border border-gray-300 focus:border-[#2F4ACD] focus:ring-2 focus:ring-[#2F4ACD]/20 focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
               placeholder="Masukkan nama jalur muatan"
             />
             @if (routeGroupForm.get('RouteName')?.invalid && routeGroupForm.get('RouteName')?.touched) {
@@ -42,7 +42,7 @@
             <div formArrayName="Details" class="flex flex-col gap-2.5">
               @for (detail of details.controls; let i = $index; let first = $first; let last = $last; track detail.value.DocNum || i) {
               <div [formGroupName]="i" class="flex flex-col">
-                <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all shadow-xs">
+                <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
                   <div class="flex flex-col gap-2">
                     <div class="grid grid-cols-12 w-full gap-2">
                       <div class="col-span-8">
@@ -81,7 +81,7 @@
                       <button
                         type="button"
                         (click)="moveUp(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2 cursor-pointer shadow-xs transition-all"
+                        class="w-10 h-10 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
                       >
                         <img src="up.png" alt="Up" class="w-full h-full object-contain" />
                       </button>
@@ -91,7 +91,7 @@
                       <button
                         type="button"
                         (click)="moveDown(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2 cursor-pointer shadow-xs transition-all"
+                        class="w-10 h-10 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
                       >
                         <img src="down.png" alt="Down" class="w-full h-full object-contain" />
                       </button>
@@ -100,7 +100,7 @@
                       <button
                         type="button"
                         (click)="removeDetail(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl p-2 cursor-pointer shadow-xs transition-all"
+                        class="w-10 h-10 flex items-center justify-center bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
                       >
                         <img src="close-w.png" alt="Delete" class="w-full h-full object-contain" />
                       </button>
@@ -157,7 +157,7 @@
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Pilih BON</h2>
       <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer" (click)="isDialogOpenBarcode = false">
-        ✕
+        âœ•
       </button>
     </div>
 
@@ -172,7 +172,7 @@
           </div>
           <button
             type="button"
-            class="px-3 py-1.5 bg-[#202B6D] hover:bg-[#1a235b] text-white rounded-xl text-xs font-semibold cursor-pointer transition-all shadow-xs"
+            class="px-3 py-1.5 bg-[#202B6D] hover:bg-[#1a235b] text-white rounded-xl text-xs font-semibold cursor-pointer transition-all"
             (click)="getLoadingList()"
           >
             Refresh
@@ -184,7 +184,7 @@
             <label class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Tanggal</label>
             <input
               type="date"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white shadow-xs"
+              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
               [(ngModel)]="date"
               (change)="onDateChange($event)"
             />
@@ -194,7 +194,7 @@
             <label for="dropdown-area" class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Area</label>
             <select
               id="dropdown-area"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white shadow-xs"
+              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
               (change)="onOptionSelect($event)"
             >
               <option value="">Lihat Semua</option>
@@ -209,7 +209,7 @@
           <div class="flex flex-row items-center gap-1.5">
             @if (filteredSalesInvoices.length !== 0) {
             <button
-              class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
+              class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
               (click)="onSelectedAlphabet('~')"
             >
               Reset
@@ -220,7 +220,7 @@
               type="button"
               class="font-bold text-base px-2 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
               [ngClass]="{
-                'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAplhabet,
+                'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
                 'text-gray-600 hover:bg-gray-100': item !== selectedAplhabet
               }"
               (click)="onSelectedAlphabet(item)"
@@ -241,7 +241,7 @@
             @for (item of filteredSalesInvoices; track item.DocNum) {
             <div
               (click)="onSelectedHeaderRes(item)"
-              class="border rounded-xl p-3.5 cursor-pointer transition-all shadow-xs"
+              class="border rounded-xl p-3.5 cursor-pointer transition-all"
               [ngClass]="{
                 'bg-emerald-50 border-emerald-400': isSelectedItem(item),
                 'bg-white border-gray-200 hover:border-gray-300': !isSelectedItem(item)

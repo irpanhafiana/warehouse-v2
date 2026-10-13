@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <div class="w-full p-4 shrink-0 flex flex-col">
     <div class="flex flex-row justify-between gap-2 items-center">
       <div class="flex flex-col">
@@ -10,18 +10,12 @@
         </h1>
       </div>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="getDetailDelivery(statusSelected)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="getDetailDelivery(statusSelected)"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
-        <button
-          type="button"
-          (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -40,7 +34,7 @@
 
       @if(statusSelected === 'ONGOING'){
       @for (item of deliveriesWithoutRemarks; track item.Alias || item.DocNum || $index) {
-      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs transition-all flex flex-col gap-3">
+      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-3">
         <div class="grid grid-cols-2 justify-between">
           <div class="flex flex-col items-start">
             <small class="text-gray-500 text-xs font-semibold">Tanggal</small>
@@ -70,14 +64,18 @@
           <div class="w-full flex flex-col justify-between border-b border-gray-200 last:border-b-0 py-2">
             <p class="text-base font-bold text-slate-800">{{ subItem.Data?.ProductModel?.Name }}</p>
             <div class="text-sm font-semibold text-gray-600 mt-1">
-              @if(subItem.Data?.ProductModel?.Description !== 'RECEH' && subItem.Data?.Quantity !== subItem.Data?.OpenQuantity){
+              @if(subItem.Data?.ProductModel?.Description !== 'RECEH' && subItem.Data?.Quantity !==
+              subItem.Data?.OpenQuantity){
               <p>
-                <span class="line-through text-gray-400">{{ subItem.Data?.Quantity }}{{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity }})</span>
-                ➜
-                <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold"> {{ subItem.Data?.SAPDocEntry }} {{ subItem.Data?.SAPDocNum }}</span>
+                <span class="line-through text-gray-400">{{ subItem.Data?.Quantity }}{{ subItem.Data?.UoMModel?.Code
+                  }}({{ subItem.Data?.BaseQuantity }})</span>
+                âžœ
+                <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold"> {{ subItem.Data?.SAPDocEntry
+                  }} {{ subItem.Data?.SAPDocNum }}</span>
               </p>
               } @else {
-              <span>{{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity }})</span>
+              <span>{{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity
+                }})</span>
               }
             </div>
           </div>
@@ -85,12 +83,9 @@
         </div>
         }
 
-        <button
-          type="button"
-          class="w-full py-2.5 px-4 font-bold rounded-xl cursor-pointer text-base transition-all"
+        <button type="button" class="w-full py-2.5 px-4 font-bold rounded-xl cursor-pointer text-base transition-all"
           [ngClass]="{'btn-no-shadow-primary': !item.isExpanded, 'btn-no-shadow-danger': item.isExpanded }"
-          (click)="toggleExpand(item)"
-        >
+          (click)="toggleExpand(item)">
           {{ !item.isExpanded ? 'Lihat Item' : 'Tutup' }}
         </button>
       </div>
@@ -99,7 +94,7 @@
 
       @if(statusSelected === 'HISTORY') {
       @for (remarksKey of objectKeys(deliveriesWithRemarks); track remarksKey) {
-      <div class="w-full bg-white border border-gray-200 rounded-xl overflow-hidden mb-4 shadow-xs">
+      <div class="w-full bg-white border border-gray-200 rounded-xl overflow-hidden mb-4">
         <div class="w-full bg-[#202B6D] py-2.5 px-4">
           <p class="font-bold text-base text-white text-start">
             Nomor: {{ remarksKey }}
@@ -137,14 +132,18 @@
               <div class="w-full flex flex-col justify-between border-b border-gray-200 last:border-b-0 py-2">
                 <p class="text-base font-bold text-slate-800">{{ subItem.Data?.ProductModel?.Name }}</p>
                 <div class="text-sm font-semibold text-gray-600 mt-1">
-                  @if(subItem.Data?.ProductModel?.Description !== 'RECEH' && subItem.Data?.Quantity !== subItem.Data?.OpenQuantity){
+                  @if(subItem.Data?.ProductModel?.Description !== 'RECEH' && subItem.Data?.Quantity !==
+                  subItem.Data?.OpenQuantity){
                   <p>
-                    <span class="line-through text-gray-400">{{ subItem.Data?.Quantity }}{{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity }})</span>
-                    ➜
-                    <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold"> {{ subItem.Data?.SAPDocEntry }} {{ subItem.Data?.SAPDocNum }}</span>
+                    <span class="line-through text-gray-400">{{ subItem.Data?.Quantity }}{{ subItem.Data?.UoMModel?.Code
+                      }}({{ subItem.Data?.BaseQuantity }})</span>
+                    âžœ
+                    <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold"> {{
+                      subItem.Data?.SAPDocEntry }} {{ subItem.Data?.SAPDocNum }}</span>
                   </p>
                   } @else {
-                  <span>{{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity }})</span>
+                  <span>{{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }}({{ subItem.Data?.BaseQuantity
+                    }})</span>
                   }
                 </div>
               </div>
@@ -152,12 +151,10 @@
             </div>
             }
 
-            <button
-              type="button"
+            <button type="button"
               class="w-full py-2.5 px-4 font-bold rounded-xl cursor-pointer text-base transition-all"
               [ngClass]="{'btn-no-shadow-primary': !item.isExpanded, 'btn-no-shadow-danger': item.isExpanded }"
-              (click)="toggleExpand(item)"
-            >
+              (click)="toggleExpand(item)">
               {{ !item.isExpanded ? 'Lihat Item' : 'Tutup' }}
             </button>
           </div>
@@ -173,27 +170,23 @@
 </div>
 
 @if(statusSelected === 'ONGOING'){
-<div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-20 border-t border-gray-200 shadow-sm flex items-center justify-center">
-  <button
-    type="button"
-    class="btn-no-shadow-primary w-full py-3 text-base font-bold rounded-xl cursor-pointer"
-    (click)="onTransportUnitReady()"
-  >
+<div
+  class="fixed bottom-0 left-0 right-0 bg-white p-3 z-20 border-t border-gray-200   flex items-center justify-center">
+  <button type="button" class="btn-no-shadow-primary w-full py-3 text-base font-bold rounded-xl cursor-pointer"
+    (click)="onTransportUnitReady()">
     Mobil siap Jalan
   </button>
 </div>
 }
 
-<div
-  [class.hidden]="!isErrorPicSebagian"
-  [class.flex]="isErrorPicSebagian"
-  class="fixed inset-0 z-50 items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop"
->
-  <div class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4">
+<div [class.hidden]="!isErrorPicSebagian" [class.flex]="isErrorPicSebagian"
+  class="fixed inset-0 z-50 items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Kamu yakin?</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer" (click)="isErrorPicSebagian = false">
-        ✕
+      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="isErrorPicSebagian = false">
+        âœ•
       </button>
     </div>
     <div class="flex justify-center mx-auto gap-2">
@@ -202,7 +195,8 @@
       </p>
     </div>
     <div class="grid grid-cols-2 gap-3 mt-4">
-      <button class="btn-no-shadow-secondary py-2.5 rounded-xl cursor-pointer text-center" (click)="isErrorPicSebagian = false">
+      <button class="btn-no-shadow-secondary py-2.5 rounded-xl cursor-pointer text-center"
+        (click)="isErrorPicSebagian = false">
         Tutup
       </button>
       <button class="btn-no-shadow-primary py-2.5 rounded-xl cursor-pointer text-center" (click)="onSubmit()">
@@ -211,4 +205,3 @@
     </div>
   </div>
 </div>
-

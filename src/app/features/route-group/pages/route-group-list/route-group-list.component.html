@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -7,11 +7,8 @@
         <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ filteredSalesInvoices.length }})</span>
       </h1>
       <div class="flex flex-row items-center gap-2">
-        <button
-          type="button"
-          (click)="fetchRouteGroups(dateString, statusSelected)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="fetchRouteGroups(dateString, statusSelected)"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -23,23 +20,16 @@
       <div class="grid grid-cols-2 gap-3 items-end">
         <div class="flex flex-col items-start gap-1">
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
-          <input
-            type="date"
-            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
-            [(ngModel)]="date"
-            (change)="onDateChange($event)"
-          />
+          <input type="date"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
+            [(ngModel)]="date" (change)="onDateChange($event)" />
         </div>
 
         <div class="flex flex-col items-start gap-1">
           <label for="dropdown" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Status</label>
-          <select
-            id="dropdown"
-            [(ngModel)]="statusSelected"
-            name="dropdown"
-            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs"
-            (change)="onSelectedType()"
-          >
+          <select id="dropdown" [(ngModel)]="statusSelected" name="dropdown"
+            class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
+            (change)="onSelectedType()">
             <option value="HISTORY">History</option>
             <option value="ONGOING">On Going</option>
           </select>
@@ -63,24 +53,19 @@
         <div class="flex flex-row items-center gap-2 text-slate-800 py-1 mb-2 min-w-0">
           @if (filteredSalesInvoices.length !== 0) {
           <button
-            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')"
-          >
+            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+            (click)="onSelectedAlphabet('~')">
             Reset
           </button>
           }
           <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
             <div class="flex flex-row items-center gap-1">
               @for (item of alphabet; track item) {
-              <button
-                type="button"
-                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-                [ngClass]="{
-                  'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAplhabet,
+              <button type="button"
+                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
+                  'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
                   'text-gray-600 hover:bg-gray-200': item !== selectedAplhabet
-                }"
-                (click)="onSelectedAlphabet(item)"
-              >
+                }" (click)="onSelectedAlphabet(item)">
                 {{ item }}
               </button>
               }
@@ -93,7 +78,8 @@
           <div class="flex flex-col justify-between">
             <p class="text-red-700 font-bold text-base text-center">Pesan Pengingat!</p>
             <p class="text-center text-xs sm:text-sm text-gray-600 mt-1">
-              Jangan lupa untuk selesaikan jalur jika semua BON sudah berwarna hijau atau BON sudah dimuat ke dalam mobil
+              Jangan lupa untuk selesaikan jalur jika semua BON sudah berwarna hijau atau BON sudah dimuat ke dalam
+              mobil
             </p>
           </div>
         </div>
@@ -102,13 +88,10 @@
         @if (filteredSalesInvoices.length > 0) {
         <div class="flex flex-col gap-3">
           @for (item of filteredSalesInvoices; track item.Alias || $index) {
-          <div
-            class="w-full border rounded-xl p-4 transition-all"
-            [ngClass]="{
+          <div class="w-full border rounded-xl p-4 transition-all" [ngClass]="{
               'bg-emerald-50 border-emerald-300': item.Remarks.toLowerCase() === 'done',
               'bg-white border-gray-200': item.Remarks.toLowerCase() !== 'done'
-            }"
-          >
+            }">
             <div class="flex justify-between items-start">
               <div class="flex flex-col">
                 <small class="text-gray-500 text-xs font-medium">Jalur Muatan</small>
@@ -124,10 +107,7 @@
               </div>
             </div>
             <div class="flex justify-between w-full mt-3">
-              <button
-                class="w-full btn-no-shadow-primary text-center cursor-pointer"
-                (click)="toDetail(item.Alias)"
-              >
+              <button class="w-full btn-no-shadow-primary text-center cursor-pointer" (click)="toDetail(item.Alias)">
                 Lihat BON
               </button>
             </div>
@@ -160,24 +140,19 @@
         <div class="flex flex-row items-center gap-2 text-slate-800 py-1 mb-2 min-w-0">
           @if (filteredSalesInvoices.length !== 0) {
           <button
-            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shadow-xs shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')"
-          >
+            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+            (click)="onSelectedAlphabet('~')">
             Reset
           </button>
           }
           <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
             <div class="flex flex-row items-center gap-1">
               @for (item of alphabet; track $index) {
-              <button
-                type="button"
-                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-                [ngClass]="{
-                  'bg-[#FF8B00] text-white shadow-xs scale-105': item === selectedAplhabet,
+              <button type="button"
+                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
+                  'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
                   'text-gray-600 hover:bg-gray-200': item !== selectedAplhabet
-                }"
-                (click)="onSelectedAlphabet(item)"
-              >
+                }" (click)="onSelectedAlphabet(item)">
                 {{ item }}
               </button>
               }
@@ -204,10 +179,8 @@
               </div>
             </div>
             <div class="flex justify-between w-full mt-3">
-              <button
-                class="w-full btn-no-shadow-primary text-center cursor-pointer"
-                (click)="toDetailHistory(item.Alias)"
-              >
+              <button class="w-full btn-no-shadow-primary text-center cursor-pointer"
+                (click)="toDetailHistory(item.Alias)">
                 Lihat BON
               </button>
             </div>
@@ -234,25 +207,16 @@
 <!-- Floating action buttons -->
 @if (isShowMenu) {
 <div class="fixed bottom-[270px] right-3 z-30 flex flex-col gap-2 items-end">
-  <button
-    type="button"
-    class="btn-no-shadow-success text-sm py-2 px-4 rounded-xl cursor-pointer shadow-md"
-    (click)="toAddRouteGroup()"
-  >
+  <button type="button" class="btn-no-shadow-success text-sm py-2 px-4 rounded-xl cursor-pointer  "
+    (click)="toAddRouteGroup()">
     Tambah Jalur Muatan
   </button>
-  <button
-    type="button"
-    class="btn-no-shadow-primary text-sm py-2 px-4 rounded-xl cursor-pointer shadow-md"
-    (click)="toAdditionalInvoice()"
-  >
+  <button type="button" class="btn-no-shadow-primary text-sm py-2 px-4 rounded-xl cursor-pointer  "
+    (click)="toAdditionalInvoice()">
     Lihat BON Tambahan
   </button>
-  <button
-    type="button"
-    class="btn-no-shadow-warning text-sm py-2 px-4 rounded-xl cursor-pointer shadow-md"
-    (click)="toLoadingList()"
-  >
+  <button type="button" class="btn-no-shadow-warning text-sm py-2 px-4 rounded-xl cursor-pointer  "
+    (click)="toLoadingList()">
     Lihat BON Loading
   </button>
 </div>
@@ -260,21 +224,16 @@
 
 <div class="fixed bottom-[95px] right-3 z-30">
   @if (!isShowMenu) {
-  <button
-    type="button"
-    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center shadow-md p-3 cursor-pointer transition-all"
-    (click)="isShowMenu = true"
-  >
+  <button type="button"
+    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all  "
+    (click)="isShowMenu = true">
     <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
   </button>
   } @else {
-  <button
-    type="button"
-    class="w-13 h-13 bg-red-600 hover:bg-red-700 active:scale-95 border border-red-700/30 rounded-xl flex items-center justify-center shadow-md p-3 cursor-pointer transition-all"
-    (click)="isShowMenu = false"
-  >
+  <button type="button"
+    class="w-13 h-13 bg-red-600 hover:bg-red-700 active:scale-95 border border-red-700/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all  "
+    (click)="isShowMenu = false">
     <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
   </button>
   }
 </div>
-

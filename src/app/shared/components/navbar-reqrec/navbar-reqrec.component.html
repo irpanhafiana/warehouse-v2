@@ -1,14 +1,9 @@
 <div
-  class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2"
->
-  <div
-    routerLink="/main-reqrec/request-receive/list"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqrec/request-receive/list'),
+  class="fixed bottom-0 left-0 right-0 w-full bg-white flex flex-row justify-around items-center z-40 h-[72px] sm:h-[80px] shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-gray-200 px-2">
+  <div routerLink="/main-reqrec/request-receive/list" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqrec/request-receive/list'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqrec/request-receive/list')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/pick-list.png" alt="Waiting" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqrec/request-receive/list')) {
@@ -17,14 +12,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main-reqrec/request-receive/processed-bon"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqrec/request-receive/processed-bon'),
+  <div routerLink="/main-reqrec/request-receive/processed-bon" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqrec/request-receive/processed-bon'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqrec/request-receive/processed-bon')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/delivery-truck.png" alt="BON Diproses" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqrec/request-receive/processed-bon')) {
@@ -33,14 +24,10 @@
     </div>
   </div>
 
-  <div
-    routerLink="/main-reqrec/request-receive/history"
-    [ngClass]="{
-      'bg-[#202B6D] text-white shadow-md': isActive('/main-reqrec/request-receive/history'),
+  <div routerLink="/main-reqrec/request-receive/history" [ngClass]="{
+      'bg-[#202B6D] text-white  ': isActive('/main-reqrec/request-receive/history'),
       'bg-transparent text-gray-600 hover:bg-gray-50': !isActive('/main-reqrec/request-receive/history')
-    }"
-    class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200"
-  >
+    }" class="rounded-xl py-2.5 px-5 cursor-pointer transition-all duration-200">
     <div class="flex flex-row gap-2 items-center justify-center">
       <img src="images/navbar/load.png" alt="History" class="w-[30px] h-[30px] object-contain" />
       @if (isActive('/main-reqrec/request-receive/history')) {
@@ -49,4 +36,3 @@
     </div>
   </div>
 </div>
-

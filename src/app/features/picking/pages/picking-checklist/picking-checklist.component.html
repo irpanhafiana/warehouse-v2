@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -12,19 +12,13 @@
       </div>
 
       <div class="flex flex-row items-center gap-2">
-        <button
-          type="button"
-          (click)="getDetail()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="getDetail()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
-        <button
-          type="button"
-          (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 shadow-sm transition-all cursor-pointer"
-        >
+        <button type="button" (click)="onBack()"
+          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -37,8 +31,8 @@
     <div class="flex flex-col gap-2 shrink-0 pb-2">
       @if (salesInvoice?.Note) {
       <div class="w-full bg-amber-50 border border-amber-200/60 rounded-xl p-2.5">
-        <small class="text-amber-800 text-xs font-semibold uppercase tracking-wider">Catatan Kasir</small>
-        <p class="font-medium text-sm text-amber-950 mt-0.5 leading-snug">
+        <small class="text-amber-800 text-xs font-bold tracking-normal">Catatan Kasir</small>
+        <p class="font-medium text-sm text-amber-950 leading-snug">
           {{ salesInvoice?.Note }}
         </p>
       </div>
@@ -50,36 +44,28 @@
 
       <!-- Segmented Tabs -->
       <div class="grid grid-cols-2 gap-2 bg-gray-200/70 p-1 rounded-2xl">
-        <button
-          type="button"
-          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer"
-          [ngClass]="{
+        <button type="button"
+          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer" [ngClass]="{
             'bg-[#FF8B00] text-white': selectedTab === 'receh',
             'text-gray-600 hover:text-gray-900': selectedTab !== 'receh'
-          }"
-          (click)="onSelectedTab('receh')"
-        >
+          }" (click)="onSelectedTab('receh')">
           Receh [{{ arrReceh.length }}]
         </button>
 
-        <button
-          type="button"
-          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer"
-          [ngClass]="{
+        <button type="button"
+          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer" [ngClass]="{
             'bg-[#FF8B00] text-white': selectedTab === 'non-receh',
             'text-gray-600 hover:text-gray-900': selectedTab !== 'non-receh'
-          }"
-          (click)="onSelectedTab('non-receh')"
-        >
+          }" (click)="onSelectedTab('non-receh')">
           Non Rch [{{ arrNonReceh.length }}]
         </button>
       </div>
     </div>
 
     <!-- Scrollable Items List -->
-    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
@@ -88,29 +74,21 @@
       <!-- Receh Tab Content -->
       @if (selectedTab === 'receh') {
       @if (arrReceh.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         @for (item of arrReceh; track item.Id) {
         <app-card-picking-item [salesInvoiceDetail]="item" [loadingId]="loadingId ?? 0">
           @if (!item.Remarks) {
           <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
-            <button
-              type="button"
-              class="btn-sm-no-shadow-success cursor-pointer text-center"
-              (click)="openDialog(item.Id)"
-            >
+            <button type="button" class="btn-sm-no-shadow-success cursor-pointer text-center"
+              (click)="openDialog(item.Id)">
               Picker
             </button>
 
-            <button
-              type="button"
-              class="cursor-pointer text-center"
-              (click)="onSaveItem(item.Id)"
-              [disabled]="isLoading(item.Id)"
-              [ngClass]="{
+            <button type="button" class="cursor-pointer text-center" (click)="onSaveItem(item.Id)"
+              [disabled]="isLoading(item.Id)" [ngClass]="{
                 'btn-sm-no-shadow-primary': !isLoading(item.Id),
                 'btn-sm-no-shadow-secondary': isLoading(item.Id)
-              }"
-            >
+              }">
               @if (!isLoading(item.Id)) {
               Selesai
               } @else {
@@ -120,11 +98,8 @@
           </div>
           } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
-            <button
-              type="button"
-              class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
-              (click)="onCancel(item.Id)"
-            >
+            <button type="button" class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
+              (click)="onCancel(item.Id)">
               Batalkan
             </button>
           </div>
@@ -145,29 +120,21 @@
       <!-- Non-Receh Tab Content -->
       @if (selectedTab === 'non-receh') {
       @if (arrNonReceh.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         @for (item of arrNonReceh; track item.Id) {
         <app-card-picking-item [salesInvoiceDetail]="item" [loadingId]="loadingId ?? 0">
           @if (!item.Remarks) {
           <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
-            <button
-              type="button"
-              class="btn-sm-no-shadow-success cursor-pointer text-center"
-              (click)="openDialog(item.Id)"
-            >
+            <button type="button" class="btn-sm-no-shadow-success cursor-pointer text-center"
+              (click)="openDialog(item.Id)">
               Picker
             </button>
 
-            <button
-              type="button"
-              class="cursor-pointer text-center"
-              (click)="onSaveItem(item.Id)"
-              [disabled]="isLoading(item.Id)"
-              [ngClass]="{
+            <button type="button" class="cursor-pointer text-center" (click)="onSaveItem(item.Id)"
+              [disabled]="isLoading(item.Id)" [ngClass]="{
                 'btn-sm-no-shadow-primary': !isLoading(item.Id),
                 'btn-sm-no-shadow-secondary': isLoading(item.Id)
-              }"
-            >
+              }">
               @if (!isLoading(item.Id)) {
               Selesai
               } @else {
@@ -177,11 +144,8 @@
           </div>
           } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
-            <button
-              type="button"
-              class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
-              (click)="onCancel(item.Id)"
-            >
+            <button type="button" class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
+              (click)="onCancel(item.Id)">
               Batalkan
             </button>
           </div>
@@ -205,24 +169,14 @@
 
 <!-- Bottom Sticky Action Button -->
 @if (!loading && salesInvoice) {
-<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 shadow-lg z-40">
-  <button
-    type="button"
-    class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
-    (click)="toLoadingDetail(salesInvoice.DocNum, salesInvoice.CustomerModel.Code)"
-  >
+<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 z-40">
+  <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
+    (click)="toLoadingDetail(salesInvoice.DocNum, salesInvoice.CustomerModel.Code)">
     BON Siap Dimuat
   </button>
 </div>
 }
 
 <!-- Reusable Dialog Picker -->
-<app-dialog-set-pic
-  [isOpen]="isDialogOpen"
-  [title]="'Pilih Picker'"
-  [confirmText]="'Selesai'"
-  [picList]="pickingPic"
-  (saved)="onPickerSelectedFromDialog($event)"
-  (closed)="closeDialog()"
-></app-dialog-set-pic>
-
+<app-dialog-set-pic [isOpen]="isDialogOpen" [title]="'Pilih Picker'" [confirmText]="'Selesai'" [picList]="pickingPic"
+  (saved)="onPickerSelectedFromDialog($event)" (closed)="closeDialog()"></app-dialog-set-pic>
