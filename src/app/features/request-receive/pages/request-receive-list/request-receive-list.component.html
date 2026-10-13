@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,11 +6,8 @@
         Penerimaan Antar Toko
       </h1>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="fetchDefaultBranch()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-        >
+        <button type="button" (click)="fetchDefaultBranch()"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -72,11 +69,9 @@
             </div>
 
             <div class="flex justify-between w-full mt-2">
-              <button
-                type="button"
+              <button type="button"
                 class="btn-no-shadow-primary w-full py-2.5 font-bold text-base rounded-xl cursor-pointer"
-                (click)="toInventoryRequestView(item.DocNum)"
-              >
+                (click)="toInventoryRequestView(item.DocNum)">
                 Lihat Detail
               </button>
             </div>
@@ -85,12 +80,8 @@
         </div>
         } @else {
         <div class="flex items-center justify-center flex-col pt-20">
-          <img
-            src="new-assets/data-not-founds.png"
-            class="w-1/2 max-w-[200px] mx-auto"
-            alt="Data Not Found"
-          />
-          <p class="w-3/4 text-center font-medium text-lg text-[#2F4ACD] mt-4">
+          <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
+          <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
             Ooops, tidak ada BON Permintaan Antar Toko :(
           </p>
         </div>

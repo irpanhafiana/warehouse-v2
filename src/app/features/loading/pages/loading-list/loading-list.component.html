@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -8,7 +8,7 @@
       </h1>
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="getLoadingList()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -90,7 +90,7 @@
       } @else {
       <div class="flex items-center justify-center flex-col pt-16">
         <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
-        <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
           Ooops, tidak ada BON Loading di tanggal ini :(
         </p>
       </div>
@@ -105,7 +105,8 @@
 
 <!-- Dialog Detail Docnum -->
 @if (isDialogDetailDocnum) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
   <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">BON Siap Loading</h2>
@@ -116,15 +117,14 @@
     </div>
     <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">
       @for (item of detailDocnumCustomer; track $index) {
-      <div
-        class="border border-gray-200 hover:border-[#2F4ACD] w-full rounded-xl p-3 cursor-pointer transition-all"
+      <div class="border border-gray-200 hover:border-checkout w-full rounded-xl p-3 cursor-pointer transition-all"
         (click)="toChecklist(item.DocNum)">
         <div class="flex justify-between items-center">
           <div class="flex flex-col">
             <small class="font-medium text-gray-500 text-xs">{{ item.DocDate | date:'dd MMMM yyyy' }}</small>
             <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
           </div>
-          <span class="font-bold text-sm text-[#2F4ACD] bg-blue-50 px-2 py-1 rounded-lg">
+          <span class="font-bold text-sm text-checkout bg-blue-50 px-2 py-1 rounded-lg">
             {{ item.Details }} Item
           </span>
         </div>

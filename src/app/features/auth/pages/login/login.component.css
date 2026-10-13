@@ -1,7 +1,7 @@
 @reference "tailwindcss";
 
 .ic-all-bonds {
-  @apply w-[100px] h-[100px] p-5 rounded-full bg-[#2F4ACD];
+  @apply w-[100px] h-[100px] p-5 rounded-full bg-checkout;
 }
 
 .ic-picking {

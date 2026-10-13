@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -8,7 +8,7 @@
       </h1>
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="getFinishedList()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -71,7 +71,7 @@
 
   <!-- Main Content Card List -->
   <div
-    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-[32px] sm:rounded-t-[40px] p-4 flex flex-col border-t-2 border-[#202B6D]/30 overflow-hidden">
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-4xl sm:rounded-t-[40px] p-4 flex flex-col border-t-2 border-[#202B6D]/30 overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-3">
@@ -83,15 +83,14 @@
       @if (groupResult.length > 0) {
       <div class="flex flex-col gap-3">
         @for (item of groupResult; track item.customerCode || $index) {
-        <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item"
-          (dialogOpen)="openDialogDetailDocnum(item.data)">
+        <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item" (dialogOpen)="openDialogDetailDocnum(item.data)">
         </app-card>
         }
       </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-16">
         <img src="/new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
-        <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
           Ooops, tidak ada BON Selesai di tanggal ini :(
         </p>
       </div>
@@ -117,15 +116,14 @@
     </div>
     <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">
       @for (item of detailDocnumCustomer; track item.DocNum || $index) {
-      <div
-        class="border border-gray-200 hover:border-[#2F4ACD] w-full rounded-xl p-3 cursor-pointer transition-all"
+      <div class="border border-gray-200 hover:border-checkout w-full rounded-xl p-3 cursor-pointer transition-all"
         (click)="toChecklist(item.DocNum)">
         <div class="flex justify-between items-center">
           <div class="flex flex-col">
             <small class="font-medium text-gray-500 text-xs">{{ item.DocDate | date:'dd MMMM yyyy' }}</small>
             <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
           </div>
-          <span class="font-bold text-sm text-[#2F4ACD] bg-blue-50 px-2 py-1 rounded-lg">
+          <span class="font-bold text-sm text-checkout bg-blue-50 px-2 py-1 rounded-lg">
             {{ item.Details }} Item
           </span>
         </div>
@@ -140,4 +138,3 @@
   </div>
 </div>
 }
-

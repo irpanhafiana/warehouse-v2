@@ -1,25 +1,18 @@
 ﻿@if (isOpen()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
   <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">{{ title() }}</h2>
-      <button
-        class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="onClose()"
-      >
+      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer" (click)="onClose()">
         âœ•
       </button>
     </div>
 
     <div class="flex flex-col gap-1 mt-4">
-      <input
-        id="picName"
-        type="text"
-        placeholder="Ketik nama di sini..."
-        class="w-full border border-gray-300 focus:border-[#2F4ACD] focus:ring-2 focus:ring-[#2F4ACD]/20 rounded-xl p-3 focus:outline-none text-base text-gray-800 font-medium"
-        [ngModel]="tempName()"
-        (ngModelChange)="tempName.set($event)"
-      />
+      <input id="picName" type="text" placeholder="Ketik nama di sini..."
+        class="w-full border border-gray-300 focus:border-checkout focus:ring-2 focus:ring-[#2F4ACD]/20 rounded-xl p-3 focus:outline-none text-base text-gray-800 font-medium"
+        [ngModel]="tempName()" (ngModelChange)="tempName.set($event)" />
     </div>
 
     @if (isLoading()) {
@@ -34,17 +27,13 @@
       </label>
       <div class="w-full max-h-[180px] overflow-y-auto flex flex-wrap gap-2 p-1">
         @for (item of picList(); track $index) {
-        <button
-          type="button"
-          class="px-3.5 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer border"
+        <button type="button" class="px-3.5 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer border"
           [ngClass]="{
-            'bg-[#2F4ACD] text-white border-[#2F4ACD] font-semibold':
+            'bg-checkout text-white border-[#2F4ACD] font-semibold':
               tempName() === item,
             'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100':
               tempName() !== item
-          }"
-          (click)="onSelectPic(item)"
-        >
+          }" (click)="onSelectPic(item)">
           {{ item }}
         </button>
         }
@@ -55,9 +44,7 @@
     <div class="mt-6">
       <button
         class="w-full btn-no-shadow-primary text-center cursor-pointer py-3 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:pointer-events-none"
-        (click)="onConfirm()"
-        [disabled]="tempName().trim().length === 0"
-      >
+        (click)="onConfirm()" [disabled]="tempName().trim().length === 0">
         {{ confirmText() }}
       </button>
     </div>

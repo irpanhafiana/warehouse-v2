@@ -1,16 +1,14 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <div class="w-full h-[23%] flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
       <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
         Pengiriman
-        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ goodsDeliveries ? goodsDeliveries.length : 0 }})</span>
+        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ goodsDeliveries ? goodsDeliveries.length : 0
+          }})</span>
       </h1>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="getGoodsDeliveries(dateString, statusSelected)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-        >
+        <button type="button" (click)="getGoodsDeliveries(dateString, statusSelected)"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -20,22 +18,16 @@
       <div class="grid grid-cols-2 gap-2 items-end">
         <div class="flex flex-col items-start gap-1">
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
-          <input
-            type="date"
+          <input type="date"
             class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base"
-            [(ngModel)]="date"
-            (change)="onDateChange($event)"
-          />
+            [(ngModel)]="date" (change)="onDateChange($event)" />
         </div>
         <div class="flex flex-col items-start gap-1">
-          <label for="dropdown-gd-status" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Status</label>
-          <select
-            id="dropdown-gd-status"
-            [(ngModel)]="statusSelected"
-            name="dropdown"
+          <label for="dropdown-gd-status"
+            class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Status</label>
+          <select id="dropdown-gd-status" [(ngModel)]="statusSelected" name="dropdown"
             class="w-full p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold text-base"
-            (change)="onSelectedType($event)"
-          >
+            (change)="onSelectedType($event)">
             <option value="HISTORY">History</option>
             <option value="ONGOING">On Going</option>
           </select>
@@ -72,11 +64,9 @@
               </div>
             </div>
             <div class="flex justify-between w-full mt-4">
-              <button
-                type="button"
+              <button type="button"
                 class="w-full py-2.5 px-4 btn-no-shadow-primary text-base font-bold rounded-xl cursor-pointer"
-                (click)="toDetail(dateString, item.TransportUnit)"
-              >
+                (click)="toDetail(dateString, item.TransportUnit)">
                 Lihat Detail
               </button>
             </div>
@@ -86,7 +76,7 @@
         } @else {
         <div class="flex items-center justify-center flex-col pt-20">
           <img src="new-assets/data-not-founds.png" class="w-40 mx-auto opacity-90" alt="" />
-          <p class="w-2/3 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          <p class="w-2/3 text-center font-medium text-base text-checkout mt-3">
             Ooops, tidak ada data {{ statusSelected }} pengiriman :(
           </p>
         </div>
@@ -98,4 +88,3 @@
 </div>
 
 <app-navbar></app-navbar>
-

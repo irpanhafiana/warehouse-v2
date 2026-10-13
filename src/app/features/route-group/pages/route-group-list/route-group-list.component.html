@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -8,7 +8,7 @@
       </h1>
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="fetchRouteGroups(dateString, statusSelected)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -118,7 +118,7 @@
         } @else {
         <div class="flex items-center justify-center flex-col pt-16">
           <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
-          <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
             Ooops, tidak ada jalur muat di tanggal ini :(
           </p>
         </div>
@@ -167,7 +167,7 @@
         } @else {
         <div class="flex items-center justify-center flex-col pt-16">
           <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Not found" />
-          <p class="w-3/4 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
             Ooops, tidak ada jalur muat di tanggal ini :(
           </p>
         </div>
@@ -183,7 +183,7 @@
 
 <!-- Floating action buttons -->
 @if (isShowMenu) {
-<div class="fixed bottom-[270px] right-3 z-30 flex flex-col gap-2 items-end">
+<div class="fixed bottom-67.5 right-3 z-30 flex flex-col gap-2 items-end">
   <button type="button" class="btn-no-shadow-success text-sm py-2 px-4 rounded-xl cursor-pointer  "
     (click)="toAddRouteGroup()">
     Tambah Jalur Muatan
@@ -199,7 +199,7 @@
 </div>
 }
 
-<div class="fixed bottom-[95px] right-3 z-30">
+<div class="fixed bottom-23.75 right-3 z-30">
   @if (!isShowMenu) {
   <button type="button"
     class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all  "

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col text-white min-w-0">
@@ -8,24 +8,24 @@
       </div>
       <div class="flex flex-row items-center gap-2 shrink-0">
         <button type="button" (click)="getLoading()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
         @if (!isFilterAlphabet) {
         <button type="button" (click)="openFilterAlphabet()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-red-600 hover:bg-red-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-red-600 hover:bg-red-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
         </button>
         } @else {
         <button type="button" (click)="closeFilterAlphabet()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-gray-600 hover:bg-gray-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-gray-600 hover:bg-gray-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
         </button>
         }
 
         <button type="button" (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -267,7 +267,7 @@
 </div>
 
 @if (data && filteredDetails && filteredDetails.length > initialLength) {
-<div class="fixed bottom-[130px] right-3 z-30">
+<div class="fixed bottom-32.5 right-3 z-30">
   <button type="button" class="btn-no-shadow-success text-sm py-2.5 px-4 rounded-xl cursor-pointer  "
     (click)="onSubmit()">
     âœ” Simpan Perubahan
@@ -275,7 +275,7 @@
 </div>
 }
 
-<div class="fixed bottom-[80px] right-3 z-30">
+<div class="fixed bottom-20 right-3 z-30">
   <button type="button" class="btn-no-shadow-warning text-sm py-2.5 px-4 rounded-xl cursor-pointer  "
     (click)="isDialogOpenBarcode = true">
     + BON Baru
@@ -312,7 +312,7 @@
           <div class="flex flex-col">
             <label class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Tanggal</label>
             <input type="date"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
+              class="w-full p-2.5 border border-gray-300 focus:border-checkout focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
               [(ngModel)]="date" (change)="onDateChange($event)" />
           </div>
 
@@ -320,7 +320,7 @@
             <label for="dropdown-area-detail"
               class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Area</label>
             <select id="dropdown-area-detail"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
+              class="w-full p-2.5 border border-gray-300 focus:border-checkout focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
               (change)="onOptionSelect($event)">
               <option value="">Lihat Semua</option>
               @for (item of area; track item.Code) {
@@ -373,7 +373,7 @@
                 </div>
                 <div class="flex flex-col items-end">
                   <small class="text-gray-500 text-xs font-medium">Item</small>
-                  <span class="bg-blue-50 text-[#2F4ACD] px-2 py-0.5 rounded-md font-bold text-xs">{{ item.Details ?
+                  <span class="bg-blue-50 text-checkout px-2 py-0.5 rounded-md font-bold text-xs">{{ item.Details ?
                     item.Details : '-' }}</span>
                 </div>
               </div>
@@ -439,7 +439,7 @@
         <label for="select-vehicle" class="font-medium text-xs uppercase tracking-wider text-gray-700 pl-1">Mobil /
           Truck</label>
         <select id="select-vehicle" [(ngModel)]="selectedVehicle" (change)="onSelectedVehicle()"
-          class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-[#2F4ACD] rounded-xl font-semibold text-sm text-gray-800 focus:outline-none">
+          class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl font-semibold text-sm text-gray-800 focus:outline-none">
           <option [ngValue]="null">Pilih Mobil</option>
           @for (item of vehicles; track item.vehicleNo) {
           <option [ngValue]="item">{{ item.vehicleNo }} - {{ item.description }}</option>
@@ -453,7 +453,7 @@
         <label for="select-driver" class="font-medium text-xs uppercase tracking-wider text-gray-700 pl-1">Sopir /
           Driver</label>
         <select id="select-driver" (change)="onSelectedDriver($event)"
-          class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-[#2F4ACD] rounded-xl font-semibold text-sm text-gray-800 focus:outline-none">
+          class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl font-semibold text-sm text-gray-800 focus:outline-none">
           <option value="">Pilih Sopir / Driver</option>
           @for (item of drivers; track item.alias || item.loginName || $index) {
           <option [value]="item.firstName + ' ' + (item.lastName !== '-' ? item.lastName : '')">

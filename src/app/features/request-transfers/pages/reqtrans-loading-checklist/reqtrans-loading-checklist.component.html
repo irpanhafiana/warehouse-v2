@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header Atas (Fixed) -->
   <div class="w-full shrink-0 flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,46 +6,34 @@
         <p class="font-bold text-base text-blue-200">
           {{ !loading && salesInvoice ? salesInvoice.DocNum : 'Memuat...' }}
         </p>
-        <h1 class="font-bold text-xl text-start text-white truncate max-w-[220px]">
+        <h1 class="font-bold text-xl text-start text-white truncate max-w-55">
           {{ !loading && salesInvoice ? salesInvoice.CustomerModel.CustomerName : 'Memuat...' }}
         </h1>
       </div>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="onRefresh()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
-          aria-label="Refresh"
-        >
+        <button type="button" (click)="onRefresh()"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          aria-label="Refresh">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
         @if (!isFilterAlphabet) {
-          <button
-            type="button"
-            (click)="isFilterAlphabet = true"
-            class="w-[52px] h-[52px] flex items-center justify-center bg-red-700 border-4 border-red-800 rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
-            aria-label="Filter"
-          >
-            <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
-          </button>
+        <button type="button" (click)="isFilterAlphabet = true"
+          class="w-13 h-13 flex items-center justify-center bg-red-700 border-4 border-red-800 rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          aria-label="Filter">
+          <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
+        </button>
         } @else {
-          <button
-            type="button"
-            (click)="isFilterAlphabet = false; selectedAlphabet = ''; applyFilter()"
-            class="w-[52px] h-[52px] flex items-center justify-center bg-gray-700 border-4 border-gray-800 rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
-            aria-label="Close Filter"
-          >
-            <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
-          </button>
+        <button type="button" (click)="isFilterAlphabet = false; selectedAlphabet = ''; applyFilter()"
+          class="w-13 h-13 flex items-center justify-center bg-gray-700 border-4 border-gray-800 rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          aria-label="Close Filter">
+          <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
+        </button>
         }
 
-        <button
-          type="button"
-          (click)="isDialogConfirmKeluar = true"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] border-4 border-[#ce8225] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
-          aria-label="Kembali"
-        >
+        <button type="button" (click)="isDialogConfirmKeluar = true"
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] border-4 border-[#ce8225] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          aria-label="Kembali">
           <img src="new-assets/back-w.png" alt="Kembali" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -53,82 +41,66 @@
 
     <!-- Alphabet Filter Strip -->
     @if (isFilterAlphabet) {
-      <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
-        @if (filteredData.length !== 0) {
-          <button
-            type="button"
-            class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')"
-          >
-            Reset
-          </button>
-        }
-        <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
-          <div class="flex flex-row items-center gap-1">
-            @for (item of alphabet; track item) {
-              <button
-                type="button"
-                class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-                [ngClass]="{
+    <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
+      @if (filteredData.length !== 0) {
+      <button type="button"
+        class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
+        (click)="onSelectedAlphabet('~')">
+        Reset
+      </button>
+      }
+      <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
+        <div class="flex flex-row items-center gap-1">
+          @for (item of alphabet; track item) {
+          <button type="button"
+            class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
                   'bg-[#FF8B00] text-white scale-105': item === selectedAlphabet,
                   'text-white/80 hover:bg-white/10': item !== selectedAlphabet
-                }"
-                (click)="onSelectedAlphabet(item)"
-              >
-                {{ item }}
-              </button>
-            }
-          </div>
+                }" (click)="onSelectedAlphabet(item)">
+            {{ item }}
+          </button>
+          }
         </div>
       </div>
+    </div>
     }
   </div>
 
   <!-- Kontainer Konten & List (Scrollable) -->
   <div
-    class="w-full flex-1 bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-3 border-t-[15px] border-[#202B6D] overflow-hidden"
-  >
+    class="w-full flex-1 bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-3 border-t-15 border-[#202B6D] overflow-hidden">
     @if (!loading && salesInvoice?.Note && salesInvoice?.Note?.trim() !== '') {
-      <div class="w-full flex flex-col items-start bg-amber-50 border border-amber-200 rounded-2xl p-3 shrink-0">
-        <p class="font-semibold text-gray-500 text-xs">Catatan Kasir</p>
-        <p class="font-bold text-sm text-slate-700 leading-snug">
-          {{ salesInvoice?.Note }}
-        </p>
-      </div>
+    <div class="w-full flex flex-col items-start bg-amber-50 border border-amber-200 rounded-2xl p-3 shrink-0">
+      <p class="font-semibold text-gray-500 text-xs">Catatan Kasir</p>
+      <p class="font-bold text-sm text-slate-700 leading-snug">
+        {{ salesInvoice?.Note }}
+      </p>
+    </div>
     }
 
     <!-- Bar PIC & Aksi -->
     <div class="flex flex-row justify-between w-full gap-2 items-center shrink-0">
       <div class="flex-1">
-        <select
-          id="picSelect"
-          name="picSelect"
+        <select id="picSelect" name="picSelect"
           class="input-name-no- w-full font-bold text-base py-2.5 bg-white border-2 border-gray-300 rounded-xl px-3"
-          (change)="onOptionSelect($event)"
-        >
+          (change)="onOptionSelect($event)">
           <option value="">Pilih PIC</option>
           @for (item of pickingPic; track item) {
-            <option [value]="item" [selected]="item === picName">
-              {{ item }}
-            </option>
+          <option [value]="item" [selected]="item === picName">
+            {{ item }}
+          </option>
           }
         </select>
       </div>
       <div class="flex flex-row gap-1.5 shrink-0">
-        <button
-          type="button"
+        <button type="button"
           class="w-11 h-11 bg-primary flex items-center justify-center rounded-xl p-2.5 active:scale-95 transition-transform cursor-pointer"
-          (click)="isDialogAddPic = true"
-          aria-label="Tambah PIC"
-        >
+          (click)="isDialogAddPic = true" aria-label="Tambah PIC">
           <img src="add-w.png" alt="Add" class="w-full h-full object-contain" />
         </button>
-        <button
-          type="button"
+        <button type="button"
           class="w-11 h-11 bg-emerald-600 flex items-center justify-center rounded-xl p-2.5 active:scale-95 transition-transform cursor-pointer"
-          (click)="isDialogOpenBarcode = true"
-          aria-label="Share QR"
-        >
+          (click)="isDialogOpenBarcode = true" aria-label="Share QR">
           <img src="shared-w.png" alt="Share" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -136,275 +108,228 @@
 
     <!-- Horizontal BON Carousel/List -->
     @if (listBON.length > 0) {
-      <div class="w-full overflow-x-auto pb-1 shrink-0">
-        <div class="flex flex-row gap-2.5 whitespace-nowrap">
-          @for (item of listBON; track item.DocNum) {
-            <button
-              type="button"
-              (click)="getLoadingDetail(item.DocNum)"
-              class="card border-4 rounded-2xl p-3 min-w-[150px] text-left transition-all cursor-pointer"
-              [ngClass]="{
+    <div class="w-full overflow-x-auto pb-1 shrink-0">
+      <div class="flex flex-row gap-2.5 whitespace-nowrap">
+        @for (item of listBON; track item.DocNum) {
+        <button type="button" (click)="getLoadingDetail(item.DocNum)"
+          class="card border-4 rounded-2xl p-3 min-w-37.5 text-left transition-all cursor-pointer" [ngClass]="{
                 'bg-green-100 border-green-500': selectedBON === item.DocNum,
                 'bg-white border-gray-300': selectedBON !== item.DocNum
-              }"
-            >
-              <div class="flex justify-between items-center text-xs font-bold text-gray-500">
-                <span>BON: {{ $index + 1 }}</span>
-                <span>{{ item.Details }} Items</span>
-              </div>
-              <p class="text-xs text-gray-400 mt-0.5">{{ item.DocDate | date: 'dd MMM yyyy' }}</p>
-              <p class="font-bold text-slate-800 text-sm mt-1 truncate">{{ item.DocNum }}</p>
-            </button>
-          }
-        </div>
+              }">
+          <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+            <span>BON: {{ $index + 1 }}</span>
+            <span>{{ item.Details }} Items</span>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">{{ item.DocDate | date: 'dd MMM yyyy' }}</p>
+          <p class="font-bold text-slate-800 text-sm mt-1 truncate">{{ item.DocNum }}</p>
+        </button>
+        }
       </div>
+    </div>
     }
 
     <!-- Item List -->
     <div class="flex-1 overflow-y-auto flex flex-col gap-3 pr-1 pb-32">
       @if (loading) {
-        <div class="flex flex-col gap-2">
-          <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
-          <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
-          <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
-        </div>
+      <div class="flex flex-col gap-2">
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+      </div>
       } @else {
-        @if (filteredData.length > 0) {
-          @for (item of filteredData; track item.Id) {
-            <div
-              class="flex flex-col justify-between gap-3 card border-4 rounded-2xl p-3.5 transition-colors"
-              [ngClass]="getCardClass(item)"
-            >
-              @if (isItemLoaded(item)) {
-                <div class="flex justify-between items-center text-xs">
-                  @if (item.OpenQuantity === 0) {
-                    <span class="bg-green-700 font-semibold px-2 py-0.5 text-white rounded-md">
-                      Sudah Dikirim Semua
-                    </span>
-                  } @else {
-                    <span class="bg-orange-500 font-semibold px-2 py-0.5 text-white rounded-md">
-                      Sudah dikirim: {{ item.SAPDocEntry }}
-                    </span>
-                    @if (item.sebagianValue > 0) {
-                      <span class="bg-cyan-600 font-semibold px-2 py-0.5 text-white rounded-md">
-                        Akan dikirim: {{ item.sebagianValue }}
-                      </span>
-                    } @else if (item.Remarks?.includes(picName) && item.OpenQuantity > 0) {
-                      <span class="bg-cyan-600 font-semibold px-2 py-0.5 text-white rounded-md">
-                        Akan dikirim: {{ item.OpenQuantity }}
-                      </span>
-                    }
-                  }
-                </div>
-              }
-
-              <div class="flex flex-col gap-1">
-                <div class="flex justify-between items-center text-xs text-gray-500 font-bold">
-                  <span>{{ item.Alias || '' }}</span>
-                  <span>{{ item.Remarks ?? '' }}</span>
-                </div>
-
-                <button
-                  type="button"
-                  class="font-bold text-lg text-slate-800 text-left leading-snug cursor-pointer transition-opacity"
-                  [class.opacity-50]="isLoading(item.Id)"
-                  (click)="!isLoading(item.Id) && onRemarkDone(item.Id, item.Remarks, item.DetailId, item)"
-                >
-                  {{ isLoading(item.Id) ? 'Proses Menyimpan Data...' : item.ProductModel.Name }}
-                </button>
-              </div>
-
-              <div class="flex justify-between items-center pt-1 border-t border-gray-200/80">
-                <span class="font-bold text-gray-700 text-sm">
-                  {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-                </span>
-
-                @if (!item.Remarks?.includes(picName)) {
-                  <div class="flex flex-row gap-2 items-center">
-                    <button
-                      type="button"
-                      class="w-8 h-8 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold text-lg active:scale-95 cursor-pointer"
-                      (click)="onSebagianValueChange('-', item.Id)"
-                    >
-                      -
-                    </button>
-                    <span class="font-bold text-sm text-center min-w-[50px]">
-                      {{ item.sebagianValue }} / {{ item.OpenQuantity > 0 ? item.OpenQuantity : item.Quantity }}
-                    </span>
-                    <button
-                      type="button"
-                      class="w-8 h-8 bg-green-700 text-white rounded-lg flex items-center justify-center font-bold text-lg active:scale-95 cursor-pointer"
-                      (click)="onSebagianValueChange('+', item.Id)"
-                    >
-                      +
-                    </button>
-                  </div>
-                } @else {
-                  <button
-                    type="button"
-                    class="px-4 py-1.5 bg-red-600 text-white font-semibold text-xs rounded-xl active:scale-95 transition-transform cursor-pointer"
-                    (click)="onCancel(item.Id)"
-                  >
-                    Batalkan
-                  </button>
-                }
-              </div>
-            </div>
+      @if (filteredData.length > 0) {
+      @for (item of filteredData; track item.Id) {
+      <div class="flex flex-col justify-between gap-3 card border-4 rounded-2xl p-3.5 transition-colors"
+        [ngClass]="getCardClass(item)">
+        @if (isItemLoaded(item)) {
+        <div class="flex justify-between items-center text-xs">
+          @if (item.OpenQuantity === 0) {
+          <span class="bg-green-700 font-semibold px-2 py-0.5 text-white rounded-md">
+            Sudah Dikirim Semua
+          </span>
+          } @else {
+          <span class="bg-orange-500 font-semibold px-2 py-0.5 text-white rounded-md">
+            Sudah dikirim: {{ item.SAPDocEntry }}
+          </span>
+          @if (item.sebagianValue > 0) {
+          <span class="bg-cyan-600 font-semibold px-2 py-0.5 text-white rounded-md">
+            Akan dikirim: {{ item.sebagianValue }}
+          </span>
+          } @else if (item.Remarks?.includes(picName) && item.OpenQuantity > 0) {
+          <span class="bg-cyan-600 font-semibold px-2 py-0.5 text-white rounded-md">
+            Akan dikirim: {{ item.OpenQuantity }}
+          </span>
           }
-        } @else {
-          <div class="flex items-center justify-center flex-col pt-16">
-            <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-[180px] mx-auto" alt="Empty" />
-            <p class="w-2/3 text-center font-medium text-lg text-[#2F4ACD] mt-4">
-              Tidak ada item loading pada BON ini :(
-            </p>
-          </div>
+          }
+        </div>
         }
+
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between items-center text-xs text-gray-500 font-bold">
+            <span>{{ item.Alias || '' }}</span>
+            <span>{{ item.Remarks ?? '' }}</span>
+          </div>
+
+          <button type="button"
+            class="font-bold text-lg text-slate-800 text-left leading-snug cursor-pointer transition-opacity"
+            [class.opacity-50]="isLoading(item.Id)"
+            (click)="!isLoading(item.Id) && onRemarkDone(item.Id, item.Remarks, item.DetailId, item)">
+            {{ isLoading(item.Id) ? 'Proses Menyimpan Data...' : item.ProductModel.Name }}
+          </button>
+        </div>
+
+        <div class="flex justify-between items-center pt-1 border-t border-gray-200/80">
+          <span class="font-bold text-gray-700 text-sm">
+            {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+          </span>
+
+          @if (!item.Remarks?.includes(picName)) {
+          <div class="flex flex-row gap-2 items-center">
+            <button type="button"
+              class="w-8 h-8 bg-gray-700 text-white rounded-lg flex items-center justify-center font-bold text-lg active:scale-95 cursor-pointer"
+              (click)="onSebagianValueChange('-', item.Id)">
+              -
+            </button>
+            <span class="font-bold text-sm text-center min-w-12.5">
+              {{ item.sebagianValue }} / {{ item.OpenQuantity > 0 ? item.OpenQuantity : item.Quantity }}
+            </span>
+            <button type="button"
+              class="w-8 h-8 bg-green-700 text-white rounded-lg flex items-center justify-center font-bold text-lg active:scale-95 cursor-pointer"
+              (click)="onSebagianValueChange('+', item.Id)">
+              +
+            </button>
+          </div>
+          } @else {
+          <button type="button"
+            class="px-4 py-1.5 bg-red-600 text-white font-semibold text-xs rounded-xl active:scale-95 transition-transform cursor-pointer"
+            (click)="onCancel(item.Id)">
+            Batalkan
+          </button>
+          }
+        </div>
+      </div>
+      }
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-16">
+        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-45 mx-auto" alt="Empty" />
+        <p class="w-2/3 text-center font-medium text-lg text-checkout mt-4">
+          Tidak ada item loading pada BON ini :(
+        </p>
+      </div>
+      }
       }
     </div>
   </div>
 
   <!-- Floating Action Buttons -->
   @if (isShowMenu) {
-    <div class="fixed bottom-28 right-6 z-40">
-      <button
-        type="button"
-        class="bg-green-700 hover:bg-green-800 text-white font-bold px-6 py-3 rounded-full border-4 border-green-800 text-base active:scale-95 transition-all cursor-pointer"
-        (click)="toAddDelivery()"
-      >
-        Muat Kedalam Mobil
-      </button>
-    </div>
+  <div class="fixed bottom-28 right-6 z-40">
+    <button type="button"
+      class="bg-green-700 hover:bg-green-800 text-white font-bold px-6 py-3 rounded-full border-4 border-green-800 text-base active:scale-95 transition-all cursor-pointer"
+      (click)="toAddDelivery()">
+      Muat Kedalam Mobil
+    </button>
+  </div>
   }
 
   <div class="fixed bottom-6 right-6 z-40">
     @if (!isShowMenu) {
-      <button
-        type="button"
-        class="w-16 h-16 bg-[#FF8B00] border-4 border-[#cc7f22] rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
-        (click)="isShowMenu = true"
-        aria-label="Menu"
-      >
-        <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
-      </button>
+    <button type="button"
+      class="w-16 h-16 bg-[#FF8B00] border-4 border-[#cc7f22] rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
+      (click)="isShowMenu = true" aria-label="Menu">
+      <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
+    </button>
     } @else {
-      <button
-        type="button"
-        class="w-16 h-16 bg-red-700 border-4 border-red-800 rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
-        (click)="isShowMenu = false"
-        aria-label="Tutup Menu"
-      >
-        <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
-      </button>
+    <button type="button"
+      class="w-16 h-16 bg-red-700 border-4 border-red-800 rounded-full flex items-center justify-center p-3 active:scale-90 transition-transform cursor-pointer"
+      (click)="isShowMenu = false" aria-label="Tutup Menu">
+      <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
+    </button>
     }
   </div>
 </div>
 
 <!-- Dialog Confirm Keluar -->
 @if (isDialogConfirmKeluar) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-md bg-white rounded-3xl p-6 border-4 border-gray-400">
-      <div class="flex justify-between items-center pb-4 border-b">
-        <h2 class="text-2xl font-bold text-slate-800">Apakah kamu yakin?</h2>
-        <button
-          type="button"
-          class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
-          (click)="isDialogConfirmKeluar = false"
-        >
-          âœ•
-        </button>
-      </div>
-      <p class="text-center mt-6 text-base text-slate-700 leading-relaxed">
-        Saat kamu meninggalkan BON
-        <span class="font-bold underline text-primary">{{ docnum }}</span>, item yang ditandai
-        <span class="font-bold underline text-amber-600">masuk sebagian</span> akan di-reset.
-      </p>
-      <div class="grid grid-cols-2 gap-4 mt-6">
-        <button type="button" class="btn-no-shadow-secondary" (click)="isDialogConfirmKeluar = false">
-          Tutup
-        </button>
-        <button type="button" class="btn-no-shadow-primary" (click)="onBack()">Keluar</button>
-      </div>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl p-6 border-4 border-gray-400">
+    <div class="flex justify-between items-center pb-4 border-b">
+      <h2 class="text-2xl font-bold text-slate-800">Apakah kamu yakin?</h2>
+      <button type="button" class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
+        (click)="isDialogConfirmKeluar = false">
+        âœ•
+      </button>
+    </div>
+    <p class="text-center mt-6 text-base text-slate-700 leading-relaxed">
+      Saat kamu meninggalkan BON
+      <span class="font-bold underline text-primary">{{ docnum }}</span>, item yang ditandai
+      <span class="font-bold underline text-amber-600">masuk sebagian</span> akan di-reset.
+    </p>
+    <div class="grid grid-cols-2 gap-4 mt-6">
+      <button type="button" class="btn-no-shadow-secondary" (click)="isDialogConfirmKeluar = false">
+        Tutup
+      </button>
+      <button type="button" class="btn-no-shadow-primary" (click)="onBack()">Keluar</button>
     </div>
   </div>
+</div>
 }
 
 <!-- Dialog Barcode -->
 @if (isDialogOpenBarcode) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-gray-400">
-      <div class="flex justify-between items-center pb-4 border-b">
-        <h2 class="text-xl font-bold text-slate-800">Bagikan BON</h2>
-        <button
-          type="button"
-          class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
-          (click)="isDialogOpenBarcode = false"
-        >
-          âœ•
-        </button>
-      </div>
-      <div class="flex justify-center p-4">
-        <qrcode [qrdata]="QRCodes" [width]="240" [errorCorrectionLevel]="'M'"></qrcode>
-      </div>
-      <button
-        type="button"
-        class="btn-no-shadow-secondary w-full mt-4"
-        (click)="isDialogOpenBarcode = false"
-      >
-        Tutup
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-gray-400">
+    <div class="flex justify-between items-center pb-4 border-b">
+      <h2 class="text-xl font-bold text-slate-800">Bagikan BON</h2>
+      <button type="button" class="text-gray-500 hover:text-gray-700 text-xl font-bold p-1 cursor-pointer"
+        (click)="isDialogOpenBarcode = false">
+        âœ•
       </button>
     </div>
+    <div class="flex justify-center p-4">
+      <qrcode [qrdata]="QRCodes" [width]="240" [errorCorrectionLevel]="'M'"></qrcode>
+    </div>
+    <button type="button" class="btn-no-shadow-secondary w-full mt-4" (click)="isDialogOpenBarcode = false">
+      Tutup
+    </button>
   </div>
+</div>
 }
 
 <!-- Dialog Tambah PIC Modal -->
-<app-dialog-set-pic
-  [isOpen]="isDialogAddPic"
-  title="Tambah PIC Loading"
-  confirmText="Tambah PIC"
-  [currentPic]="picName"
-  [picList]="pickingPic"
-  (saved)="onPicSelectedFromModal($event)"
-  (closed)="isDialogAddPic = false"
-></app-dialog-set-pic>
+<app-dialog-set-pic [isOpen]="isDialogAddPic" title="Tambah PIC Loading" confirmText="Tambah PIC" [currentPic]="picName"
+  [picList]="pickingPic" (saved)="onPicSelectedFromModal($event)"
+  (closed)="isDialogAddPic = false"></app-dialog-set-pic>
 
 <!-- Dialog Error Alert -->
 @if (isErrorPicSebagian) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500">
-      <h2 class="text-xl font-bold text-red-600 border-b pb-2">Oops, Perhatian!</h2>
-      <p class="text-slate-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
-      <button
-        type="button"
-        class="btn-no-shadow-secondary w-full mt-6"
-        (click)="isErrorPicSebagian = false"
-      >
-        Tutup
-      </button>
-    </div>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500">
+    <h2 class="text-xl font-bold text-red-600 border-b pb-2">Oops, Perhatian!</h2>
+    <p class="text-slate-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
+    <button type="button" class="btn-no-shadow-secondary w-full mt-6" (click)="isErrorPicSebagian = false">
+      Tutup
+    </button>
   </div>
+</div>
 }
 
 <!-- Dialog Pengingat Item Belum Di Pick -->
 @if (isBonNotFinishPick) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-    <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-amber-500">
-      <h2 class="text-xl font-bold text-amber-700 border-b pb-2">Pengingat!</h2>
-      <p class="text-slate-800 text-sm mt-4 leading-relaxed">
-        Ada
-        <span class="bg-red-700 text-white px-2 py-0.5 rounded font-bold">{{ notPickedItem }}</span>
-        item yang belum selesai di-pick di BON ini!
-      </p>
-      @if (isRecehExist) {
-        <p class="text-amber-800 font-semibold text-sm mt-2">Ada receh yang belum di-pick!</p>
-      }
-      <button
-        type="button"
-        class="btn-no-shadow-secondary w-full mt-6"
-        (click)="isBonNotFinishPick = false"
-      >
-        Mengerti
-      </button>
-    </div>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
+  <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-amber-500">
+    <h2 class="text-xl font-bold text-amber-700 border-b pb-2">Pengingat!</h2>
+    <p class="text-slate-800 text-sm mt-4 leading-relaxed">
+      Ada
+      <span class="bg-red-700 text-white px-2 py-0.5 rounded font-bold">{{ notPickedItem }}</span>
+      item yang belum selesai di-pick di BON ini!
+    </p>
+    @if (isRecehExist) {
+    <p class="text-amber-800 font-semibold text-sm mt-2">Ada receh yang belum di-pick!</p>
+    }
+    <button type="button" class="btn-no-shadow-secondary w-full mt-6" (click)="isBonNotFinishPick = false">
+      Mengerti
+    </button>
   </div>
+</div>
 }
-

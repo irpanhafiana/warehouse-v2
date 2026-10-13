@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,8 +6,7 @@
         <p class="font-bold text-xs uppercase tracking-wider text-white/80">
           {{ !loading && inventoryRequest ? inventoryRequest.DocNum : "Loading ... " }}
         </p>
-        <h1
-          class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
+        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-50 sm:max-w-70">
           @if (loading) {
           <span>Loading...</span>
           } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
@@ -18,11 +17,11 @@
       </div>
       <div class="flex flex-row gap-2">
         <button type="button" (click)="fetchDetailInventoryRequest(docnum)"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <button type="button" (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -64,8 +63,8 @@
       </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-20">
-        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-[200px] mx-auto" alt="Data Not Found" />
-        <p class="w-3/4 text-center font-medium text-lg text-[#2F4ACD] mt-4">
+        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
+        <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
           Ooops, tidak ada item pada BON ini :(
         </p>
       </div>

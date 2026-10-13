@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Atas (fix) -->
   <div class="w-full flex flex-col p-4 shrink-0"
     [ngClass]="{ 'h-[15%]': isFilterAlphabet, 'h-[10%]': !isFilterAlphabet }">
@@ -6,30 +6,30 @@
       <div class="flex flex-col">
         <p class="font-bold text-xs text-white/80">{{ loading ? 'loading' : (salesInvoice ? salesInvoice.DocNum : '') }}
         </p>
-        <h1 class="font-bold text-xl text-start text-white truncate max-w-[220px]">
+        <h1 class="font-bold text-xl text-start text-white truncate max-w-55">
           {{ getShortName(loading ? 'loading' : (salesInvoice ? salesInvoice.CustomerModel.CustomerName : '')) }}
         </h1>
       </div>
       <div class="flex flex-row gap-1.5">
         <button type="button" (click)="getDetail()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
+          class="w-12 h-12 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
         @if (!isFilterAlphabet) {
         <button type="button" (click)="openFilterAlphabet()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
+          class="w-12 h-12 flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
         </button>
         } @else {
         <button type="button" (click)="closeFilterAlphabet()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
+          class="w-12 h-12 flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
         </button>
         }
 
         <button type="button" (click)="onBack()"
-          class="w-[48px] h-[48px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
+          class="w-12 h-12 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -47,8 +47,8 @@
       <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
         <div class="flex flex-row items-center gap-1">
           @for (item of alphabet; track $index) {
-          <button type="button" class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-            [ngClass]="{
+          <button type="button"
+            class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
               'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
               'text-white/80 hover:bg-white/10': item !== selectedAplhabet
             }" (click)="onSelectedAlphabet(item)">

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Atas (fix) -->
   <div class="w-full h-[25%] flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -7,11 +7,8 @@
         <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ filteredSalesInvoices.length }})</span>
       </h1>
       <div class="flex flex-row gap-2">
-        <button
-          type="button"
-          (click)="getCheckoutList()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-        >
+        <button type="button" (click)="getCheckoutList()"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -21,23 +18,17 @@
       <div class="grid grid-cols-2 gap-3 items-end">
         <div class="flex flex-col items-start gap-1">
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
-          <input
-            type="date"
+          <input type="date"
             class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
-            [(ngModel)]="date"
-            (change)="onDateChange($event)"
-          />
+            [(ngModel)]="date" (change)="onDateChange($event)" />
         </div>
 
         <div class="flex flex-col items-start gap-1">
-          <label for="dropdown-area-co" class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Area</label>
-          <select
-            id="dropdown-area-co"
-            [(ngModel)]="areaSelected"
-            name="dropdown"
+          <label for="dropdown-area-co"
+            class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Area</label>
+          <select id="dropdown-area-co" [(ngModel)]="areaSelected" name="dropdown"
             class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
-            (change)="onOptionSelect($event)"
-          >
+            (change)="onOptionSelect($event)">
             @if (area.length > 0) {
             <option value="">Lihat Semua</option>
             }
@@ -56,23 +47,18 @@
         @if (filteredSalesInvoices.length !== 0) {
         <button
           class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-          (click)="onSelectedAlphabet('~')"
-        >
+          (click)="onSelectedAlphabet('~')">
           Reset
         </button>
         }
         <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
           <div class="flex flex-row items-center gap-1">
             @for (item of alphabet; track item) {
-            <button
-              type="button"
-              class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-              [ngClass]="{
+            <button type="button"
+              class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
                 'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
                 'text-white/80 hover:bg-white/10': item !== selectedAplhabet
-              }"
-              (click)="onSelectedAlphabet(item)"
-            >
+              }" (click)="onSelectedAlphabet(item)">
               {{ item }}
             </button>
             }
@@ -95,18 +81,14 @@
         @if (groupResult.length > 0) {
         <div class="flex flex-col gap-3">
           @for (item of groupResult; track item.customerCode || $index) {
-          <app-card
-            [dataFrom]="'LOADING'"
-            [salesInvoicesModel]="item"
-            (dialogOpen)="openDialogDetailDocnum(item.data)"
-          >
+          <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item" (dialogOpen)="openDialogDetailDocnum(item.data)">
           </app-card>
           }
         </div>
         } @else {
         <div class="flex items-center justify-center flex-col pt-20">
           <img src="new-assets/data-not-founds.png" class="w-40 mx-auto opacity-90" alt="" />
-          <p class="w-2/3 text-center font-medium text-base text-[#2F4ACD] mt-3">
+          <p class="w-2/3 text-center font-medium text-base text-checkout mt-3">
             Ooops, tidak ada BON Checkout :(
           </p>
         </div>
@@ -120,11 +102,14 @@
 <app-navbar></app-navbar>
 
 @if (isDialogDetailDocnum) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4 max-h-[85vh]">
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4 max-h-[85vh]">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">DocNum</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer" (click)="onCloseDialogDetailDocnum()">
+      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
+        (click)="onCloseDialogDetailDocnum()">
         âœ•
       </button>
     </div>
@@ -133,8 +118,7 @@
       @for (item of detailDocnumCustomer; track item.DocNum || $index) {
       <div
         class="border border-gray-200 hover:border-[#202B6D] bg-white w-full rounded-xl p-4 cursor-pointer transition-all"
-        (click)="toChecklist(item.DocNum)"
-      >
+        (click)="toChecklist(item.DocNum)">
         <div class="flex justify-between items-center">
           <small class="font-semibold text-xs text-gray-500">
             {{ item.DocDate | date : 'dd MMMM yyyy' }}
@@ -159,15 +143,11 @@
     </div>
 
     <div class="pt-2 border-t border-gray-200">
-      <button
-        type="button"
-        class="btn-no-shadow-secondary w-full py-2.5 rounded-xl cursor-pointer"
-        (click)="onCloseDialogDetailDocnum()"
-      >
+      <button type="button" class="btn-no-shadow-secondary w-full py-2.5 rounded-xl cursor-pointer"
+        (click)="onCloseDialogDetailDocnum()">
         Tutup
       </button>
     </div>
   </div>
 </div>
 }
-

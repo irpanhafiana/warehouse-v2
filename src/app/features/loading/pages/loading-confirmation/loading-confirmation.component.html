@@ -1,12 +1,9 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row items-center gap-3 text-white">
-      <button
-        type="button"
-        (click)="onCheckUlang()"
-        class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-      >
+      <button type="button" (click)="onCheckUlang()"
+        class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
         <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
       </button>
       <h1 class="font-bold text-2xl tracking-tight">Konfirmasi Loading</h1>
@@ -14,7 +11,8 @@
   </div>
 
   <!-- Content Container -->
-  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-6 flex flex-col items-center justify-center overflow-hidden">
+  <div
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-6 flex flex-col items-center justify-center overflow-hidden">
     <div class="max-w-sm w-full mx-auto text-center flex flex-col items-center">
       <div class="w-24 h-24 mb-4">
         <img src="loading-confirm.png" alt="Confirm" class="w-full h-full object-contain" />
@@ -26,28 +24,17 @@
       </p>
 
       <div class="flex flex-row gap-3 w-full">
-        <button
-          type="button"
-          class="flex-1 btn-no-shadow-danger text-sm py-3 cursor-pointer"
-          (click)="onCheckUlang()"
-        >
+        <button type="button" class="flex-1 btn-no-shadow-danger text-sm py-3 cursor-pointer" (click)="onCheckUlang()">
           Ragu, Cek Ulang
         </button>
 
-        <button
-          type="button"
-          [disabled]="loading"
-          class="flex-1 text-sm py-3 cursor-pointer"
-          [ngClass]="{
+        <button type="button" [disabled]="loading" class="flex-1 text-sm py-3 cursor-pointer" [ngClass]="{
             'btn-no-shadow-primary': !loading,
             'btn-no-shadow-disabled': loading
-          }"
-          (click)="onSubmit()"
-        >
+          }" (click)="onSubmit()">
           {{ loading ? 'Menyimpan...' : 'Yakin, Submit' }}
         </button>
       </div>
     </div>
   </div>
 </div>
-

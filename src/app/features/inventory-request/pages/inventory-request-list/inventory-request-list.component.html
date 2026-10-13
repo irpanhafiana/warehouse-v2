@@ -1,4 +1,4 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full h-[10%] flex flex-col p-4">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,21 +6,16 @@
         Pengiriman Antar Toko
       </h1>
       <div class="flex flex-row gap-2">
-        <img
-          src="refresh-w.png"
-          alt="Refresh"
-          class="w-[50px] sm:w-[60px] bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer"
-          (click)="onRefresh()"
-        />
+        <img src="refresh-w.png" alt="Refresh"
+          class="w-12.5 sm:w-15 bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer"
+          (click)="onRefresh()" />
         <app-button-home></app-button-home>
       </div>
     </div>
   </div>
 
   <!-- Body Container -->
-  <div
-    class="w-full h-[90%] bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-[15px] border-[#202B6D]"
-  >
+  <div class="w-full h-[90%] bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-15 border-[#202B6D]">
     <!-- Scrollable List -->
     <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-60">
       @if (isLoading) {
@@ -34,9 +29,7 @@
         @if (inventoryRequests.length > 0) {
         <div class="flex flex-col gap-3 pb-48">
           @for (item of inventoryRequests; track item.DocNum || $index) {
-          <div
-            class="card flex flex-col gap-2 bg-white border-4 border-gray-400 rounded-3xl p-4"
-          >
+          <div class="card flex flex-col gap-2 bg-white border-4 border-gray-400 rounded-3xl p-4">
             <div class="flex flex-row justify-between items-center">
               <div class="flex flex-col">
                 <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
@@ -86,10 +79,8 @@
             }
 
             <div class="flex justify-between w-full mt-3">
-              <button
-                class="btn-no-shadow-primary w-full py-3 font-bold text-lg"
-                (click)="toInventoryRequestView(item.DocNum)"
-              >
+              <button class="btn-no-shadow-primary w-full py-3 font-bold text-lg"
+                (click)="toInventoryRequestView(item.DocNum)">
                 Lihat Detail
               </button>
             </div>
@@ -98,12 +89,8 @@
         </div>
         } @else {
         <div class="flex items-center justify-center flex-col pt-20">
-          <img
-            src="new-assets/data-not-founds.png"
-            class="w-1/2 max-w-[200px] mx-auto"
-            alt="Data Not Found"
-          />
-          <p class="w-3/4 text-center font-medium text-lg text-[#2F4ACD] mt-4">
+          <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
+          <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
             Ooops, tidak ada BON Permintaan Antar Toko :(
           </p>
         </div>
@@ -115,12 +102,10 @@
 </div>
 
 <!-- Bottom Navigation Action -->
-<div class="fixed bottom-0 left-0 right-0 z-40 w-full h-[90px] bg-white border-t border-gray-200 px-4 flex items-center justify-center shadow-lg">
-  <button
-    class="btn-no-shadow-primary w-full py-3.5 text-lg font-bold text-center rounded-xl cursor-pointer"
-    (click)="toPickingListPengiriman()"
-  >
+<div
+  class="fixed bottom-0 left-0 right-0 z-40 w-full h-22.5 bg-white border-t border-gray-200 px-4 flex items-center justify-center shadow-lg">
+  <button class="btn-no-shadow-primary w-full py-3.5 text-lg font-bold text-center rounded-xl cursor-pointer"
+    (click)="toPickingListPengiriman()">
     Picking Loading Permintaan
   </button>
 </div>
-

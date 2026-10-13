@@ -8,7 +8,7 @@
           <p class="text-xl font-bold text-slate-800">{{ salesInvoicesModel?.data?.[0]?.Area }}</p>
         </div>
       </div>
-      <p class="bg-[#2F4ACD] text-white text-xs font-bold px-3 py-1.5 rounded-lg tracking-wide">
+      <p class="bg-checkout text-white text-xs font-bold px-3 py-1.5 rounded-lg tracking-wide">
         @if (salesInvoicesModel?.data?.length === salesInvoicesModel?.total) {
         {{ salesInvoicesModel.total }} BON
         } @else {
@@ -35,11 +35,8 @@
     </div>
 
     <div class="grid grid-cols-1 mt-2">
-      <button
-        type="button"
-        class="w-full btn-no-shadow-primary text-center cursor-pointer"
-        (click)="openDialogDetail()"
-      >
+      <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer"
+        (click)="openDialogDetail()">
         Lihat Detail
       </button>
     </div>
@@ -73,7 +70,7 @@
           </span>
         </p>
         <p class="font-bold text-sm text-slate-700">
-          NonRch: <span class="px-2 py-0.5 bg-[#2F4ACD] text-white rounded-md text-xs font-bold">
+          NonRch: <span class="px-2 py-0.5 bg-checkout text-white rounded-md text-xs font-bold">
             {{ headerRes.NonReceh }}
           </span>
         </p>
@@ -112,4 +109,3 @@
   </div>
 </div>
 }
-

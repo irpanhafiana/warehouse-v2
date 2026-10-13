@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col text-white">
@@ -6,11 +6,8 @@
         <h1 class="font-bold text-xl sm:text-2xl tracking-tight">Jalur Muatan Baru</h1>
       </div>
       <div class="flex flex-row items-center gap-2">
-        <button
-          type="button"
-          (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-        >
+        <button type="button" (click)="onBack()"
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -23,12 +20,9 @@
         <div class="flex flex-col gap-4">
           <div class="flex flex-col gap-1">
             <label class="font-medium text-xs uppercase tracking-wider text-gray-700 pl-1">Nama Jalur Muatan</label>
-            <input
-              type="text"
-              formControlName="RouteName"
-              class="w-full p-3 border border-gray-300 focus:border-[#2F4ACD] focus:ring-2 focus:ring-[#2F4ACD]/20 focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
-              placeholder="Masukkan nama jalur muatan"
-            />
+            <input type="text" formControlName="RouteName"
+              class="w-full p-3 border border-gray-300 focus:border-checkout focus:ring-2 focus:ring-checkout/20 focus:outline-none rounded-xl bg-white text-gray-800 font-semibold"
+              placeholder="Masukkan nama jalur muatan" />
             @if (routeGroupForm.get('RouteName')?.invalid && routeGroupForm.get('RouteName')?.touched) {
             <div class="text-red-700 font-semibold text-xs pl-1 mt-1">
               Nama Jalur Harus diisi.
@@ -40,7 +34,8 @@
           <div class="flex flex-col gap-2.5">
             <label class="font-semibold text-center my-1 text-gray-600 text-sm">BON yang akan dimuat</label>
             <div formArrayName="Details" class="flex flex-col gap-2.5">
-              @for (detail of details.controls; let i = $index; let first = $first; let last = $last; track detail.value.DocNum || i) {
+              @for (detail of details.controls; let i = $index; let first = $first; let last = $last; track
+              detail.value.DocNum || i) {
               <div [formGroupName]="i" class="flex flex-col">
                 <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
                   <div class="flex flex-col gap-2">
@@ -48,60 +43,42 @@
                       <div class="col-span-8">
                         <div class="flex flex-col w-full">
                           <small class="text-gray-500 text-xs font-medium">DocNum</small>
-                          <input
-                            formControlName="DocNum"
-                            readonly
-                            class="font-bold text-lg text-slate-800 w-full bg-transparent outline-none"
-                          />
+                          <input formControlName="DocNum" readonly
+                            class="font-bold text-lg text-slate-800 w-full bg-transparent outline-none" />
                         </div>
                       </div>
                       <div class="col-span-4 text-end">
                         <div class="flex flex-col w-full items-end">
                           <small class="text-gray-500 text-xs font-medium">Item</small>
-                          <input
-                            formControlName="Details"
-                            readonly
-                            class="font-bold text-lg text-slate-800 w-16 text-end bg-transparent outline-none"
-                          />
+                          <input formControlName="Details" readonly
+                            class="font-bold text-lg text-slate-800 w-16 text-end bg-transparent outline-none" />
                         </div>
                       </div>
                     </div>
                     <div class="flex justify-start items-start w-full">
                       <div class="flex flex-col w-full">
                         <small class="text-gray-500 text-xs font-medium">Nama Customer</small>
-                        <input
-                          formControlName="Name"
-                          readonly
-                          class="font-bold text-base text-slate-800 w-full bg-transparent outline-none"
-                        />
+                        <input formControlName="Name" readonly
+                          class="font-bold text-base text-slate-800 w-full bg-transparent outline-none" />
                       </div>
                     </div>
                     <div class="flex justify-center flex-row items-center gap-3 mt-2 pt-2 border-t border-gray-100">
                       @if (!first) {
-                      <button
-                        type="button"
-                        (click)="moveUp(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
-                      >
+                      <button type="button" (click)="moveUp(i)"
+                        class="w-10 h-10 flex items-center justify-center bg-[#202B6D] hover:bg-[#19245a] active:scale-95 rounded-xl p-2 cursor-pointer transition-all">
                         <img src="up.png" alt="Up" class="w-full h-full object-contain" />
                       </button>
                       }
 
                       @if (!last) {
-                      <button
-                        type="button"
-                        (click)="moveDown(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
-                      >
+                      <button type="button" (click)="moveDown(i)"
+                        class="w-10 h-10 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 rounded-xl p-2 cursor-pointer transition-all">
                         <img src="down.png" alt="Down" class="w-full h-full object-contain" />
                       </button>
                       }
 
-                      <button
-                        type="button"
-                        (click)="removeDetail(i)"
-                        class="w-10 h-10 flex items-center justify-center bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl p-2 cursor-pointer transition-all"
-                      >
+                      <button type="button" (click)="removeDetail(i)"
+                        class="w-10 h-10 flex items-center justify-center bg-red-600 hover:bg-red-700 active:scale-95 rounded-xl p-2 cursor-pointer transition-all">
                         <img src="close-w.png" alt="Delete" class="w-full h-full object-contain" />
                       </button>
                     </div>
@@ -114,27 +91,18 @@
           }
 
           <div class="grid grid-cols-2 gap-3 mt-2">
-            <button
-              type="button"
-              (click)="isDialogOpenBarcode = true"
-              [disabled]="routeGroupForm.get('RouteName')?.invalid"
-              class="w-full cursor-pointer text-center"
-              [ngClass]="{
+            <button type="button" (click)="isDialogOpenBarcode = true"
+              [disabled]="routeGroupForm.get('RouteName')?.invalid" class="w-full cursor-pointer text-center" [ngClass]="{
                 'btn-no-shadow-disabled': routeGroupForm.get('RouteName')?.invalid,
                 'btn-no-shadow-success': routeGroupForm.get('RouteName')?.valid
-              }"
-            >
+              }">
               Lihat BON
             </button>
-            <button
-              type="submit"
-              [disabled]="routeGroupForm.get('RouteName')?.invalid"
-              class="w-full cursor-pointer text-center"
-              [ngClass]="{
+            <button type="submit" [disabled]="routeGroupForm.get('RouteName')?.invalid"
+              class="w-full cursor-pointer text-center" [ngClass]="{
                 'btn-no-shadow-disabled': routeGroupForm.get('RouteName')?.invalid,
                 'btn-no-shadow-primary': routeGroupForm.get('RouteName')?.valid
-              }"
-            >
+              }">
               Simpan
             </button>
           </div>
@@ -152,11 +120,14 @@
 
 <!-- dialog Barcode/Pilih BON -->
 @if (isDialogOpenBarcode) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col max-h-[90vh]">
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div
+    class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col max-h-[90vh]">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Pilih BON</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer" (click)="isDialogOpenBarcode = false">
+      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
+        (click)="isDialogOpenBarcode = false">
         âœ•
       </button>
     </div>
@@ -170,11 +141,9 @@
             </h1>
             <span class="text-slate-700 font-bold text-base">Loading</span>
           </div>
-          <button
-            type="button"
+          <button type="button"
             class="px-3 py-1.5 bg-[#202B6D] hover:bg-[#1a235b] text-white rounded-xl text-xs font-semibold cursor-pointer transition-all"
-            (click)="getLoadingList()"
-          >
+            (click)="getLoadingList()">
             Refresh
           </button>
         </div>
@@ -182,21 +151,17 @@
         <div class="grid grid-cols-2 gap-2">
           <div class="flex flex-col">
             <label class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Tanggal</label>
-            <input
-              type="date"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
-              [(ngModel)]="date"
-              (change)="onDateChange($event)"
-            />
+            <input type="date"
+              class="w-full p-2.5 border border-gray-300 focus:border-checkout focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
+              [(ngModel)]="date" (change)="onDateChange($event)" />
           </div>
 
           <div class="flex flex-col">
-            <label for="dropdown-area" class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Area</label>
-            <select
-              id="dropdown-area"
-              class="w-full p-2.5 border border-gray-300 focus:border-[#2F4ACD] focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
-              (change)="onOptionSelect($event)"
-            >
+            <label for="dropdown-area"
+              class="font-medium text-xs text-gray-600 uppercase tracking-wider mb-1">Area</label>
+            <select id="dropdown-area"
+              class="w-full p-2.5 border border-gray-300 focus:border-checkout focus:outline-none rounded-xl text-sm font-semibold text-gray-800 bg-white"
+              (change)="onOptionSelect($event)">
               <option value="">Lihat Semua</option>
               @for (item of area; track $index) {
               <option [value]="item.Code">{{ item.Code }}</option>
@@ -209,23 +174,18 @@
           @if (filteredSalesInvoices.length !== 0) {
           <button
             class="active:scale-95 px-3 py-1 bg-red-600 hover:bg-red-700 text-xs font-bold text-white rounded-lg transition-all shrink-0 cursor-pointer"
-            (click)="onSelectedAlphabet('~')"
-          >
+            (click)="onSelectedAlphabet('~')">
             Reset
           </button>
           }
           <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
             <div class="flex flex-row items-center gap-1">
               @for (item of alphabet; track $index) {
-              <button
-                type="button"
-                class="font-bold text-base px-2 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-                [ngClass]="{
+              <button type="button"
+                class="font-bold text-base px-2 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
                   'bg-[#FF8B00] text-white scale-105': item === selectedAplhabet,
                   'text-gray-600 hover:bg-gray-100': item !== selectedAplhabet
-                }"
-                (click)="onSelectedAlphabet(item)"
-              >
+                }" (click)="onSelectedAlphabet(item)">
                 {{ item }}
               </button>
               }
@@ -241,14 +201,11 @@
           } @else if (filteredSalesInvoices.length > 0) {
           <div class="flex flex-col gap-2.5">
             @for (item of filteredSalesInvoices; track item.DocNum) {
-            <div
-              (click)="onSelectedHeaderRes(item)"
-              class="border rounded-xl p-3.5 cursor-pointer transition-all"
+            <div (click)="onSelectedHeaderRes(item)" class="border rounded-xl p-3.5 cursor-pointer transition-all"
               [ngClass]="{
                 'bg-emerald-50 border-emerald-400': isSelectedItem(item),
                 'bg-white border-gray-200 hover:border-gray-300': !isSelectedItem(item)
-              }"
-            >
+              }">
               <div class="flex justify-between items-start">
                 <div class="flex flex-col">
                   <small class="text-gray-500 text-xs font-medium">DocNum</small>
@@ -256,7 +213,8 @@
                 </div>
                 <div class="flex flex-col items-end">
                   <small class="text-gray-500 text-xs font-medium">Item</small>
-                  <span class="bg-blue-50 text-[#2F4ACD] px-2 py-0.5 rounded-md font-bold text-xs">{{ item.Details }}</span>
+                  <span class="bg-blue-50 text-checkout px-2 py-0.5 rounded-md font-bold text-xs">{{ item.Details
+                    }}</span>
                 </div>
               </div>
               <div class="flex flex-col mt-1">
@@ -278,15 +236,11 @@
     </div>
 
     <div class="pt-3 border-t border-gray-100 mt-2">
-      <button
-        type="button"
-        class="w-full btn-no-shadow-secondary text-center cursor-pointer"
-        (click)="isDialogOpenBarcode = false"
-      >
+      <button type="button" class="w-full btn-no-shadow-secondary text-center cursor-pointer"
+        (click)="isDialogOpenBarcode = false">
         Selesai Memilih
       </button>
     </div>
   </div>
 </div>
 }
-

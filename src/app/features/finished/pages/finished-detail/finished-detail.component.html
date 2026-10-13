@@ -1,10 +1,10 @@
-﻿<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-row items-center gap-3">
         <button type="button" (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
         <div class="flex flex-col">
@@ -15,15 +15,14 @@
         </div>
       </div>
       <button type="button" (click)="getDetail()"
-        class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+        class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
         <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
       </button>
     </div>
   </div>
 
   <!-- Content Container -->
-  <div
-    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-16">
       @if (loading) {
       <div class="flex flex-col gap-3">
@@ -62,16 +61,15 @@
       <div class="flex flex-col gap-3 mt-2">
         <h2 class="font-bold text-base text-slate-700 px-1">Daftar Item:</h2>
         @for (item of salesInvoice.Details; track item.Id || item.DetailId || $index) {
-        <div class="w-full rounded-xl p-4 relative border transition-all"
-          [ngClass]="{
+        <div class="w-full rounded-xl p-4 relative border transition-all" [ngClass]="{
             'bg-red-50 border-red-200': item.Remarks === '',
             'bg-orange-50 border-orange-200': item.Remarks === 'pick',
             'bg-green-50 border-green-200': item.Remarks === 'load'
           }">
           @if (item.Remarks === 'load') {
-          <img src="/done.png" alt="Done" class="absolute top-2 right-2 w-[40px] z-10" />
+          <img src="/done.png" alt="Done" class="absolute top-2 right-2 w-10 z-10" />
           } @else if (item.Remarks === 'pick') {
-          <img src="/pick.png" alt="Pick" class="absolute top-2 right-2 w-[40px] z-10" />
+          <img src="/pick.png" alt="Pick" class="absolute top-2 right-2 w-10 z-10" />
           }
 
           <div class="flex flex-col gap-1 pr-10">
@@ -104,4 +102,3 @@
     </div>
   </div>
 </div>
-

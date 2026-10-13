@@ -116,20 +116,20 @@ Use the defined flat utility classes in `src/styles.css`:
 - Small variants: `btn-sm-no-shadow-*`
 - Header Icon Button:
   ```html
-  <button type="button" class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5   transition-all cursor-pointer">
+  <button type="button" class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5   transition-all cursor-pointer">
     <img src="icon.png" alt="Icon" class="w-full h-full object-contain" />
   </button>
   ```
 
 ### 4.3 Form Inputs & Dropdowns
-- **On Dark Header** (`bg-[#2F4ACD]`):
+- **On Dark Header** (`bg-checkout`):
   ```html
   <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Label</label>
   <input class="w-full text-sm sm:text-base p-2.5 border border-white/20 focus:border-white focus:outline-none rounded-xl bg-white text-gray-800 font-semibold shadow-xs" />
   ```
 - **In Light Body / Modal**:
   ```html
-  <input class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-[#2F4ACD] rounded-xl text-base font-semibold text-gray-800 focus:outline-none shadow-xs" />
+  <input class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl text-base font-semibold text-gray-800 focus:outline-none shadow-xs" />
   ```
 
 ### 4.4 Modals & Dialogs

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
   <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -6,29 +6,28 @@
         <p class="font-bold text-xs uppercase tracking-wider text-white/80">
           {{ !loading && inventoryRequest ? inventoryRequest.DocNum : 'Loading...' }}
         </p>
-        <h1
-          class="font-bold text-lg sm:text-xl text-start text-white tracking-tight truncate max-w-[200px] sm:max-w-[280px]">
+        <h1 class="font-bold text-lg sm:text-xl text-start text-white tracking-tight truncate max-w-50 sm:max-w-70">
           {{ !loading && inventoryRequest ? inventoryRequest.Remarks : 'Loading...' }}
         </h1>
       </div>
       <div class="flex flex-row gap-2">
         <button type="button" (click)="onRefresh()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         @if (!isFilterAlphabet) {
         <button type="button" (click)="openFilterAlphabet()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-red-700 hover:bg-red-800 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="filter-w.png" alt="Filter Alphabet" class="w-full h-full object-contain" />
         </button>
         } @else {
         <button type="button" (click)="closeFilterAlphabet()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-gray-700 hover:bg-gray-800 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="close-w.png" alt="Close Filter" class="w-full h-full object-contain" />
         </button>
         }
         <button type="button" (click)="onBack()"
-          class="w-[52px] h-[52px] flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
       </div>
@@ -47,8 +46,8 @@
       <div class="flex-1 min-w-0 overflow-x-auto scrollbar-none">
         <div class="flex flex-row items-center gap-1">
           @for (item of alphabet; track $index) {
-          <button type="button" class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer"
-            [ngClass]="{
+          <button type="button"
+            class="font-bold text-lg px-2.5 py-0.5 rounded-lg transition-all shrink-0 cursor-pointer" [ngClass]="{
               'bg-[#FF8B00] text-white scale-105': item === selectedAlphabet,
               'text-white/80 hover:bg-white/10': item !== selectedAlphabet
             }" (click)="onSelectedAlphabet(item)">
@@ -88,7 +87,7 @@
         <div class="flex flex-row justify-between w-full gap-2 items-center">
           <div class="flex-1">
             <select id="dropdown" name="dropdown"
-              class="w-full border border-gray-300 rounded-xl px-3 py-2.5 font-semibold text-base bg-white text-slate-800 focus:outline-none focus:border-[#2F4ACD]"
+              class="w-full border border-gray-300 rounded-xl px-3 py-2.5 font-semibold text-base bg-white text-slate-800 focus:outline-none focus:border-checkout"
               (change)="onOptionSelect($event)">
               <option value="">Pilih PIC</option>
               @for (item of pickingPic; track $index) {
@@ -103,12 +102,12 @@
           </div>
           <div class="flex flex-row gap-2">
             <button type="button"
-              class="w-[44px] h-[44px] bg-[#202B6D] hover:bg-[#19245a] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer p-2 transition-all"
+              class="w-11 h-11 bg-[#202B6D] hover:bg-[#19245a] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer p-2 transition-all"
               (click)="openDialogAddPic()" title="Tambah / Pilih PIC">
               <img src="add-w.png" alt="Add PIC" class="w-full h-full object-contain" />
             </button>
             <button type="button"
-              class="w-[44px] h-[44px] bg-[#2F4ACD] hover:bg-[#202B6D] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer p-2 transition-all"
+              class="w-11 h-11 bg-checkout hover:bg-[#202B6D] border border-white/20 rounded-xl flex items-center justify-center active:scale-95 cursor-pointer p-2 transition-all"
               (click)="openDialogBarcode()" title="Bagikan QR">
               <img src="shared-w.png" alt="Share QR" class="w-full h-full object-contain" />
             </button>
@@ -186,7 +185,7 @@
                   -
                 </button>
 
-                <span class="text-lg font-bold text-slate-800 min-w-[24px] text-center">
+                <span class="text-lg font-bold text-slate-800 min-w-6 text-center">
                   {{ item.Quantity }}
                 </span>
 
