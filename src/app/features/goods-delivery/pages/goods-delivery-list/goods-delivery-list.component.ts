@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.service';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { ButtonHomeComponent } from '../../../../shared/components/button-home/button-home.component';
@@ -34,14 +35,9 @@ export class GoodsDeliveryListComponent implements OnInit {
   statusSelected = 'ONGOING';
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const defaultDate = getDefaultDateFilter(3);
+    this.date = defaultDate.date;
+    this.dateString = defaultDate.dateString;
 
     if (this.dateString) {
       this.getGoodsDeliveries(this.dateString, this.statusSelected);
@@ -80,7 +76,7 @@ export class GoodsDeliveryListComponent implements OnInit {
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
 
     if (this.dateString) {
       this.getGoodsDeliveries(this.dateString, this.statusSelected);

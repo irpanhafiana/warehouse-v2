@@ -11,6 +11,8 @@ import { NavbarComponent } from '../../../../shared/components/navbar/navbar.com
 import { ButtonHomeComponent } from '../../../../shared/components/button-home/button-home.component';
 import { ToastrService } from 'ngx-toastr';
 
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils';
+
 @Component({
   selector: 'app-finished-list',
   standalone: true,
@@ -48,13 +50,9 @@ export class FinishedListComponent implements OnInit {
   alphabet: string[] = [];
 
   constructor() {
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() - 3);
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const defaultDate = getDefaultDateFilter(3);
+    this.date = defaultDate.date;
+    this.dateString = defaultDate.dateString;
   }
 
   ngOnInit(): void {
@@ -105,7 +103,7 @@ export class FinishedListComponent implements OnInit {
     const input = e.target as HTMLInputElement;
     if (input.value) {
       this.date = input.value;
-      this.dateString = input.value.replace(/-/g, '');
+      this.dateString = formatToApiDateString(input.value);
       this.getFinishedList();
     }
   }
