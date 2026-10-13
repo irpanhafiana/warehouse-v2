@@ -1,0 +1,106 @@
+<div class="w-full h-screen flex flex-col bg-[#2F4ACD] overflow-hidden">
+  <!-- Header Atas (Fixed) -->
+  <div class="w-full shrink-0 flex flex-col p-4">
+    <div class="flex flex-row justify-between gap-2 items-center">
+      <h1 class="font-bold text-3xl text-start text-white">
+        Pengiriman
+        <span>({{ goodsDeliveries.length }})</span>
+      </h1>
+      <div class="flex flex-row gap-2">
+        <button
+          type="button"
+          (click)="getGoodsDeliveries(dateString, statusSelected)"
+          class="w-[60px] h-[60px] flex items-center justify-center bg-[#202B6D] border-4 border-[#19245a] active:scale-90 transition-transform rounded-xl p-2 cursor-pointer"
+          aria-label="Refresh"
+        >
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <app-button-home></app-button-home>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-4 mt-4">
+      <div class="grid grid-cols-2 gap-2 items-end">
+        <div class="flex flex-col items-start gap-2">
+          <label class="font-semibold text-xl text-white pl-4">Tanggal</label>
+          <input
+            type="date"
+            class="input-date font-semibold w-full"
+            [(ngModel)]="date"
+            (change)="onDateChange($event)"
+          />
+        </div>
+        <div class="flex flex-col items-start gap-2">
+          <label for="statusSelect" class="font-semibold text-xl text-white pl-4">Status</label>
+          <select
+            id="statusSelect"
+            [(ngModel)]="statusSelected"
+            name="statusSelect"
+            class="input-date font-semibold text-lg tracking-wide w-full"
+            (change)="onSelectedType($event)"
+          >
+            <option value="HISTORY">History</option>
+            <option value="ONGOING">On Going</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container List (Scrollable) -->
+  <div
+    class="w-full flex-1 bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col border-t-[15px] border-[#202B6D] overflow-hidden"
+  >
+    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+      @if (loading) {
+        <div class="flex flex-col gap-2">
+          <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
+          <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
+          <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
+        </div>
+      } @else {
+        @if (goodsDeliveries.length > 0) {
+          <div class="flex flex-col gap-3 pb-24">
+            @for (item of goodsDeliveries; track item.TransportUnit) {
+              <div class="card flex flex-col gap-2 border-4 border-gray-400 bg-white shadow-sm rounded-3xl p-4">
+                <div class="flex justify-between items-start">
+                  <div class="flex flex-col">
+                    <small class="text-gray-500 text-sm font-bold">Mobil / Truck</small>
+                    <p class="font-bold text-2xl text-slate-700 text-start">
+                      {{ item.TransportUnit }}
+                    </p>
+                  </div>
+                  <div class="flex flex-col items-end">
+                    <small class="text-gray-500 text-sm font-bold">Total BON</small>
+                    <p class="font-bold text-2xl text-slate-700 text-end">
+                      {{ item.BasedSalesInvoiceCount }}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex justify-between w-full mt-3">
+                  <button
+                    type="button"
+                    class="btn-no-shadow-primary w-full py-2.5 cursor-pointer text-base"
+                    (click)="toDetail(dateString, item.TransportUnit)"
+                  >
+                    Lihat Detail
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="flex items-center justify-center flex-col pt-20">
+            <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-[200px] mx-auto" alt="Not found" />
+            <p class="w-2/3 text-center font-medium text-lg text-[#2F4ACD] mt-4">
+              Ooops, tidak ada data {{ statusSelected }} pengiriman :(
+            </p>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<app-navbar-reqtrans></app-navbar-reqtrans>
+

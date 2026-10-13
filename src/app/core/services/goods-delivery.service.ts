@@ -34,6 +34,12 @@ export class GoodsDeliveryService {
     );
   }
 
+  getReqTransHistoryList(date: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/Delivery/History/${date}`
+    );
+  }
+
   getDetailGoodsDelivery(date: string, transportUnit: string): Observable<any> {
     return this.http.get(
       `${this.apiUrl}api/v2/GoodsDeliveries/${date}/${transportUnit}`
@@ -52,6 +58,69 @@ export class GoodsDeliveryService {
   onFinishGoodsDelivery(payload: string[]): Observable<any> {
     return this.http.put<any>(
       `${this.apiUrl}api/v2/GoodsDeliveries/Finish`,
+      payload,
+      {
+        headers: this.headers,
+      }
+    );
+  }
+
+  getDetailGoodsDeliveryTrans(date: string, transportUnit: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/Delivery/${date}/${transportUnit}`
+    );
+  }
+
+  getDetailGoodsDeliveryTransDetailHistory(
+    date: string,
+    transportUnit: string
+  ): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/Delivery/History/${date}/${transportUnit}`
+    );
+  }
+
+  getDetailGoodsDeliveryTransHistory(
+    date: string,
+    transportUnit: string
+  ): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/History/${date}/${transportUnit}`
+    );
+  }
+
+  onFinishGoodsDeliveryTrans(payload: string[]): Observable<any> {
+    return this.http.put<any>(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/Delivery/Finish`,
+      payload,
+      {
+        headers: this.headers,
+      }
+    );
+  }
+
+  onReEntryGoodsDeliveryTrans(payload: string[]): Observable<any> {
+    return this.http.put<any>(
+      `${this.apiUrl}api/v1/InventoryTransfers/Tab/Delivery/Finish/Reprocess`,
+      payload,
+      {
+        headers: this.headers,
+      }
+    );
+  }
+
+  onRecheckDeliveryByDocnum(docnum: string): Observable<any> {
+    return this.http.get<any>(
+      `${this.apiUrlCloud}api/v1/InventoryTransfers/Tab/Delivery/Finish/Recheck/${docnum}`,
+      {
+        headers: this.headers,
+      }
+    );
+  }
+
+  onInventoryRequest(payload: any): Observable<any> {
+    return this.http.post<any>(
+      `${this.apiUrlCloud}api/v1/InventoryRequests/Delivery`,
       payload,
       {
         headers: this.headers,

@@ -74,6 +74,26 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'main-reqtrans',
+    component: MainLayoutComponent,
+    children: [
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/inventory-request/inventory-request.routes').then(
+            (m) => m.inventoryRequestRoutes
+          ),
+      },
+      {
+        path: '',
+        loadChildren: () =>
+          import('./features/request-transfers/request-transfers.routes').then(
+            (m) => m.requestTransfersRoutes
+          ),
+      },
+    ],
+  },
+  {
     path: '**',
     redirectTo: '',
   },
