@@ -32,7 +32,7 @@
     <div class="w-full flex flex-col items-start bg-amber-50 border border-amber-200 rounded-2xl p-3 shrink-0">
       <p class="font-semibold text-gray-500 text-xs">Catatan Dari Toko</p>
       <p class="font-bold text-sm text-slate-700 leading-snug">
-        {{ salesInvoice?.Note }}
+        {{ salesInvoice?.Note || '-'}}
       </p>
     </div>
     }
