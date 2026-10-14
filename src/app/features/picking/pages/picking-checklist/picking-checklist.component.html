@@ -1,14 +1,14 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
-  <div class="w-full flex flex-col p-4 shrink-0">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between items-center gap-2">
-      <div class="flex flex-col text-white">
-        <p class="font-medium text-xs sm:text-sm text-white/80">
-          {{ loading ? 'Memuat...' : (salesInvoice?.DocDate | date:'dd MMM yyyy') }}
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80 truncate">
+          Picking Gudang &bull; {{ loading ? 'Memuat...' : salesInvoice?.DocNum }}
         </p>
-        <p class="font-bold text-lg sm:text-xl tracking-tight">
-          {{ loading ? 'Memuat...' : salesInvoice?.DocNum }}
-        </p>
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-50 sm:max-w-72">
+          {{ loading ? 'Memuat...' : (salesInvoice?.CustomerModel?.CustomerName || 'Detail Item') }}
+        </h1>
       </div>
 
       <div class="flex flex-row items-center gap-2">

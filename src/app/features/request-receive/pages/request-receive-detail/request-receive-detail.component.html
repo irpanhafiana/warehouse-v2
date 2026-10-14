@@ -1,14 +1,14 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full flex flex-col p-4 shrink-0">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
+      <div class="flex flex-col min-w-0 text-white">
         <p class="font-bold text-xs uppercase tracking-wider text-white/80">
-          {{ !loading && inventoryRequest ? inventoryRequest.DocNum : "Loading ... " }}
+          Terima &bull; {{ !loading && inventoryRequest ? inventoryRequest.DocNum : '...' }}
         </p>
-        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-50 sm:max-w-70">
+        <h1 class="font-bold text-lg sm:text-xl text-white tracking-tight truncate max-w-48 sm:max-w-72">
           @if (loading) {
-          <span>Loading...</span>
+          <span>Memuat...</span>
           } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
           {{ inventoryRequest.Details[0].WarehouseModel.Code }} -
           {{ inventoryRequest.Details[0].WarehouseModel.Description }}
@@ -93,9 +93,11 @@
     class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Kamu yakin?</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
-        (click)="isConfirmDialogOpen = false">
-        âœ•
+      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isConfirmDialogOpen = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 

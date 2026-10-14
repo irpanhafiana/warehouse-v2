@@ -1,23 +1,23 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
-  <!-- Atas (fix) -->
-  <div class="w-full shrink-0 flex flex-col p-4">
-    <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
-        <p class="font-bold text-base text-blue-200">
-          {{ !loading && salesInvoice ? salesInvoice.DocNum : 'Memuat...' }}
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+  <!-- Top Bar -->
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          Picking &bull; {{ !loading && salesInvoice ? salesInvoice.DocNum : '...' }}
         </p>
-        <h1 class="font-bold text-2xl text-start text-white truncate max-w-60">
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
           {{ !loading && salesInvoice ? salesInvoice.CustomerModel.CustomerName : 'Memuat...' }}
         </h1>
       </div>
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="getDetail()"
-          class="w-15 h-15 flex items-center justify-center bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
           aria-label="Refresh">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <button type="button" (click)="onBack()"
-          class="w-15 h-15 flex items-center justify-center bg-[#FF8B00] border-4 border-[#ce8225] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
           aria-label="Kembali">
           <img src="new-assets/back-w.png" alt="Kembali" class="w-full h-full object-contain" />
         </button>
@@ -25,43 +25,45 @@
     </div>
   </div>
 
-  <!-- Bawah (container list + scrollable) -->
-  <div
-    class="w-full flex-1 bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-15 border-[#202B6D] overflow-hidden">
-    @if (!loading && salesInvoice?.Note && salesInvoice?.Note?.trim() !== '') {
-    <div class="w-full flex flex-col items-start bg-amber-50 border border-amber-200 rounded-2xl p-3 shrink-0">
-      <p class="font-semibold text-gray-500 text-xs">Catatan Dari Toko</p>
-      <p class="font-bold text-sm text-slate-700 leading-snug">
-        {{ salesInvoice?.Note || '-'}}
-      </p>
-    </div>
-    }
+  <!-- Content Container -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <!-- Customer & Note Header -->
+    <div class="flex flex-col gap-2 shrink-0 pb-2">
+      @if (!loading && salesInvoice?.Note && salesInvoice?.Note?.trim() !== '') {
+      <div class="w-full bg-amber-50 border border-amber-200/60 rounded-xl p-2.5">
+        <small class="text-amber-800 text-xs font-bold tracking-normal">Catatan dari Toko</small>
+        <p class="font-medium text-sm text-amber-950 leading-snug">
+          {{ salesInvoice?.Note }}
+        </p>
+      </div>
+      }
 
-    <!-- Tab Selector -->
-    <div class="grid grid-cols-2 gap-2 items-center bg-gray-200/80 p-1.5 rounded-2xl shrink-0">
-      <button type="button" (click)="onSelectedTab('receh')"
-        class="py-2.5 rounded-xl font-bold text-center transition-all cursor-pointer" [ngClass]="{
-          'bg-checkout text-white': selectedTab === 'receh',
-          'text-gray-600 hover:text-gray-900': selectedTab !== 'receh'
-        }">
-        Receh [{{ arrReceh.length }}]
-      </button>
-      <button type="button" (click)="onSelectedTab('non-receh')"
-        class="py-2.5 rounded-xl font-bold text-center transition-all cursor-pointer" [ngClass]="{
-          'bg-checkout text-white': selectedTab === 'non-receh',
-          'text-gray-600 hover:text-gray-900': selectedTab !== 'non-receh'
-        }">
-        Non Rch [{{ arrNonReceh.length }}]
-      </button>
+      <!-- Segmented Tabs -->
+      <div class="grid grid-cols-2 gap-2 bg-gray-200/70 p-1 rounded-2xl">
+        <button type="button" (click)="onSelectedTab('receh')"
+          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer" [ngClass]="{
+            'bg-[#FF8B00] text-white': selectedTab === 'receh',
+            'text-gray-600 hover:text-gray-900': selectedTab !== 'receh'
+          }">
+          Receh [{{ arrReceh.length }}]
+        </button>
+        <button type="button" (click)="onSelectedTab('non-receh')"
+          class="py-2.5 px-4 rounded-xl font-bold text-sm sm:text-base transition-all cursor-pointer" [ngClass]="{
+            'bg-[#FF8B00] text-white': selectedTab === 'non-receh',
+            'text-gray-600 hover:text-gray-900': selectedTab !== 'non-receh'
+          }">
+          Non Rch [{{ arrNonReceh.length }}]
+        </button>
+      </div>
     </div>
 
     <!-- Scrollable Item List -->
-    <div class="flex-1 overflow-y-auto flex flex-col gap-3 pr-1 pb-24">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
-        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
       </div>
       } @else {
       <!-- TAB RECEH -->
@@ -70,41 +72,41 @@
       <div class="flex flex-col gap-2">
         @for (item of arrReceh; track item.Id) {
         @if (item.ProductModel.Name.toLowerCase() !== 'receh') {
-        <div class="card relative border-4 border-gray-400 transition-colors" [ngClass]="{
-                      'bg-green-100 border-green-500': item.Remarks,
-                      'bg-white': !item.Remarks
-                    }">
+        <div class="relative rounded-xl p-4 transition-all duration-200 border" [ngClass]="{
+          'bg-emerald-50 border-emerald-400': item.Remarks,
+          'bg-white border-gray-200': !item.Remarks
+        }">
           <div class="flex flex-col">
             @if (item.Remarks) {
-            <small class="font-bold text-green-800 tracking-wide">
-              âœ“ Dikerjakan oleh: {{ item.Remarks }}
-            </small>
+            <span class="inline-block text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md w-fit mb-1">
+              ✓ {{ item.Remarks }}
+            </span>
             }
-            <h2 class="font-bold text-xl text-slate-800 leading-snug">
+            <h2 class="font-bold text-slate-800 text-base sm:text-lg leading-snug">
               {{ item.ProductModel.Name }}
             </h2>
           </div>
 
-          <div class="flex flex-row justify-between items-center mt-1">
-            <span class="font-bold text-gray-600 text-base">
+          <div class="flex flex-row justify-between items-center mt-2">
+            <span class="font-semibold text-gray-600 text-sm sm:text-base">
               {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
             </span>
           </div>
 
           @if (!item.Remarks) {
-          <div class="grid grid-cols-2 gap-2 items-center mt-3">
-            <button type="button" class="btn-sm-no-shadow-success py-2 cursor-pointer"
+          <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
+            <button type="button" class="btn-sm-no-shadow-success py-2 cursor-pointer text-center"
               (click)="openPickerModal(item.Id)">
               Picker
             </button>
             <button type="button" (click)="onSaveItem(item.Id)" [disabled]="isLoading(item.Id)"
-              class="btn-sm-no-shadow-primary py-2 cursor-pointer disabled:opacity-50">
+              class="btn-sm-no-shadow-primary py-2 cursor-pointer disabled:opacity-50 text-center">
               {{ isLoading(item.Id) ? 'Proses...' : 'Selesai' }}
             </button>
           </div>
           } @else {
-          <div class="grid grid-cols-1 mt-3">
-            <button type="button" class="btn-sm-no-shadow-danger w-full py-2 cursor-pointer disabled:opacity-50"
+          <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
+            <button type="button" class="btn-sm-no-shadow-danger w-full py-2 cursor-pointer disabled:opacity-50 text-center"
               [disabled]="isLoading(item.Id)" (click)="onCancel(item.Id)">
               {{ isLoading(item.Id) ? 'Proses...' : 'Batalkan' }}
             </button>
@@ -116,8 +118,8 @@
       </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-16">
-        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-45 mx-auto" alt="Empty" />
-        <p class="w-2/3 text-center font-medium text-lg text-checkout mt-4">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Empty" />
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
           Ooops, tidak ada item receh di BON ini :(
         </p>
       </div>
@@ -129,41 +131,41 @@
       @if (arrNonReceh.length > 0) {
       <div class="flex flex-col gap-2">
         @for (item of arrNonReceh; track item.Id) {
-        <div class="card relative border-4 border-gray-400 transition-colors" [ngClass]="{
-                    'bg-green-100 border-green-500': item.Remarks,
-                    'bg-white': !item.Remarks
-                  }">
+        <div class="relative rounded-xl p-4 transition-all duration-200 border" [ngClass]="{
+          'bg-emerald-50 border-emerald-400': item.Remarks,
+          'bg-white border-gray-200': !item.Remarks
+        }">
           <div class="flex flex-col">
             @if (item.Remarks) {
-            <small class="font-bold text-green-800 tracking-wide">
-              âœ“ Dikerjakan oleh: {{ item.Remarks }}
-            </small>
+            <span class="inline-block text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md w-fit mb-1">
+              ✓ {{ item.Remarks }}
+            </span>
             }
-            <h2 class="font-bold text-xl text-slate-800 leading-snug">
+            <h2 class="font-bold text-slate-800 text-base sm:text-lg leading-snug">
               {{ item.ProductModel.Name }}
             </h2>
           </div>
 
-          <div class="flex flex-row justify-between items-center mt-1">
-            <span class="font-bold text-gray-600 text-base">
+          <div class="flex flex-row justify-between items-center mt-2">
+            <span class="font-semibold text-gray-600 text-sm sm:text-base">
               {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
             </span>
           </div>
 
           @if (!item.Remarks) {
-          <div class="grid grid-cols-2 gap-2 items-center mt-3">
-            <button type="button" class="btn-sm-no-shadow-success py-2 cursor-pointer"
+          <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
+            <button type="button" class="btn-sm-no-shadow-success py-2 cursor-pointer text-center"
               (click)="openPickerModal(item.Id)">
               Picker
             </button>
             <button type="button" (click)="onSaveItem(item.Id)" [disabled]="isLoading(item.Id)"
-              class="btn-sm-no-shadow-primary py-2 cursor-pointer disabled:opacity-50">
+              class="btn-sm-no-shadow-primary py-2 cursor-pointer disabled:opacity-50 text-center">
               {{ isLoading(item.Id) ? 'Proses...' : 'Selesai' }}
             </button>
           </div>
           } @else {
-          <div class="grid grid-cols-1 mt-3">
-            <button type="button" class="btn-sm-no-shadow-danger w-full py-2 cursor-pointer disabled:opacity-50"
+          <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
+            <button type="button" class="btn-sm-no-shadow-danger w-full py-2 cursor-pointer disabled:opacity-50 text-center"
               [disabled]="isLoading(item.Id)" (click)="onCancel(item.Id)">
               {{ isLoading(item.Id) ? 'Proses...' : 'Batalkan' }}
             </button>
@@ -174,8 +176,8 @@
       </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-16">
-        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-45 mx-auto" alt="Empty" />
-        <p class="w-2/3 text-center font-medium text-lg text-checkout mt-4">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Empty" />
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
           Ooops, tidak ada item non receh di BON ini :(
         </p>
       </div>
@@ -184,14 +186,17 @@
       }
     </div>
   </div>
-
-  <!-- Bottom Action Bar -->
-  <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-sm border-t border-gray-200 z-40">
-    <button type="button" class="btn-no-shadow-primary w-full py-3 text-lg font-bold" (click)="toLoadingDetail()">
-      BON Siap Dimuat
-    </button>
-  </div>
 </div>
+
+<!-- Bottom Sticky Action Bar -->
+@if (!loading && salesInvoice) {
+<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 z-40">
+  <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
+    (click)="toLoadingDetail()">
+    BON Siap Dimuat
+  </button>
+</div>
+}
 
 <!-- Modal Picker -->
 <app-dialog-set-pic [isOpen]="isDialogOpen" title="Pilih Picker" confirmText="Pilih & Selesai" [currentPic]="picName"

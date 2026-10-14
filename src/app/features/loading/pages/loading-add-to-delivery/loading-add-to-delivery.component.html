@@ -1,10 +1,14 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
-  <div class="w-full flex flex-col p-4 shrink-0">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between items-center gap-2">
-      <div class="flex flex-col text-white">
-        <p class="font-medium text-xs text-white/80">{{ docnum }}</p>
-        <h1 class="font-bold text-xl tracking-tight">Goods Delivery</h1>
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          Surat Jalan &bull; {{ docnum }}
+        </p>
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
+          Buat Surat Jalan
+        </h1>
       </div>
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="onIs4Login()"
@@ -108,9 +112,11 @@
   <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-lg font-bold text-red-600">Perhatian!</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="isItemsNull = false">
-        âœ•
+      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isItemsNull = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <p class="font-normal text-gray-700 text-sm mt-4 leading-relaxed">

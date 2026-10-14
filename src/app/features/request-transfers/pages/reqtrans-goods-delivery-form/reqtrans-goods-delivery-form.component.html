@@ -1,19 +1,23 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
-  <!-- Header Atas (Fixed) -->
-  <div class="w-full shrink-0 flex flex-col p-4">
-    <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
-        <p class="font-bold text-base text-blue-200">{{ docnum }}</p>
-        <h1 class="font-bold text-2xl text-start text-white">Penugasan Pengiriman</h1>
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+  <!-- Top Bar -->
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          Surat Jalan &bull; {{ docnum }}
+        </p>
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
+          Buat Surat Jalan
+        </h1>
       </div>
-      <div class="flex flex-row gap-2">
+      <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="onIs4Login()"
-          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
           aria-label="Refresh">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <button type="button" (click)="onBack()"
-          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] border-4 border-[#ce8225] rounded-xl p-2 active:scale-90 transition-transform cursor-pointer"
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
           aria-label="Kembali">
           <img src="new-assets/back-w.png" alt="Kembali" class="w-full h-full object-contain" />
         </button>
@@ -21,88 +25,85 @@
     </div>
   </div>
 
-  <!-- Kontainer Form & Preview (Scrollable) -->
-  <div
-    class="w-full flex-1 bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-15 border-[#202B6D] overflow-hidden">
-    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-24">
+  <!-- Content Container -->
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
-        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
       </div>
       } @else {
-      <div class="flex flex-col gap-6">
-        <!-- Card Form Pemilihan Mobil & Driver -->
-        <div class="flex flex-col gap-4 p-5 card border-4 border-gray-400 bg-white rounded-3xl">
-          <div class="flex flex-col gap-4">
-            <!-- Select Mobil -->
-            <div class="flex flex-col gap-1.5">
-              <label for="vehicleSelect" class="block text-sm text-gray-600 font-bold">
-                Mobil / Truck
-              </label>
-              <select id="vehicleSelect" name="vehicleSelect" [(ngModel)]="selectedVehicle"
-                [ngModelOptions]="{ standalone: true }" (change)="onSelectedVehicle()"
-                class="rounded-xl p-3 block w-full bg-white text-slate-800 font-bold text-base border-2 border-gray-300">
-                <option [ngValue]="null">Pilih Mobil / Truck</option>
-                @for (item of vehicles; track item.vehicleNo) {
-                <option [ngValue]="item">
-                  {{ item.vehicleNo }} - {{ item.description }}
-                </option>
-                }
-              </select>
-            </div>
-
-            <!-- Select Driver -->
-            <div class="flex flex-col gap-1.5">
-              <label for="driverSelect" class="block text-sm text-gray-600 font-bold">
-                Sopir / Driver
-              </label>
-              <select id="driverSelect" name="driverSelect" (change)="onSelectedDriver($event)"
-                class="rounded-xl p-3 block w-full bg-white text-slate-800 font-bold text-base border-2 border-gray-300">
-                <option value="">Pilih Sopir / Driver</option>
-                @for (item of drivers; track item.registration || $index) {
-                <option [value]="item.firstName + ' ' + (item.lastName !== '-' ? item.lastName : '')">
-                  {{ item.firstName }} {{ item.lastName !== '-' ? item.lastName : '' }}
-                </option>
-                }
-              </select>
-            </div>
-          </div>
-
-          <button type="button"
-            class="btn-no-shadow-primary mt-2 py-3 text-lg font-bold w-full cursor-pointer disabled:opacity-50"
-            [disabled]="loading" (click)="onSubmit()">
-            {{ loading ? 'Menyimpan...' : 'Simpan & Berangkatkan' }}
-          </button>
-        </div>
-
-        <!-- Section Item Yang Dimuat -->
-        <div class="p-4 border-4 border-amber-300 rounded-3xl bg-amber-50">
-          <h2 class="font-bold text-xl text-center text-slate-800 mb-3">
-            Produk yang sudah dimuat ({{ itemLoaded.length }})
-          </h2>
-          <div class="flex flex-col gap-2">
-            @for (item of itemLoaded; track item.Id) {
-            <div class="bg-white rounded-2xl border-2 border-amber-200 p-3">
-              <p class="font-bold text-base text-slate-800 leading-snug">
-                {{ item.ProductModel.Name }}
-              </p>
-              <div class="flex justify-between items-center text-sm font-semibold text-gray-600 mt-1">
-                <span>
-                  Jumlah:
-                  @if (item.sebagianValue === 0) {
-                  {{ item.OpenQuantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-                  } @else {
-                  {{ item.sebagianValue }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-                  }
-                </span>
-                <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">
-                  Dimuat
-                </span>
-              </div>
-            </div>
+      <!-- Selection Card -->
+      <div class="bg-white rounded-xl p-4 border border-gray-200 flex flex-col gap-3">
+        @if (vehicles.length > 0) {
+        <div class="flex flex-col gap-1.5">
+          <label for="vehicleSelect" class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            Mobil / Truck
+          </label>
+          <select id="vehicleSelect" name="vehicleSelect" [(ngModel)]="selectedVehicle"
+            [ngModelOptions]="{ standalone: true }" (change)="onSelectedVehicle()"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl font-bold text-sm sm:text-base text-gray-800 focus:outline-none focus:border-checkout">
+            <option [ngValue]="null">Pilih Mobil / Truck</option>
+            @for (item of vehicles; track item.vehicleNo) {
+            <option [ngValue]="item">
+              {{ item.vehicleNo }} - {{ item.description }}
+            </option>
             }
+          </select>
+        </div>
+        }
+
+        @if (drivers.length > 0) {
+        <div class="flex flex-col gap-1.5">
+          <label for="driverSelect" class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            Sopir / Driver
+          </label>
+          <select id="driverSelect" name="driverSelect" (change)="onSelectedDriver($event)"
+            class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl font-bold text-sm sm:text-base text-gray-800 focus:outline-none focus:border-checkout">
+            <option value="">Pilih Sopir / Driver</option>
+            @for (item of drivers; track item.registration || $index) {
+            <option [value]="item.firstName + ' ' + (item.lastName !== '-' ? item.lastName : '')">
+              {{ item.firstName }} {{ item.lastName !== '-' ? item.lastName : '' }}
+            </option>
+            }
+          </select>
+        </div>
+        }
+
+        <button type="button"
+          class="w-full btn-no-shadow-primary text-center cursor-pointer mt-2 py-3 text-base font-bold disabled:opacity-50"
+          [disabled]="loading" (click)="onSubmit()">
+          {{ loading ? 'Menyimpan...' : 'Simpan ke Pengiriman' }}
+        </button>
+      </div>
+
+      <!-- Loaded Items Section -->
+      <div class="bg-amber-50/70 border border-amber-200/80 rounded-xl p-4">
+        <h2 class="font-bold text-base sm:text-lg text-slate-800 text-center mb-3">
+          Produk yang sudah dimuat ({{ itemLoaded.length }})
+        </h2>
+        <div class="flex flex-col gap-2.5">
+          @for (item of itemLoaded; track item.Id) {
+          <div class="bg-white rounded-xl border border-gray-200 p-3.5 flex flex-col gap-1">
+            <p class="font-bold text-sm sm:text-base text-slate-800 leading-snug">
+              {{ item.ProductModel.Name }}
+            </p>
+            <div class="flex justify-between items-center text-xs font-semibold text-gray-500 mt-1">
+              <span>
+                Jumlah:
+                @if (item.sebagianValue === 0) {
+                {{ item.OpenQuantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                } @else {
+                {{ item.sebagianValue }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                }
+              </span>
+              <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">
+                Dimuat
+              </span>
+            </div>
           </div>
+          }
         </div>
       </div>
       }
@@ -112,13 +113,25 @@
 
 <!-- Modal Error Notice -->
 @if (isItemsNull) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/80 p-4">
-  <div class="w-full max-w-sm bg-white rounded-3xl p-6 border-4 border-red-500">
-    <h2 class="text-xl font-bold text-red-600 border-b pb-2">Oops, Perhatian!</h2>
-    <p class="text-slate-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
-    <button type="button" class="btn-no-shadow-secondary w-full mt-6" (click)="isItemsNull = false">
-      Tutup
-    </button>
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+      <h2 class="text-lg font-bold text-red-600">Perhatian!</h2>
+      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isItemsNull = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    <p class="font-normal text-gray-700 text-sm mt-4 leading-relaxed">{{ msgError }}</p>
+    <div class="mt-6">
+      <button type="button" class="w-full btn-no-shadow-secondary text-center cursor-pointer text-sm py-2.5"
+        (click)="isItemsNull = false">
+        Tutup
+      </button>
+    </div>
   </div>
 </div>
 }

@@ -1,14 +1,19 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
-  <div class="w-full flex flex-col p-4 shrink-0">
+  <div class="w-full flex flex-col p-4 shrink-0 gap-3">
     <div class="flex flex-row justify-between items-center gap-2">
-      <h1 class="font-bold text-2xl sm:text-3xl text-start text-white tracking-tight">
-        BON Loading
-        <span class="text-white/80 font-semibold text-xl sm:text-2xl">({{ filteredSalesInvoices.length }})</span>
-      </h1>
-      <div class="flex flex-row items-center gap-2">
+      <div class="flex flex-col min-w-0">
+        <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
+          Loading Gudang
+        </p>
+        <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
+          Muat Barang
+        </h1>
+      </div>
+      <div class="flex flex-row items-center gap-2 shrink-0">
         <button type="button" (click)="getLoadingList()"
-          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
+          aria-label="Refresh">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
         <app-button-home></app-button-home>
@@ -110,9 +115,11 @@
   <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">BON Siap Loading</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="onCloseDialogDetailDocnum()">
-        âœ•
+      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="onCloseDialogDetailDocnum()" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">

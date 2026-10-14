@@ -1,13 +1,13 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full flex flex-col p-4 shrink-0">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
+      <div class="flex flex-col min-w-0 text-white">
         <p class="font-bold text-xs uppercase tracking-wider text-white/80">
-          {{ !loading && salesInvoice ? salesInvoice.DocNum : 'Loading...' }}
+          Riwayat &bull; {{ !loading && salesInvoice ? salesInvoice.DocNum : '...' }}
         </p>
-        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight truncate max-w-50 sm:max-w-70">
-          {{ !loading && salesInvoice?.CustomerModel ? salesInvoice?.CustomerModel?.CustomerName : 'Loading...' }}
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
+          {{ !loading && salesInvoice?.CustomerModel ? salesInvoice?.CustomerModel?.CustomerName : 'Memuat...' }}
         </h1>
       </div>
       <div class="flex flex-row gap-2">

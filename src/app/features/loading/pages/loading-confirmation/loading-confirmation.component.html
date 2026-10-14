@@ -1,12 +1,19 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
-  <div class="w-full flex flex-col p-4 shrink-0">
-    <div class="flex flex-row items-center gap-3 text-white">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
+    <div class="flex flex-row items-center gap-3">
       <button type="button" (click)="onCheckUlang()"
         class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
         <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
       </button>
-      <h1 class="font-bold text-2xl tracking-tight">Konfirmasi Loading</h1>
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
+          Loading Gudang
+        </p>
+        <h1 class="font-bold text-xl sm:text-2xl tracking-tight">
+          Konfirmasi Muat
+        </h1>
+      </div>
     </div>
   </div>
 

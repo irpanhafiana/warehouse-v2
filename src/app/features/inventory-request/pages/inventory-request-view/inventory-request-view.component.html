@@ -1,84 +1,89 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full h-[10%] flex flex-col p-4">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
-        <p class="font-bold text-sm sm:text-base text-white">
-          {{ !loading && inventoryRequest ? inventoryRequest.DocNum : "Loading ... " }}
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          IR #{{ !loading && inventoryRequest ? inventoryRequest.DocNum : '...' }}
         </p>
-        <h1 class="font-bold text-lg sm:text-2xl text-start text-white truncate max-w-50 sm:max-w-70">
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
           @if (loading) {
-          <span>Loading...</span>
+          <span>Memuat...</span>
           } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
           {{ inventoryRequest.WarehouseModel.Description }}
           }
         </h1>
       </div>
-      <div class="flex flex-row gap-2">
-        <img src="refresh-w.png" alt="Refresh"
-          class="w-12.5 sm:w-15 bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer"
-          (click)="fetchDetailInventoryRequest(docnum)" />
-        <img src="new-assets/back-w.png" alt="Back"
-          class="w-12.5 sm:w-15 bg-[#FF8B00] border-4 border-[#ce8225] rounded-xl p-2 active:scale-90 cursor-pointer"
-          (click)="onBack()" />
+      <div class="flex flex-row items-center gap-2">
+        <button type="button" (click)="fetchDetailInventoryRequest(docnum)"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
+          aria-label="Refresh">
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
+        <button type="button" (click)="onBack()"
+          class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
+          aria-label="Back">
+          <img src="new-assets/back-w.png" alt="Back" class="w-full h-full object-contain" />
+        </button>
       </div>
     </div>
   </div>
 
   <!-- Body Container -->
-  <div class="w-full h-[90%] bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-15 border-[#202B6D]">
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-60">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
-        <app-loader [width]="'w-full'" [height]="'h-[120px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[120px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[120px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
       </div>
       } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-      <div class="h-full">
-        <div class="flex flex-col gap-3 pb-32">
-          <p class="font-bold text-lg sm:text-xl py-3 text-center text-slate-700">
-            Item yang diminta:
+      <div class="flex flex-col gap-3">
+        <p class="font-bold text-base sm:text-lg text-slate-800 px-1">
+          Item yang diminta:
+        </p>
+        @for (item of inventoryRequest.Details; track item.Id || item.LineNo || $index) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-2">
+          @if (item.Remarks) {
+          <span class="inline-block text-xs font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-md w-fit">
+            {{ item.Remarks }}
+          </span>
+          }
+          <h2 class="font-bold text-slate-800 text-base sm:text-lg leading-snug">
+            {{ item.ProductModel.Name }}
+          </h2>
+          <p class="font-semibold text-gray-600 text-sm sm:text-base">
+            {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
           </p>
-          @for (item of inventoryRequest.Details; track item.Id || item.LineNo || $index) {
-          <div class="card relative bg-white border-4 border-gray-400 rounded-2xl p-4 flex flex-col gap-2">
-            @if (item.Remarks) {
-            <p class="text-sm font-semibold text-gray-500">
-              {{ item.Remarks }}
-            </p>
-            }
-            <h2 class="text-xl sm:text-2xl text-slate-800 font-bold">
-              {{ item.ProductModel.Name }}
-            </h2>
-            <p class="text-lg sm:text-xl text-gray-600 font-bold">
-              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-            </p>
 
-            <div class="flex justify-end items-center gap-3 pt-2 border-t border-gray-200">
+          <div class="flex justify-between items-center pt-2 border-t border-gray-100 mt-1">
+            <span class="text-xs font-medium text-gray-500">Kuantitas Kirim</span>
+            <div class="flex items-center gap-2">
               <button type="button" (click)="onSebagianValueChange('-', item.Id)"
-                class="w-9 h-9 flex items-center justify-center bg-gray-800 text-white rounded-xl font-bold text-lg disabled:bg-gray-400 cursor-pointer active:scale-90"
+                class="w-8 h-8 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg cursor-pointer transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 [disabled]="(item.sebagianValue || 0) <= 0">
                 -
               </button>
 
-              <span class="text-xl font-bold text-slate-800 min-w-7.5 text-center">
+              <span class="font-bold text-base text-slate-800 min-w-8 text-center">
                 {{ item.Quantity }}
               </span>
 
               <button type="button" (click)="onSebagianValueChange('+', item.Id)"
-                class="w-9 h-9 flex items-center justify-center bg-green-700 text-white rounded-xl font-bold text-lg cursor-pointer active:scale-90">
+                class="w-8 h-8 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg cursor-pointer transition-all active:scale-95">
                 +
               </button>
             </div>
           </div>
-          }
         </div>
+        }
       </div>
       } @else {
-      <div class="flex items-center justify-center flex-col pt-20">
-        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
-        <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
+      <div class="flex items-center justify-center flex-col pt-16">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Data Not Found" />
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
           Ooops, tidak ada item pada permintaan ini :(
         </p>
       </div>
@@ -89,9 +94,8 @@
 
 <!-- Bottom Action Button -->
 @if (!loading && inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-<div
-  class="fixed bottom-0 left-0 right-0 z-40 w-full h-22.5 bg-white border-t border-gray-200 px-4 flex items-center justify-center shadow-lg">
-  <button class="btn-no-shadow-primary w-full py-3.5 text-lg font-bold text-center rounded-xl cursor-pointer"
+<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 z-40">
+  <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
     (click)="isSelectTransportUnit = true">
     Kirim ke {{ inventoryRequest.WarehouseModel.Description }}
   </button>
@@ -102,19 +106,21 @@
 @if (isSelectTransportUnit) {
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-3xl p-6 border-4 border-gray-400 animate-modal-card">
-    <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-      <h2 class="text-2xl font-bold text-[#202B6D]">Pilih Mobil / Armada</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold p-1 cursor-pointer"
-        (click)="isSelectTransportUnit = false">
-        âœ•
+  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+      <h2 class="text-xl font-bold text-[#202B6D]">Pilih Mobil / Armada</h2>
+      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isSelectTransportUnit = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 
-    <div class="my-6 flex flex-col gap-2">
-      <label class="text-sm font-bold text-gray-700">Pilih Kendaraan:</label>
+    <div class="my-4 flex flex-col gap-1.5">
+      <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Pilih Kendaraan:</label>
       <select
-        class="w-full border-2 border-gray-300 rounded-xl px-4 py-3 font-bold text-base bg-white text-slate-800 focus:outline-none focus:border-checkout"
+        class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl text-base font-semibold text-gray-800 focus:outline-none shadow-xs"
         [(ngModel)]="selectedVehicle" (change)="onSelectedVehicle()">
         <option [ngValue]="null">Pilih Kendaraan</option>
         @for (item of vehicles; track item.vehicleNo) {
@@ -125,13 +131,13 @@
       </select>
     </div>
 
-    <div class="grid grid-cols-2 gap-4">
-      <button class="btn-no-shadow-secondary w-full py-3 text-center rounded-xl font-bold"
+    <div class="grid grid-cols-2 gap-3 mt-6">
+      <button type="button" class="btn-no-shadow-secondary"
         (click)="isSelectTransportUnit = false">
         Tutup
       </button>
-      <button [disabled]="loadingSubmitted || !selectedVehicle"
-        class="btn-no-shadow-success w-full py-3 text-center rounded-xl font-bold disabled:bg-gray-400 disabled:cursor-not-allowed"
+      <button type="button" [disabled]="loadingSubmitted || !selectedVehicle"
+        class="btn-no-shadow-success disabled:bg-gray-300 disabled:cursor-not-allowed"
         (click)="onSubmit()">
         @if (loadingSubmitted) {
         <span>Tunggu...</span>

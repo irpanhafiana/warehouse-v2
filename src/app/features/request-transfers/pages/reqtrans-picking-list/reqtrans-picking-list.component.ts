@@ -46,6 +46,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   filteredSalesInvoices: HeaderRes[] = [];
   area: Area[] = [];
   pickingPic: string[] = [];
+  alphabet: string[] = [];
 
   date: string = '';
   dateString: string = '';
@@ -53,6 +54,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   docNumSelected: string = '';
   remarksSelected: string = '';
   areaSelected: string = '';
+  selectedAlphabet: string = '';
 
   loading: boolean = true;
   isDialogBantu: boolean = false;
@@ -129,6 +131,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
         this.bonCheckout = this.headerRes.filter((item) => item.IsCheckout);
 
         this.generateAreaList(this.headerRes);
+        this.generateAlphabet(this.headerRes);
         this.applyFilter();
         this.loading = false;
         this.cdr.markForCheck();
@@ -166,32 +169,68 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   applyFilter(): void {
     this.filteredSalesInvoices = this.headerRes.filter(
       (invoice) =>
+        this.matchesAlphabetFilter(invoice) &&
         this.matchesAreaFilter(invoice) &&
         !invoice.IsCheckout
     );
 
     this.bonCheckout = this.headerRes.filter(
       (invoice) =>
+        this.matchesAlphabetFilter(invoice) &&
         this.matchesAreaFilter(invoice) &&
         invoice.IsCheckout
     );
 
-    if (this.filteredSalesInvoices.length === 0) {
+    if (this.filteredSalesInvoices.length === 0 && !this.selectedAlphabet && !this.areaSelected) {
       this.filteredSalesInvoices = this.headerRes.filter((item) => !item.IsCheckout);
     }
-    if (this.bonCheckout.length === 0) {
+    if (this.bonCheckout.length === 0 && !this.selectedAlphabet && !this.areaSelected) {
       this.bonCheckout = this.headerRes.filter((item) => item.IsCheckout);
     }
     this.cdr.markForCheck();
   }
 
+  onSelectedAlphabet(char: string): void {
+    this.selectedAlphabet = char === '~' ? '' : char;
+    this.areaSelected = '';
+    this.applyFilter();
+  }
+
   onOptionSelect(e: any): void {
     this.areaSelected = e.target.value;
+    this.selectedAlphabet = '';
     this.applyFilter();
   }
 
   private matchesAreaFilter(data: HeaderRes): boolean {
     return this.areaSelected ? data.Area.includes(this.areaSelected) : true;
+  }
+
+  private matchesAlphabetFilter(invoice: HeaderRes): boolean {
+    return this.selectedAlphabet
+      ? (invoice.Name || '')
+          .replace(/^~+/, '')
+          .trim()
+          .toLowerCase()
+          .startsWith(this.selectedAlphabet.toLowerCase())
+      : true;
+  }
+
+  private generateAlphabet(data: HeaderRes[]): void {
+    const customerInitials = Array.from(
+      new Set(
+        data
+          .map((header) => {
+            const trimmedName = (header.Name || '').trim();
+            if (!trimmedName) return '';
+            return trimmedName.startsWith('~')
+              ? trimmedName.charAt(1).toUpperCase()
+              : trimmedName.charAt(0).toUpperCase();
+          })
+          .filter(Boolean)
+      )
+    );
+    this.alphabet = customerInitials.sort((a, b) => a.localeCompare(b));
   }
 
   private generateAreaList(data: HeaderRes[]): void {

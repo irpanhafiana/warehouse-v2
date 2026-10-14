@@ -1,110 +1,98 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full h-[10%] flex flex-col p-4">
-    <div class="flex flex-row justify-between gap-2 items-center">
-      <h1 class="font-bold text-xl text-start text-white">
-        Pengiriman Antar Toko
-      </h1>
-      <div class="flex flex-row gap-2">
-        <img src="refresh-w.png" alt="Refresh"
-          class="w-12.5 sm:w-15 bg-[#202B6D] border-4 border-[#19245a] rounded-xl p-2 active:scale-90 cursor-pointer"
-          (click)="onRefresh()" />
+  <div class="w-full flex flex-col p-4 shrink-0 gap-3">
+    <div class="flex flex-row justify-between items-center gap-2">
+      <div class="flex flex-col min-w-0">
+        <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
+          Kirim Antar Toko
+        </p>
+        <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
+          Permintaan IR
+        </h1>
+      </div>
+      <div class="flex flex-row items-center gap-2 shrink-0">
+        <button type="button" (click)="onRefresh()"
+          class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
+          aria-label="Refresh">
+          <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        </button>
         <app-button-home></app-button-home>
       </div>
     </div>
   </div>
 
   <!-- Body Container -->
-  <div class="w-full h-[90%] bg-[#F3F2F8] rounded-t-[50px] p-4 flex flex-col gap-4 border-t-15 border-[#202B6D]">
+  <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-60">
+    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
-        <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
-        <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
+        <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
       </div>
       } @else {
-      <div class="h-full pb-32">
-        @if (inventoryRequests.length > 0) {
-        <div class="flex flex-col gap-3 pb-48">
-          @for (item of inventoryRequests; track item.DocNum || $index) {
-          <div class="card flex flex-col gap-2 bg-white border-4 border-gray-400 rounded-3xl p-4">
-            <div class="flex flex-row justify-between items-center">
+      @if (inventoryRequests.length > 0) {
+      <div class="flex flex-col gap-3">
+        @for (item of inventoryRequests; track item.DocNum || $index) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex justify-between items-start">
               <div class="flex flex-col">
-                <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
-                  DocNum
-                </small>
-                <p class="font-bold text-lg sm:text-xl text-slate-700 text-start">
-                  {{ item.DocNum }}
-                </p>
+                <small class="text-gray-500 text-xs font-medium">DocNum</small>
+                <p class="font-bold text-lg text-slate-800">{{ item.DocNum }}</p>
               </div>
-              <div class="flex flex-col">
-                <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
-                  Total Items
-                </small>
-                <p class="font-bold text-lg sm:text-xl text-slate-700 text-center">
-                  {{ item.DetailsCount }}
-                </p>
+              <div class="flex flex-col items-end">
+                <small class="text-gray-500 text-xs font-medium">Total Items</small>
+                <span class="bg-blue-50 text-checkout px-2 py-0.5 rounded-md font-bold text-sm">
+                  {{ item.DetailsCount }} Item
+                </span>
               </div>
             </div>
 
             <div class="flex flex-col">
-              <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
-                Permintaan Dari:
-              </small>
-              <p class="font-bold text-xl sm:text-2xl text-slate-700 text-start">
-                {{ item.WarehouseModel.Description }}
-              </p>
+              <small class="text-gray-500 text-xs font-medium">Permintaan Dari</small>
+              <p class="font-bold text-lg text-slate-800">{{ item.WarehouseModel.Description }}</p>
             </div>
 
             <div class="flex flex-col">
-              <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
-                Tanggal Permintaan:
-              </small>
-              <p class="font-bold text-base sm:text-xl text-slate-700 text-start">
-                {{ item.DocDate | date : "dd MMM yyyy" }}
-              </p>
+              <small class="text-gray-500 text-xs font-medium">Tanggal Permintaan</small>
+              <p class="font-semibold text-sm text-gray-600">{{ item.DocDate | date : "dd MMM yyyy" }}</p>
             </div>
 
             @if (item.Remarks) {
-            <div class="flex flex-col">
-              <small class="text-gray-500 text-sm sm:text-base font-semibold text-start">
-                Catatan dari toko:
-              </small>
-              <p class="font-bold text-base sm:text-lg text-slate-700 text-start">
-                {{ item.Remarks }}
-              </p>
+            <div class="bg-amber-50 rounded-xl p-2.5 border border-amber-200/60">
+              <small class="text-amber-800 text-xs font-bold">Catatan dari toko</small>
+              <p class="font-medium text-sm text-slate-800">{{ item.Remarks }}</p>
             </div>
             }
 
-            <div class="flex justify-between w-full mt-3">
-              <button class="btn-no-shadow-primary w-full py-3 font-bold text-lg"
+            <div class="mt-2">
+              <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer py-2.5"
                 (click)="toInventoryRequestView(item.DocNum)">
                 Lihat Detail
               </button>
             </div>
           </div>
-          }
-        </div>
-        } @else {
-        <div class="flex items-center justify-center flex-col pt-20">
-          <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
-          <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
-            Ooops, tidak ada BON Permintaan Antar Toko :(
-          </p>
         </div>
         }
       </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-16">
+        <img src="new-assets/data-not-founds.png" class="w-48 mx-auto object-contain" alt="Data Not Found" />
+        <p class="w-3/4 text-center font-medium text-base text-checkout mt-3">
+          Ooops, tidak ada BON Permintaan Antar Toko :(
+        </p>
+      </div>
+      }
       }
     </div>
   </div>
 </div>
 
 <!-- Bottom Navigation Action -->
-<div
-  class="fixed bottom-0 left-0 right-0 z-40 w-full h-22.5 bg-white border-t border-gray-200 px-4 flex items-center justify-center shadow-lg">
-  <button class="btn-no-shadow-primary w-full py-3.5 text-lg font-bold text-center rounded-xl cursor-pointer"
+<div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 p-3 z-40">
+  <button type="button" class="w-full btn-no-shadow-primary text-center cursor-pointer py-3"
     (click)="toPickingListPengiriman()">
     Picking Loading Permintaan
   </button>
