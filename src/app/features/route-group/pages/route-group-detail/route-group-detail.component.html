@@ -98,8 +98,8 @@
         <div class="flex flex-col gap-3 mt-1">
           @for (item of filteredDetails; track item.Id || item.DocNum || $index) {
           <div class="w-full border rounded-xl p-4 transition-all" [ngClass]="{
-              'bg-amber-50 border-amber-300': item.newlyAdded,
-              'bg-emerald-50 border-emerald-300': item.IsFinishLoad,
+              'bg-amber-200 border-amber-300': item.newlyAdded,
+              'bg-emerald-300 border-emerald-300': item.IsFinishLoad,
               'bg-white border-gray-200': !item.newlyAdded && !item.IsFinishLoad
             }">
             <div class="flex flex-col gap-2">
@@ -291,10 +291,16 @@
   <div
     class="w-full max-w-lg bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col max-h-[90vh]">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
-      <h2 class="text-xl font-bold text-[#202B6D]">Pilih BON</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="isDialogOpenBarcode = false">
-        âœ•
+      <div class="flex flex-col">
+        <p class="font-semibold text-xs uppercase tracking-wider text-gray-500">Jalur Muatan</p>
+        <h2 class="text-xl font-bold text-[#202B6D]">Pilih BON Loading</h2>
+      </div>
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isDialogOpenBarcode = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 
@@ -366,7 +372,7 @@
             @for (item of filteredSalesInvoices; track item.DocNum) {
             <div (click)="onSelectedHeaderRes(item)" class="border rounded-xl p-3.5 cursor-pointer transition-all"
               [ngClass]="{
-                'bg-emerald-50 border-emerald-400': isSelectedItem(item),
+                'bg-emerald-300 border-emerald-400': isSelectedItem(item),
                 'bg-white border-gray-200 hover:border-gray-300': !isSelectedItem(item)
               }">
               <div class="flex justify-between items-start">
@@ -427,9 +433,12 @@
       } @else {
       <h2 class="text-xl font-bold text-[#202B6D]">Rekap Semua BON</h2>
       }
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="closeDialogRekap()">
-        âœ•
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="closeDialogRekap()" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 
@@ -510,9 +519,12 @@
     class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Konfirmasi</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="isDialogConfirmDelete = false">
-        âœ•
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isDialogConfirmDelete = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="flex flex-col gap-2">

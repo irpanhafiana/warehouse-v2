@@ -230,15 +230,18 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
 
   getRecehExist(): void {
     if (!this.selectedBON) return;
-    this.loadingService.getCheckReceh(this.selectedBON).subscribe({
-      next: (data) => {
-        this.isRecehExist = Boolean(data);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get receh exist warning:', e);
-      },
-    });
+    this.loadingService
+      .getCheckReceh(this.selectedBON)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.isRecehExist = Boolean(data);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get receh exist warning:', e);
+        },
+      });
   }
 
   createAlphabetList(details: Detail[]): void {
@@ -305,6 +308,12 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
     if (detail.OpenQuantity === 0 || this.isLoading(id)) return;
 
+    if (detail.sebagianValue > 0 && detail.sebagianValue !== detail.OpenQuantity) {
+      this.isErrorPicSebagian = true;
+      this.msgError = 'Jumlah yang masuk baru sebagian, tolong periksa kembali!';
+      return;
+    }
+
     if (!this.picName) {
       this.isErrorPicSebagian = true;
       this.msgError = 'PIC belum dipilih, silahkan pilih PIC terlebih dahulu sebelum melanjutkan loading!';
@@ -312,6 +321,39 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     }
 
     this.setLoadingState(id, true);
+
+    const isRecehItem =
+      (detail.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
+      (detail.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH';
+
+    if (isRecehItem) {
+      this.loadingService
+        .getCheckReceh(this.selectedBON)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => {
+            this.isRecehExist = Boolean(data);
+            this.cdr.markForCheck();
+
+            if (this.isRecehExist) {
+              this.setLoadingState(id, false);
+              return;
+            }
+
+            this.executeSaveRemarkDone(id, detail);
+          },
+          error: (e) => {
+            console.error('Check receh error before loading:', e);
+            this.executeSaveRemarkDone(id, detail);
+          },
+        });
+      return;
+    }
+
+    this.executeSaveRemarkDone(id, detail);
+  }
+
+  private executeSaveRemarkDone(id: number, detail: Detail): void {
     const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
 
     const payload = {
@@ -328,17 +370,21 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       DocNum: this.selectedBON || '',
     };
 
-    this.loadingService.putLoadingListDetails(payload).subscribe({
-      next: () => {
-        this.setLoadingState(id, false);
-      },
-      error: (e) => {
-        console.error('Remark done error:', e);
-        this.isErrorPicSebagian = true;
-        this.msgError = 'Gagal menyimpan data loading. Silahkan periksa koneksi.';
-        this.setLoadingState(id, false);
-      },
-    });
+    this.loadingService
+      .putLoadingListDetails(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+        },
+        error: (e) => {
+          console.error('Remark done error:', e);
+          this.isErrorPicSebagian = true;
+          this.msgError = 'Gagal menyimpan data loading. Silahkan periksa koneksi.';
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   onCancel(id: number): void {

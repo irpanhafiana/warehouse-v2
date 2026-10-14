@@ -101,7 +101,7 @@ The UI standard follows [`picking-list.component.html`](file:///d:/github/wareho
   <div class="w-full bg-white border border-gray-200 rounded-xl p-4 shadow-xs transition-all">
   ```
 - **Highlighted / Status Cards**:
-  - Success / Selected: `bg-emerald-50 border border-emerald-300 rounded-xl`
+  - Success / Selected: `bg-emerald-300 border border-emerald-300 rounded-xl`
   - In Progress / Warning: `bg-amber-50 border border-amber-300 rounded-xl`
   - Subcard / Inner details: `bg-gray-50 rounded-xl p-2.5 border border-gray-100`
 - **AVOID**: Heavy borders (`border-4`, `border-black`), excessive roundedness (`rounded-3xl` for standard cards), and neo-brutalist shadows (`box-shadow: 0px 4px 0px black`).

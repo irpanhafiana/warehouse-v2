@@ -138,6 +138,7 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
 
   checkPIC(picName: string): void {
     if (!picName || picName.trim() === '') {
+      this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
       void this.router.navigate(['/main-reqtrans/picking/list', this.docnum]);
     } else {
       this.selectedPic = picName;

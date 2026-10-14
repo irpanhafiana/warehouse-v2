@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -41,6 +41,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   private service = inject(SalesInvoiceService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   private pickingService = inject(PickingService);
   private signalrService = inject(SignalrService);
   private sharedDataService = inject(SharedDataService);
@@ -83,6 +84,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
     if (this.route.snapshot.params['docnum']) {
       this.docNumSelected = this.route.snapshot.params['docnum'];
       this.isDialogAmbilBON = true;
+      this.location.replaceState('/main/picking/list');
     }
 
     this.setDefaultDate();
@@ -257,6 +259,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   closeDialogAmbilBON(): void {
     this.docNumSelected = '';
     this.isDialogAmbilBON = false;
+    this.location.replaceState('/main/picking/list');
   }
 
   closeDialogGantiPIC(): void {

@@ -13,7 +13,7 @@ export const goodsDeliveryRoutes: Routes = [
         component: GoodsDeliveryListComponent,
       },
       {
-        path: 'detail/:status/:date/:transportUnit',
+        path: 'detail/:date/:transportUnit/:status',
         component: GoodsDeliveryDetailComponent,
       },
       {

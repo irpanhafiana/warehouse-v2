@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -37,6 +37,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   private storage = inject(StorageService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private location = inject(Location);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
@@ -76,6 +77,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
     if (docnumParam) {
       this.isDialogAmbilBON = true;
       this.docNumSelected = docnumParam;
+      this.location.replaceState('/main-reqtrans/picking/list');
     }
   }
 
@@ -265,6 +267,17 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
     this.isDialogBantu = false;
     this.docNumSelected = '';
     this.remarksSelected = '';
+  }
+
+  closeDialogAmbilBON(): void {
+    this.isDialogAmbilBON = false;
+    this.docNumSelected = '';
+    this.location.replaceState('/main-reqtrans/picking/list');
+  }
+
+  closeDialogGantiPIC(): void {
+    this.isDialogGantiPIC = false;
+    this.docNumSelected = '';
   }
 
   onBantu(): void {

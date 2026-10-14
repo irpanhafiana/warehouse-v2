@@ -121,7 +121,7 @@
             'bg-blue-50 border-blue-400': item.isSelected && !isItemLoaded(item),
             'bg-white border-gray-200': !item.isSelected && !isItemLoaded(item) && item.Remarks !== 'pick' && !item.Remarks?.includes('load by'),
             'bg-orange-50 border-orange-300': item.Remarks === 'pick' && !item.isSelected,
-            'bg-emerald-50 border-emerald-300': (item.Remarks?.includes('load by') || isItemLoaded(item)) && !item.isSelected
+            'bg-emerald-300 border-emerald-300': (item.Remarks?.includes('load by') || isItemLoaded(item)) && !item.isSelected
           }">
           @if (item.Remarks?.includes('load by')) {
           <img src="done.png" alt="" class="absolute top-3 right-3 w-8 h-8 z-10" />

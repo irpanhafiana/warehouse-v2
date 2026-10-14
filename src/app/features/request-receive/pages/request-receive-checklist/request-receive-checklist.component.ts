@@ -247,17 +247,17 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
     const remarkStr = typeof item.Remarks === 'string' ? item.Remarks : '';
     const remarkNames = remarkStr
       ? remarkStr
-          .replace('load by: ', '')
-          .split(',')
-          .map((name) => name.trim().toUpperCase())
-          .filter((name) => name !== '')
+        .replace('load by: ', '')
+        .split(',')
+        .map((name) => name.trim().toUpperCase())
+        .filter((name) => name !== '')
       : [];
 
     if (this.picName && remarkNames.includes(this.picName.toUpperCase())) {
-      return 'bg-emerald-50 border-emerald-300';
+      return 'bg-emerald-300 border-emerald-300';
     }
     if (remarkStr) {
-      return 'bg-amber-50 border-amber-300';
+      return 'bg-amber-200 border-amber-300';
     }
     return 'bg-white border-gray-200';
   }

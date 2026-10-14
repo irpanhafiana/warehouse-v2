@@ -205,9 +205,9 @@
 <!-- Dialog Ambil BON -->
 <app-dialog-set-pic [isOpen]="isDialogAmbilBON" title="Ambil BON" confirmText="Ambil" [currentPic]="picName"
   [picList]="pickingPic" (saved)="onPicSelectedForAmbil($event)"
-  (closed)="isDialogAmbilBON = false"></app-dialog-set-pic>
+  (closed)="closeDialogAmbilBON()"></app-dialog-set-pic>
 
 <!-- Dialog Ganti PIC -->
 <app-dialog-set-pic [isOpen]="isDialogGantiPIC" title="Ganti BON PIC" confirmText="Ganti PIC" [currentPic]="picName"
   [picList]="pickingPic" (saved)="onPicSelectedForGanti($event)"
-  (closed)="isDialogGantiPIC = false"></app-dialog-set-pic>
+  (closed)="closeDialogGantiPIC()"></app-dialog-set-pic>

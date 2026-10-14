@@ -4,7 +4,7 @@
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col min-w-0">
         <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
-          Muat Penjualan
+          Sales Invoice
         </p>
         <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
           Jalur Muat
@@ -95,7 +95,7 @@
         <div class="flex flex-col gap-2">
           @for (item of filteredSalesInvoices; track item.Alias || $index) {
           <div class="w-full border rounded-xl p-4 transition-all" [ngClass]="{
-              'bg-emerald-50 border-emerald-300': item.Remarks.toLowerCase() === 'done',
+              'bg-emerald-300 border-emerald-300': item.Remarks.toLowerCase() === 'done',
               'bg-white border-gray-200': item.Remarks.toLowerCase() !== 'done'
             }">
             <div class="flex justify-between items-start">
@@ -186,36 +186,56 @@
 
 <app-navbar></app-navbar>
 
-<!-- Floating action buttons -->
-@if (isShowMenu) {
-<div class="fixed bottom-67.5 right-3 z-30 flex flex-col gap-2 items-end">
-  <button type="button" class="btn-no-shadow-success text-sm py-2 px-4 rounded-xl cursor-pointer  "
-    (click)="toAddRouteGroup()">
-    Tambah Jalur Muatan
-  </button>
-  <button type="button" class="btn-no-shadow-primary text-sm py-2 px-4 rounded-xl cursor-pointer  "
-    (click)="toAdditionalInvoice()">
-    Lihat BON Tambahan
-  </button>
-  <button type="button" class="btn-no-shadow-warning text-sm py-2 px-4 rounded-xl cursor-pointer  "
-    (click)="toLoadingList()">
-    Lihat BON Loading
-  </button>
-</div>
-}
-
+<!-- Floating trigger button -->
 <div class="fixed bottom-23.75 right-3 z-30">
-  @if (!isShowMenu) {
   <button type="button"
-    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all  "
-    (click)="isShowMenu = true">
+    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all shadow-md"
+    (click)="isShowMenu = true" aria-label="Menu Aksi">
     <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
   </button>
-  } @else {
-  <button type="button"
-    class="w-13 h-13 bg-red-600 hover:bg-red-700 active:scale-95 border border-red-700/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all  "
-    (click)="isShowMenu = false">
-    <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
-  </button>
-  }
 </div>
+
+<!-- Modal Dialog Menu Aksi Jalur Muat -->
+@if (isShowMenu) {
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+      <h2 class="text-xl font-bold text-[#202B6D]">Menu Jalur Muat</h2>
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isShowMenu = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-2.5 my-1">
+      <button type="button"
+        class="btn-no-shadow-success w-full py-3 text-sm sm:text-base font-bold rounded-xl cursor-pointer text-center"
+        (click)="isShowMenu = false; toAddRouteGroup()">
+        Tambah Jalur Muatan
+      </button>
+      <button type="button"
+        class="btn-no-shadow-primary w-full py-3 text-sm sm:text-base font-bold rounded-xl cursor-pointer text-center"
+        (click)="isShowMenu = false; toAdditionalInvoice()">
+        Lihat BON Tambahan
+      </button>
+      <button type="button"
+        class="btn-no-shadow-warning w-full py-3 text-sm sm:text-base font-bold rounded-xl cursor-pointer text-center"
+        (click)="isShowMenu = false; toLoadingList()">
+        Lihat BON Loading
+      </button>
+    </div>
+
+    <div class="mt-2 pt-2 border-t border-gray-100">
+      <button type="button"
+        class="btn-no-shadow-secondary w-full py-2.5 text-sm font-bold rounded-xl cursor-pointer text-center"
+        (click)="isShowMenu = false">
+        Tutup
+      </button>
+    </div>
+  </div>
+</div>
+}

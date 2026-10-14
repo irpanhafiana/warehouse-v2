@@ -31,13 +31,24 @@ export class GoodsDeliveryDetailComponent implements OnInit {
   deliveriesWithoutRemarks: any[] = [];
 
   constructor() {
-    this.date = this.route.snapshot.params['date'];
-    this.transportUnit = this.route.snapshot.params['transportUnit'];
-    this.statusSelected = this.route.snapshot.params['status'];
+    this.readRouteParams();
   }
 
   ngOnInit() {
-    this.getDetailDelivery(this.statusSelected);
+    this.route.paramMap.subscribe((params) => {
+      this.date = params.get('date') || this.route.snapshot.params['date'] || '';
+      this.transportUnit = params.get('transportUnit') || this.route.snapshot.params['transportUnit'] || '';
+      this.statusSelected = params.get('status') || this.route.snapshot.params['status'] || '';
+      if (this.date && this.transportUnit) {
+        this.getDetailDelivery(this.statusSelected);
+      }
+    });
+  }
+
+  private readRouteParams(): void {
+    this.date = this.route.snapshot.params['date'] || '';
+    this.transportUnit = this.route.snapshot.params['transportUnit'] || '';
+    this.statusSelected = this.route.snapshot.params['status'] || '';
   }
 
   onTransportUnitReady() {

@@ -352,6 +352,35 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const isRecehItem =
+      (detail.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
+      (detail.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH';
+
+    if (isRecehItem) {
+      this.loadingService
+        .getCheckReceh(this.selectedBON)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (exists: boolean) => {
+            this.isRecehExist = exists;
+            if (this.isRecehExist) {
+              this.setLoadingState(id, false);
+              return;
+            }
+            this.executeSaveRemarkDone(id, detailId);
+          },
+          error: (e) => {
+            console.error('Check receh error before loading:', e);
+            this.executeSaveRemarkDone(id, detailId);
+          },
+        });
+      return;
+    }
+
+    this.executeSaveRemarkDone(id, detailId);
+  }
+
+  private executeSaveRemarkDone(id: number, detailId: string): void {
     const savePayload = {
       PIC: [this.picName],
       DetailId: !detailId || detailId.trim() === '' ? [Number(id)] : detailId.split(',').map(Number),
@@ -437,19 +466,19 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   getCardClass(item: Detail): string {
     const remarkNames = item.Remarks
       ? item.Remarks.replace('load by: ', '')
-          .split(',')
-          .map((name: string) => name.trim())
-          .filter(Boolean)
+        .split(',')
+        .map((name: string) => name.trim())
+        .filter(Boolean)
       : [];
 
     if (item.sebagianValue > 0 && item.sebagianValue !== item.OpenQuantity) {
       return 'bg-gray-100 border-gray-300';
     }
     if (remarkNames.includes(this.picName)) {
-      return 'bg-emerald-50 border-emerald-400';
+      return 'bg-emerald-300 border-emerald-400';
     }
     if (item.Remarks) {
-      return 'bg-amber-50 border-amber-300';
+      return 'bg-amber-200 border-amber-300';
     }
     return 'bg-white border-gray-200';
   }

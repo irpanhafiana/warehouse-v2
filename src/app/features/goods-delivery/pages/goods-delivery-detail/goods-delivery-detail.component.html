@@ -3,7 +3,7 @@
     <div class="flex flex-row justify-between gap-2 items-center">
       <div class="flex flex-col min-w-0 text-white">
         <p class="font-bold text-xs uppercase tracking-wider text-white/80 truncate">
-          Surat Jalan &bull; {{ transportUnit || 'Detail' }}
+          {{ transportUnit || 'Detail' }}
         </p>
         <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
           Detail Pengiriman
@@ -23,7 +23,7 @@
   </div>
 
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+    <div class="flex-1 overflow-y-auto flex flex-col gap-2 pr-1 pb-32">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
@@ -184,9 +184,12 @@
   <div class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Kamu yakin?</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-xl font-bold cursor-pointer"
-        (click)="isErrorPicSebagian = false">
-        âœ•
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isErrorPicSebagian = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
     <div class="flex justify-center mx-auto gap-2">

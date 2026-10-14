@@ -35,7 +35,7 @@
         <div class="flex flex-col gap-3 pb-24">
           @for (item of filteredSalesInvoices; track item.DocNum) {
           <div class="w-full rounded-xl p-4 transition-all border" [ngClass]="{
-              'bg-amber-50 border-amber-300': item.MarkBeforeRoute,
+              'bg-amber-200 border-amber-300': item.MarkBeforeRoute,
               'bg-white border-gray-200': !item.MarkBeforeRoute
             }">
             <div class="flex flex-col gap-2">
@@ -124,9 +124,12 @@
     class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Tambah Ke Jalur Muatan</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-lg font-bold p-1 cursor-pointer"
-        (click)="isDialogAddToRoute = false">
-        âœ•
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isDialogAddToRoute = false" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
       </button>
     </div>
 
