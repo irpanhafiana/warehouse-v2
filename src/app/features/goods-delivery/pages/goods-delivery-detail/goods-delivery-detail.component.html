@@ -1,12 +1,12 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
-  <div class="w-full p-4 shrink-0 flex flex-col">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+  <div class="w-full p-4 shrink-0 flex flex-col transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
-      <div class="flex flex-col">
-        <div class="flex flex-row items-center">
-          <p class="font-bold text-sm sm:text-base text-white/80">Detail Pengiriman</p>
-        </div>
-        <h1 class="font-bold text-xl sm:text-2xl text-start text-white tracking-tight">
-          {{ transportUnit }}
+      <div class="flex flex-col min-w-0 text-white">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80 truncate">
+          Surat Jalan &bull; {{ transportUnit || 'Detail' }}
+        </p>
+        <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
+          Detail Pengiriman
         </h1>
       </div>
       <div class="flex flex-row gap-2">

@@ -1,8 +1,11 @@
-﻿<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
-  <div class="w-full flex flex-col p-4 shrink-0">
+<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+  <div class="w-full flex flex-col p-4 shrink-0 transition-all duration-200">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col text-white min-w-0">
-        <h1 class="font-bold text-xl sm:text-2xl text-start tracking-tight truncate">
+        <p class="font-bold text-xs uppercase tracking-wider text-white/80">
+          Riwayat Muat &bull; Detail
+        </p>
+        <h1 class="font-bold text-lg sm:text-xl text-start tracking-tight truncate max-w-48 sm:max-w-72">
           {{ data ? data.RouteName : 'Jalur Muatan' }}
         </h1>
       </div>
