@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">SJ Warehouse</string>
-    <string name="title_activity_main">SJ Warehouse</string>
+    <string name="app_name">Warehouse V2</string>
+    <string name="title_activity_main">Warehouse V2</string>
     <string name="package_name">com.sjmart.warehouse</string>
     <string name="custom_url_scheme">com.sjmart.warehouse</string>
 </resources>

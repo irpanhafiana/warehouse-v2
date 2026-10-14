@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.sjmart.warehouse',
-  appName: 'SJ Warehouse',
+  appName: 'Warehouse V2',
   webDir: 'dist/warehouse-v2/browser',
   server: {
     androidScheme: 'https',
