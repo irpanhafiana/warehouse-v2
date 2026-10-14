@@ -7,6 +7,7 @@ import { Inventory, Vehicle } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components';
 import { ReqTransLoadingService } from '../../../request-transfers/services/reqtrans-loading.service';
 import { InventoryRequestService } from '../../services/inventory-request.service';
+import { AuthService, StorageService, STORAGE_KEYS } from '../../../../core/services';
 
 @Component({
   selector: 'app-inventory-request-view',
@@ -18,6 +19,8 @@ export class InventoryRequestViewComponent implements OnInit {
   private router = inject(Router);
   private service = inject(InventoryRequestService);
   private loadingService = inject(ReqTransLoadingService);
+  private authService = inject(AuthService);
+  private storage = inject(StorageService);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -35,10 +38,28 @@ export class InventoryRequestViewComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getVehicles();
-    if (this.docnum) {
-      this.fetchDetailInventoryRequest(this.docnum);
-    }
+    this.route.paramMap.subscribe((params) => {
+      this.docnum = params.get('docnum') || this.route.snapshot.params['docnum'] || '';
+      if (this.docnum) {
+        this.fetchDetailInventoryRequest(this.docnum);
+      }
+    });
+
+    this.onIs4Login();
+  }
+
+  onIs4Login(): void {
+    this.authService.generateIS4Token().subscribe({
+      next: async (data) => {
+        await this.storage.setItem(STORAGE_KEYS.IS4_TOKEN, data.access_token);
+        await this.storage.setItem(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
+        this.getVehicles();
+      },
+      error: (e) => {
+        console.warn('IS4 Login failed or offline, fallback to existing token:', e);
+        this.getVehicles();
+      },
+    });
   }
 
   getVehicles(): void {
