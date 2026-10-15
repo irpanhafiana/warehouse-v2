@@ -125,34 +125,13 @@
 
 <!-- Modal Konfirmasi Mobil Siap Jalan -->
 @if (isErrorPicSebagian) {
-<div
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
-    <div class="flex justify-between items-center pb-3 border-b border-gray-200">
-      <h2 class="text-xl font-bold text-[#202B6D]">Kamu yakin?</h2>
-      <button type="button"
-        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
-        (click)="isErrorPicSebagian = false" aria-label="Tutup">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    <div class="flex justify-center mx-auto gap-2">
-      <p class="text-gray-600 font-semibold text-base tracking-wide text-center">
-        {{ msgError }}
-      </p>
-    </div>
-    <div class="grid grid-cols-2 gap-3 mt-4">
-      <button type="button" class="btn-no-shadow-secondary py-2.5 rounded-xl cursor-pointer text-center"
-        (click)="isErrorPicSebagian = false">
-        Tutup
-      </button>
-      <button type="button" class="btn-no-shadow-primary py-2.5 rounded-xl cursor-pointer text-center"
-        (click)="onSubmit()">
-        Yakin
-      </button>
-    </div>
-  </div>
-</div>
+<app-dialog-confirm
+  [title]="'Konfirmasi Mobil Siap Jalan'"
+  [message]="msgError"
+  [confirmText]="'Ya, Siap Jalan'"
+  [confirmBtnClass]="'btn-no-shadow-primary'"
+  [isLoading]="isLoading"
+  (cancel)="isErrorPicSebagian = false"
+  (confirm)="onSubmit()"
+/>
 }

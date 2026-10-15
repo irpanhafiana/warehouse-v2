@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.service';
-import { LoaderComponent } from '../../../../shared/components';
+import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
 
 @Component({
   selector: 'app-reqtrans-goods-delivery-detail',
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './reqtrans-goods-delivery-detail.component.html',
 })
 export class ReqtransGoodsDeliveryDetailComponent implements OnInit {

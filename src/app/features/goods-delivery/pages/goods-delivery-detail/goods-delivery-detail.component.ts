@@ -3,12 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { GoodsDeliveryService } from '../../../../core/services';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-goods-delivery-detail',
   standalone: true,
-  imports: [CommonModule, LoaderComponent],
+  imports: [CommonModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './goods-delivery-detail.component.html',
   styleUrl: './goods-delivery-detail.component.css',
 })

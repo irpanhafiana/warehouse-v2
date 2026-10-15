@@ -14,6 +14,7 @@ export class DialogSetPicComponent {
   currentPic = input<string | null>(null);
   title = input<string>('Siapa Nama kamu?');
   confirmText = input<string>('Simpan');
+  canClose = input<boolean>(true);
 
   saved = output<string>();
   closed = output<void>();

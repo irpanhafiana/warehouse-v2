@@ -513,46 +513,34 @@
 
 <!-- Dialog Confirm Delete -->
 @if (isDialogConfirmDelete) {
-<div
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div
-    class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
-    <div class="flex justify-between items-center pb-3 border-b border-gray-100">
-      <h2 class="text-xl font-bold text-[#202B6D]">Konfirmasi</h2>
-      <button type="button"
-        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
-        (click)="isDialogConfirmDelete = false" aria-label="Tutup">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
-    <div class="flex flex-col gap-2">
-      <p class="text-gray-700 font-medium text-sm leading-relaxed">
-        Apakah kamu yakin BON dari <br />
-        <span class="font-bold text-[#202B6D] bg-blue-50 px-2 py-0.5 rounded-md inline-block mt-1">{{
-          customerNameDeleted }}</span> <br />
-        akan dihapus dari jalur ini?
-      </p>
-    </div>
-    <div class="grid grid-cols-2 gap-3 mt-4">
-      <button type="button" class="btn-no-shadow-secondary text-center cursor-pointer"
-        (click)="isDialogConfirmDelete = false">
-        Tutup
-      </button>
-      <button type="button" class="btn-no-shadow-danger text-center cursor-pointer" (click)="onHapusBON()">
-        Yakin
-      </button>
-    </div>
-  </div>
-</div>
+<app-dialog-confirm
+  [title]="'Konfirmasi Hapus BON'"
+  [message]="'Apakah kamu yakin BON dari ' + customerNameDeleted + ' akan dihapus dari jalur ini?'"
+  [confirmText]="'Ya, Hapus'"
+  [confirmBtnClass]="'btn-no-shadow-danger'"
+  (cancel)="isDialogConfirmDelete = false"
+  (confirm)="onHapusBON()"
+/>
+}
+
+<!-- Dialog Confirm Selesaikan Jalur Manual -->
+@if (isDialogConfirmFinishManual) {
+<app-dialog-confirm
+  [title]="'Konfirmasi Selesai Jalur'"
+  [message]="'Apakah Anda yakin ingin menyelesaikan jalur ini? Pastikan seluruh BON pada jalur ini sudah benar-benar selesai dimuat.'"
+  [confirmText]="'Ya, Selesaikan'"
+  [confirmBtnClass]="'btn-no-shadow-success'"
+  [isLoading]="isDisabledButton"
+  (cancel)="isDialogConfirmFinishManual = false"
+  (confirm)="onRouteFinishManual(alias)"
+/>
 }
 
 <!-- Bottom Fixed Action -->
 <div class="fixed bottom-0 left-0 right-0 bg-white p-3 z-20 border-t border-gray-200 shadow-lg">
   @if (isAllBonDone) {
   <button type="button" class="w-full btn-no-shadow-success text-center cursor-pointer py-3"
-    (click)="onRouteFinishManual(alias)">
+    (click)="isDialogConfirmFinishManual = true">
     Selesaikan jalur ini
   </button>
   } @else if (!isCanRekap) {

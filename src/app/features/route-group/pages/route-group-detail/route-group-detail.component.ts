@@ -10,6 +10,7 @@ import { SalesInvoiceService } from '../../../../core/services/sales-invoice.ser
 import { AuthService } from '../../../../core/services/auth.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 
 @Component({
   selector: 'app-route-group-detail',
@@ -18,6 +19,7 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
     FormsModule,
     ReactiveFormsModule,
     LoaderComponent,
+    DialogConfirmComponent,
     DatePipe,
   ],
   templateUrl: './route-group-detail.component.html',
@@ -53,6 +55,7 @@ export class RouteGroupDetailComponent implements OnInit {
   selectedLetter: string | null = null;
   isDialogConfirm = false;
   isDialogConfirmDelete = false;
+  isDialogConfirmFinishManual = false;
   selectedItem: HeaderRes[] = [];
 
   isUrutkan = false;
@@ -482,14 +485,18 @@ export class RouteGroupDetailComponent implements OnInit {
     this.routeGroupService.putFinishRouteGroup(payload).subscribe({
       next: () => {
         this.isDisabledButton = false;
+        this.isDialogConfirmFinishManual = false;
         this.selectedItem = [];
       },
       error: () => {
         this.isDisabledButton = false;
+        this.isDialogConfirmFinishManual = false;
         this.toastr.error('Gagal menyelesaikan rute secara manual.', 'Error');
       },
       complete: () => {
         this.isDisabledButton = false;
+        this.isDialogConfirmFinishManual = false;
+        this.toastr.success('Jalur muat berhasil diselesaikan!', 'Success');
         this.onBack();
       },
     });

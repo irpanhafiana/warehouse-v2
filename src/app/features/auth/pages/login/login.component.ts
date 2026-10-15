@@ -168,18 +168,32 @@ export class LoginComponent implements OnInit {
   }
 
   async onConfirmForceClose(): Promise<void> {
-    await this.storage.clear();
     this.isProcessForceClose = true;
     this.isDialogForceClose = false;
 
-    if (this.username || this.password) {
-      this.onLogin();
+    // 1. Bersihkan seluruh web storage & preferences
+    await this.storage.clear();
+    this.phoneName = null;
+    this.pickingPic = [];
+    this.defaultBranch = '';
+
+    // 2. Jika di Android native (Capacitor), panggil AppResetPlugin untuk membersihkan WebView cache & cache folder OS
+    try {
+      const { registerPlugin } = await import('@capacitor/core');
+      const AppReset = registerPlugin<any>('AppReset');
+      if (AppReset && AppReset.resetAppData) {
+        await AppReset.resetAppData();
+        return; // AppResetPlugin akan mematikan proses (finishAffinity & exit)
+      }
+    } catch (e) {
+      console.warn('Native AppReset tidak tersedia atau bukan di native environment:', e);
     }
 
+    // 3. Fallback jika dijalankan di browser
     setTimeout(() => {
       this.isProcessForceClose = false;
-      window.location.reload();
-    }, 3000);
+      window.location.replace('/');
+    }, 2500);
   }
 
   async onPicSaved(picName: string): Promise<void> {

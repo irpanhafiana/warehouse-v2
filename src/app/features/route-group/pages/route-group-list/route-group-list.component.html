@@ -42,6 +42,7 @@
       </div>
 
       <!-- Alphabet Initial Filter Bar -->
+      @if (alphabet.length > 0) {
       <div class="flex flex-row items-center gap-2 text-white py-1 min-w-0">
         @if (filteredSalesInvoices.length !== 0) {
         <button
@@ -64,6 +65,7 @@
           </div>
         </div>
       </div>
+      }
     </div>
   </div>
 

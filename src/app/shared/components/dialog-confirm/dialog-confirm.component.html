@@ -1,0 +1,33 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4">
+    <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+      <h2 class="text-lg sm:text-xl font-bold text-[#202B6D] tracking-tight">{{ title() }}</h2>
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="onCancel()" aria-label="Tutup">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="text-gray-600 text-sm leading-relaxed">
+      <p>{{ message() }}</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mt-2">
+      <button type="button" class="w-full btn-no-shadow-secondary text-center cursor-pointer py-2.5"
+        [disabled]="isLoading()" (click)="onCancel()">
+        {{ cancelText() }}
+      </button>
+      <button type="button" class="w-full text-center cursor-pointer py-2.5"
+        [ngClass]="confirmBtnClass()" [disabled]="isLoading()" (click)="onConfirm()">
+        @if (isLoading()) {
+        <span class="inline-block animate-spin mr-1">↻</span>
+        }
+        {{ confirmText() }}
+      </button>
+    </div>
+  </div>
+</div>
+

@@ -147,6 +147,7 @@ export class StorageService {
   async clear(): Promise<void> {
     this.cache.clear();
 
+    // 1. Bersihkan localStorage
     if (typeof localStorage !== 'undefined') {
       try {
         localStorage.clear();
@@ -155,10 +156,58 @@ export class StorageService {
       }
     }
 
+    // 2. Bersihkan sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      try {
+        sessionStorage.clear();
+      } catch (e) {
+        console.warn('Gagal clear sessionStorage:', e);
+      }
+    }
+
+    // 3. Bersihkan Preferences (Capacitor / SharedPreferences di Android)
     try {
       await Preferences.clear();
     } catch (e) {
       console.warn('Gagal clear Preferences:', e);
+    }
+
+    // 4. Bersihkan Web Cache Storage (service worker / HTTP cache jika ada)
+    if (typeof caches !== 'undefined') {
+      try {
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.map((name) => caches.delete(name)));
+      } catch (e) {
+        console.warn('Gagal clear CacheStorage:', e);
+      }
+    }
+
+    // 5. Bersihkan IndexedDB databases
+    if (typeof indexedDB !== 'undefined' && indexedDB.databases) {
+      try {
+        const dbs = await indexedDB.databases();
+        for (const db of dbs) {
+          if (db.name) {
+            indexedDB.deleteDatabase(db.name);
+          }
+        }
+      } catch (e) {
+        console.warn('Gagal clear IndexedDB:', e);
+      }
+    }
+
+    // 6. Bersihkan cookies document jika ada
+    if (typeof document !== 'undefined' && document.cookie) {
+      try {
+        const cookies = document.cookie.split(';');
+        for (const cookie of cookies) {
+          const eqPos = cookie.indexOf('=');
+          const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+          document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        }
+      } catch (e) {
+        console.warn('Gagal clear cookies:', e);
+      }
     }
   }
 

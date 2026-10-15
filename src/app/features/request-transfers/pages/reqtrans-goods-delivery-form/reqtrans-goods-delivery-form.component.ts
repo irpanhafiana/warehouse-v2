@@ -5,12 +5,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Detail, Driver, Vehicle } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
-import { LoaderComponent } from '../../../../shared/components';
+import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
 import { ReqTransLoadingService } from '../../services/reqtrans-loading.service';
 
 @Component({
   selector: 'app-reqtrans-goods-delivery-form',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './reqtrans-goods-delivery-form.component.html',
 })
 export class ReqtransGoodsDeliveryFormComponent implements OnInit {
@@ -41,6 +41,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
 
   loading: boolean = false;
   isItemsNull: boolean = false;
+  isDialogConfirmSubmit: boolean = false;
   msgError: string = '';
 
   constructor() {
@@ -131,7 +132,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
     localStorage.removeItem(this.docnum);
   }
 
-  onSubmit(): void {
+  openConfirmSubmit(): void {
     if (!this.selectedVehicleNo || !this.selectedDriverName) {
       this.isItemsNull = true;
       this.msgError = 'Mohon untuk memilih mobil dan driver terlebih dahulu';
@@ -144,6 +145,10 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
       return;
     }
 
+    this.isDialogConfirmSubmit = true;
+  }
+
+  onSubmit(): void {
     this.loading = true;
     this.cdr.markForCheck();
 
@@ -180,6 +185,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
     this.loadingService.postGoodsDeliveryReqTrans(payload).subscribe({
       next: () => {
         this.loading = false;
+        this.isDialogConfirmSubmit = false;
         this.clearLocalStorage();
         this.toastr.success('Berhasil Menambahkan Goods Delivery', 'Success');
         this.location.back();
@@ -187,6 +193,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
       error: (e) => {
         console.error('Post goods delivery reqtrans error:', e);
         this.loading = false;
+        this.isDialogConfirmSubmit = false;
         this.toastr.error('Gagal menambahkan Goods Delivery', 'Error');
         this.cdr.markForCheck();
       },

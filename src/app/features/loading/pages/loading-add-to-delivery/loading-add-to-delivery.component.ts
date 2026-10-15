@@ -18,10 +18,11 @@ import { StorageService } from '../../../../core/services/storage.service';
 import { Vehicle, Driver, Detail } from '../../../../core/models';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 
 @Component({
   selector: 'app-loading-add-to-delivery',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './loading-add-to-delivery.component.html',
   styleUrl: './loading-add-to-delivery.component.css',
 })
@@ -40,6 +41,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
   vehicles: Vehicle[] = [];
   drivers: Driver[] = [];
   isItemsNull = false;
+  isDialogConfirmSubmit = false;
   msgError = '';
 
   selectedVehicleNo = '';
@@ -136,7 +138,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
     this.location.back();
   }
 
-  async onSubmit(): Promise<void> {
+  openConfirmSubmit(): void {
     if (!this.selectedVehicleNo || !this.selectedDriverName) {
       this.isItemsNull = true;
       this.msgError = 'Mohon untuk memilih mobil dan driver terlebih dahulu.';
@@ -149,6 +151,10 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       return;
     }
 
+    this.isDialogConfirmSubmit = true;
+  }
+
+  async onSubmit(): Promise<void> {
     const currentDate = new Date();
     const jsonDetails = this.itemLoaded.map((item: any) => ({
       LineNo: item.LineNo,
@@ -173,12 +179,14 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       .subscribe({
         next: async () => {
           this.loading = false;
+          this.isDialogConfirmSubmit = false;
           await this.storageService.remove(`GOODS${this.docnum}`);
           this.toastr.success('Berhasil menambahkan Goods Delivery', 'Success');
           this.location.back();
         },
         error: (err) => {
           this.loading = false;
+          this.isDialogConfirmSubmit = false;
           this.isItemsNull = true;
           this.msgError = err?.error?.message || 'Gagal menambahkan Goods Delivery.';
         },

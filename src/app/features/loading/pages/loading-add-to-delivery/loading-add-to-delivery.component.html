@@ -66,11 +66,24 @@
         </div>
         }
 
-        <button type="button" (click)="onSubmit()"
+        <button type="button" (click)="openConfirmSubmit()"
           class="w-full btn-no-shadow-primary text-center cursor-pointer mt-2 py-3">
           Simpan ke Pengiriman
         </button>
       </div>
+
+      <!-- Dialog Konfirmasi Simpan ke Pengiriman -->
+      @if (isDialogConfirmSubmit) {
+      <app-dialog-confirm
+        [title]="'Konfirmasi Pengiriman'"
+        [message]="'Apakah Anda yakin data muatan ini sudah sesuai dan siap disimpan ke pengiriman?'"
+        [confirmText]="'Ya, Simpan'"
+        [confirmBtnClass]="'btn-no-shadow-primary'"
+        [isLoading]="loading"
+        (cancel)="isDialogConfirmSubmit = false"
+        (confirm)="onSubmit()"
+      />
+      }
 
       <!-- Loaded Items Section -->
       <div class="bg-amber-200 border border-amber-300 rounded-xl p-4">
