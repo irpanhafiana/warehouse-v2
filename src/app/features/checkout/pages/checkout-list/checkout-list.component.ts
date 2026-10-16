@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -34,6 +34,7 @@ export class CheckoutListComponent implements OnInit {
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -79,6 +80,7 @@ export class CheckoutListComponent implements OnInit {
 
   getCheckoutList(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .getCheckoutList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -90,10 +92,12 @@ export class CheckoutListComponent implements OnInit {
           this.createArrArea(this.headerRes);
           this.createArrAlphabet(this.headerRes);
           this.groupCustomerData(this.filteredSalesInvoices);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
           this.toastr.error('Gagal mengambil daftar BON checkout.', 'Error');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -132,8 +136,11 @@ export class CheckoutListComponent implements OnInit {
               matchingGroup.total = response.Count;
             }
           });
+          this.cdr.markForCheck();
         },
-        error: () => {},
+        error: () => {
+          this.cdr.markForCheck();
+        },
       });
   }
 
@@ -168,11 +175,13 @@ export class CheckoutListComponent implements OnInit {
 
   onCloseDialogDetailDocnum(): void {
     this.isDialogDetailDocnum = false;
+    this.cdr.markForCheck();
   }
 
   openDialogDetailDocnum(data: SalesInvoicesModel[]): void {
     this.detailDocnumCustomer = data;
     this.isDialogDetailDocnum = true;
+    this.cdr.markForCheck();
   }
 
   onSelectedAlphabet(i: string): void {
@@ -206,6 +215,7 @@ export class CheckoutListComponent implements OnInit {
     }
 
     this.groupCustomerData(this.filteredSalesInvoices);
+    this.cdr.markForCheck();
   }
 
   createArrAlphabet(data: HeaderRes[]): void {

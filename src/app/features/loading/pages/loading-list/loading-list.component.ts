@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import { NavbarComponent } from '../../../../shared/components/navbar/navbar.com
 import { ButtonHomeComponent } from '../../../../shared/components/button-home/button-home.component';
 import { CardComponent } from '../../../../shared/components/card/card.component';
 
-interface GroupedCustomer {
+export interface GroupedCustomer {
   customerName: string;
   customerCode: string;
   data: HeaderRes[];
@@ -41,93 +41,105 @@ export class LoadingListComponent implements OnInit {
   private loadingService = inject(LoadingService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  readonly cdr = inject(ChangeDetectorRef);
 
-  headerRes: HeaderRes[] = [];
-  filteredSalesInvoices: HeaderRes[] = [];
-  groupResult: GroupedCustomer[] = [];
-  loading = true;
-  isDialogDetailDocnum = false;
+  readonly headerRes = signal<HeaderRes[]>([]);
+  readonly filteredSalesInvoices = signal<HeaderRes[]>([]);
+  readonly groupResult = signal<GroupedCustomer[]>([]);
+  readonly loading = signal(true);
+  readonly isDialogDetailDocnum = signal(false);
 
-  date = '';
-  dateString = '';
-  area: Area[] = [];
-  detailDocnumCustomer: SalesInvoicesModel[] = [];
-  selectedAlphabet = '';
-  areaSelected = '';
-  alphabet: string[] = [];
+  readonly date = signal('');
+  readonly dateString = signal('');
+  readonly area = signal<Area[]>([]);
+  readonly detailDocnumCustomer = signal<SalesInvoicesModel[]>([]);
+  readonly selectedAlphabet = signal('');
+  readonly areaSelected = signal('');
+  readonly alphabet = signal<string[]>([]);
 
   ngOnInit(): void {
     const filter = getDefaultDateFilter(3);
-    this.date = filter.date;
-    this.dateString = filter.dateString;
+    this.date.set(filter.date);
+    this.dateString.set(filter.dateString);
 
-    if (this.dateString) {
+    if (this.dateString()) {
       this.getLoadingList();
     }
   }
 
   getLoadingList(): void {
-    this.loading = true;
+    this.loading.set(true);
+    this.cdr.markForCheck();
     this.service
-      .getLoadingList(this.dateString)
+      .getLoadingList(this.dateString())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: HeaderRes[]) => {
-          this.loading = false;
-          this.headerRes = data || [];
-          this.filteredSalesInvoices = [...this.headerRes];
-          this.createArrArea(this.headerRes);
-          this.createArrAlphabet(this.headerRes);
-          this.groupCustomerData(this.filteredSalesInvoices);
+          this.loading.set(false);
+          const list = data || [];
+          this.headerRes.set(list);
+          this.filteredSalesInvoices.set([...list]);
+          this.createArrArea(list);
+          this.createArrAlphabet(list);
+          this.groupCustomerData(this.filteredSalesInvoices());
+          this.cdr.markForCheck();
         },
         error: () => {
-          this.loading = false;
+          this.loading.set(false);
+          this.cdr.markForCheck();
         },
       });
   }
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = formatToApiDateString(input.value);
-    if (this.dateString) {
+    this.date.set(input.value);
+    this.dateString.set(formatToApiDateString(input.value));
+    if (this.dateString()) {
       this.getLoadingList();
     }
   }
 
   onOptionSelect(e: Event): void {
     const select = e.target as HTMLSelectElement;
-    this.areaSelected = select.value;
-    this.selectedAlphabet = '';
+    this.areaSelected.set(select.value);
+    this.selectedAlphabet.set('');
     this.applyFilter();
   }
 
   onSelectedAlphabet(char: string): void {
-    this.selectedAlphabet = char === '~' ? '' : char;
+    this.selectedAlphabet.set(char === '~' ? '' : char);
     this.applyFilter();
   }
 
   applyFilter(): void {
-    this.filteredSalesInvoices = this.headerRes.filter((invoice: HeaderRes) => {
-      const matchesAlphabet = this.selectedAlphabet
+    const alpha = this.selectedAlphabet();
+    const areaVal = this.areaSelected();
+    const source = this.headerRes();
+
+    let filtered = source.filter((invoice: HeaderRes) => {
+      const matchesAlphabet = alpha
         ? (invoice.Name || '')
             .replace(/^~+/, '')
             .trim()
             .toLowerCase()
-            .startsWith(this.selectedAlphabet.toLowerCase())
+            .startsWith(alpha.toLowerCase())
         : true;
 
-      const matchesDropdown = this.areaSelected
-        ? (invoice.Area || '').includes(this.areaSelected)
+      const matchesDropdown = areaVal
+        ? (invoice.Area || '').includes(areaVal)
         : true;
 
       return matchesAlphabet && matchesDropdown;
     });
 
-    if (this.filteredSalesInvoices.length === 0 && !this.selectedAlphabet && !this.areaSelected) {
-      this.filteredSalesInvoices = [...this.headerRes];
+    if (filtered.length === 0 && !alpha && !areaVal) {
+      filtered = [...source];
     }
 
-    this.groupCustomerData(this.filteredSalesInvoices);
+    this.filteredSalesInvoices.set(filtered);
+    this.groupCustomerData(filtered);
+    this.cdr.markForCheck();
   }
 
   groupCustomerData(salesInvoices: HeaderRes[]): void {
@@ -147,11 +159,12 @@ export class LoadingListComponent implements OnInit {
       }
     });
 
-    this.groupResult = result;
+    this.groupResult.set(result);
 
-    if (this.groupResult.length > 0) {
-      this.getCountCustomer(this.dateString);
+    if (result.length > 0) {
+      this.getCountCustomer(this.dateString());
     }
+    this.cdr.markForCheck();
   }
 
   getCountCustomer(dateString: string): void {
@@ -160,31 +173,43 @@ export class LoadingListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: { Code: string; Count: number }[]) => {
-          (data || []).forEach((response) => {
-            const matchingGroup = this.groupResult.find(
-              (element) => element.customerCode === response.Code
-            );
-            if (matchingGroup) {
-              matchingGroup.total = response.Count;
-            }
+          this.groupResult.update((current) => {
+            const updated = current.map((item) => ({ ...item }));
+            (data || []).forEach((response) => {
+              const matchingGroup = updated.find(
+                (element) => element.customerCode === response.Code
+              );
+              if (matchingGroup) {
+                matchingGroup.total = response.Count;
+              }
+            });
+            return updated;
           });
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
         },
       });
   }
 
   createArrArea(data: HeaderRes[]): void {
-    this.area = [];
     if (data) {
       const uniqueAreas = Array.from(new Set(data.map((inv) => inv.Area).filter(Boolean)));
-      this.area = uniqueAreas.map((areaStr) => ({
-        Code: areaStr,
-        isFromInternalMessage: false,
-        Description: '',
-        Alias: null,
-        Id: 0,
-        Remarks: null,
-      }));
+      this.area.set(
+        uniqueAreas.map((areaStr) => ({
+          Code: areaStr,
+          isFromInternalMessage: false,
+          Description: '',
+          Alias: null,
+          Id: 0,
+          Remarks: null,
+        }))
+      );
+    } else {
+      this.area.set([]);
     }
+    this.cdr.markForCheck();
   }
 
   createArrAlphabet(data: HeaderRes[]): void {
@@ -202,12 +227,13 @@ export class LoadingListComponent implements OnInit {
           .filter(Boolean)
       )
     );
-    this.alphabet = initials.sort((a, b) => a.localeCompare(b));
+    this.alphabet.set(initials.sort((a, b) => a.localeCompare(b)));
+    this.cdr.markForCheck();
   }
 
   openDialogDetailDocnum(customerCode: string, docnum: string): void {
     void this.router.navigate([
-      `/main/loading/checklist/${customerCode}/${this.dateString}/${docnum}`,
+      `/main/loading/checklist/${customerCode}/${this.dateString()}/${docnum}`,
     ]);
   }
 
@@ -217,7 +243,7 @@ export class LoadingListComponent implements OnInit {
   }
 
   onCloseDialogDetailDocnum(): void {
-    this.isDialogDetailDocnum = false;
+    this.isDialogDetailDocnum.set(false);
+    this.cdr.markForCheck();
   }
 }
-

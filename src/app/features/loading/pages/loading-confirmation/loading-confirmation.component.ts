@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,6 +21,7 @@ export class LoadingConfirmationComponent implements OnInit {
   private toastr = inject(ToastrService);
   private storageService = inject(StorageService);
   private destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   payload: any = {
     PIC: [],
@@ -41,6 +42,7 @@ export class LoadingConfirmationComponent implements OnInit {
       DetailId: pickingList ? JSON.parse(pickingList) : [],
       DocNum: savedDocNum || this.docnum,
     };
+    this.cdr.markForCheck();
   }
 
   async onCheckUlang(): Promise<void> {
@@ -52,12 +54,14 @@ export class LoadingConfirmationComponent implements OnInit {
   onSubmit(): void {
     if (this.loading) return;
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .putLoadingListDetails(this.payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: async () => {
           this.loading = false;
+          this.cdr.markForCheck();
           await this.removeItem();
           void this.router
             .navigate(['/main/loading/checklist', this.docnum])
@@ -67,6 +71,7 @@ export class LoadingConfirmationComponent implements OnInit {
         },
         error: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }

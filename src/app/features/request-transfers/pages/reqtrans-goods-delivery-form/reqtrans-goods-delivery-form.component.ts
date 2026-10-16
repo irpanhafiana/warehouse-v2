@@ -69,12 +69,14 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
       this.selectedVehicleName = '';
       this.deliveryForm.patchValue({ TransportUnit: '' });
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedDriver(e: Event): void {
     const target = e.target as HTMLSelectElement;
     this.selectedDriverName = target.value;
     this.deliveryForm.patchValue({ Driver: this.selectedDriverName });
+    this.cdr.markForCheck();
   }
 
   onIs4Login(): void {
@@ -111,6 +113,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get vehicles warning:', e);
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.loading = false;
@@ -130,6 +133,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get drivers warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -148,16 +152,19 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
     if (!this.selectedVehicleNo || !this.selectedDriverName) {
       this.isItemsNull = true;
       this.msgError = 'Mohon untuk memilih mobil dan driver terlebih dahulu';
+      this.cdr.markForCheck();
       return;
     }
 
     if (!this.itemLoaded || this.itemLoaded.length === 0) {
       this.isItemsNull = true;
       this.msgError = 'Tidak ada produk yang sudah dimuat. Silahkan periksa kembali.';
+      this.cdr.markForCheck();
       return;
     }
 
     this.isDialogConfirmSubmit = true;
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -204,6 +211,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
           this.isDialogConfirmSubmit = false;
           this.clearLocalStorage();
           this.toastr.success('Berhasil Menambahkan Goods Delivery', 'Success');
+          this.cdr.markForCheck();
           this.location.back();
         },
         error: (e) => {

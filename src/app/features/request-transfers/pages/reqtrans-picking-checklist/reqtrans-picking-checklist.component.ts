@@ -160,6 +160,7 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get picking pic list warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -213,16 +214,19 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   onSelectedTab(tab: 'receh' | 'non-receh'): void {
     this.selectedTab = tab;
     localStorage.setItem('selectedTab', tab);
+    this.cdr.markForCheck();
   }
 
   openPickerModal(detailId: number): void {
     this.detailId = detailId;
     this.isDialogOpen = true;
+    this.cdr.markForCheck();
   }
 
   onPicSelected(pic: string): void {
     this.picName = pic.toUpperCase();
     this.isDialogOpen = false;
+    this.cdr.markForCheck();
     this.onSaveItem(this.detailId, this.picName);
   }
 

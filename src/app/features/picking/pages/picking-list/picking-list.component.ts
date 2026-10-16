@@ -162,6 +162,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
 
   fetchPickingData(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.pickingService
       .getPickingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -175,12 +176,15 @@ export class PickingListComponent implements OnInit, OnDestroy {
           this.generateAreaList(this.headerRes);
           this.generateAlphabet(this.headerRes);
           this.applyFilter();
+          this.cdr.markForCheck();
         },
         error: (): void => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
         complete: (): void => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -207,6 +211,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
     if (this.bonCheckout.length === 0 && !this.selectedAlphabet && !this.areaSelected) {
       this.bonCheckout = this.headerRes.filter((item) => item.IsCheckout);
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedAlphabet(char: string): void {
@@ -238,40 +243,47 @@ export class PickingListComponent implements OnInit, OnDestroy {
       this.onAmbilBon(phoneName);
     } else {
       this.isDialogAmbilBON = true;
+      this.cdr.markForCheck();
     }
   }
 
   openDialogGantiPIC(docnum: string): void {
     this.docNumSelected = docnum;
     this.isDialogGantiPIC = true;
+    this.cdr.markForCheck();
   }
 
   openDialogBantu(docnum: string, remarks: string): void {
     this.docNumSelected = docnum;
     this.remarksSelected = remarks;
     this.isDialogBantu = true;
+    this.cdr.markForCheck();
   }
 
   closeDialogBantu(): void {
     this.docNumSelected = '';
     this.remarksSelected = '';
     this.isDialogBantu = false;
+    this.cdr.markForCheck();
   }
 
   closeDialogAmbilBON(): void {
     this.docNumSelected = '';
     this.isDialogAmbilBON = false;
     this.location.replaceState('/main/picking/list');
+    this.cdr.markForCheck();
   }
 
   closeDialogGantiPIC(): void {
     this.docNumSelected = '';
     this.isDialogGantiPIC = false;
+    this.cdr.markForCheck();
   }
 
   onAmbilBon(picName: string): void {
     if (this.isSubmitting) return;
     this.isSubmitting = true;
+    this.cdr.markForCheck();
     const targetDocNum = this.docNumSelected;
     const payload = {
       DocNum: targetDocNum,
@@ -289,6 +301,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isSubmitting = false;
+          this.cdr.markForCheck();
           console.error('Failed to take BON:', err);
         },
       });
@@ -297,6 +310,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   onGantiPIC(newPic: string): void {
     if (this.isSubmitting) return;
     this.isSubmitting = true;
+    this.cdr.markForCheck();
     const targetDocNum = this.docNumSelected;
     const payloadUnlocked = {
       DocNum: targetDocNum,
@@ -314,6 +328,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
         },
         error: (err) => {
           this.isSubmitting = false;
+          this.cdr.markForCheck();
           console.error('Failed to change PIC:', err);
         },
       });
@@ -390,6 +405,10 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data: string[]) => {
           this.pickingPic = data || [];
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
         },
       });
   }

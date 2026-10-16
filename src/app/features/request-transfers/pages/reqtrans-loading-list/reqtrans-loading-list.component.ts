@@ -132,6 +132,7 @@ export class ReqtransLoadingListComponent implements OnInit {
     }
 
     this.groupCustomerData(this.filteredSalesInvoices);
+    this.cdr.markForCheck();
   }
 
   groupCustomerData(salesInvoices: HeaderRes[]): void {
@@ -179,6 +180,7 @@ export class ReqtransLoadingListComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get count customer warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -191,6 +193,7 @@ export class ReqtransLoadingListComponent implements OnInit {
 
   onCloseDialogDetailDocnum(): void {
     this.isDialogDetailDocnum = false;
+    this.cdr.markForCheck();
   }
 }
 

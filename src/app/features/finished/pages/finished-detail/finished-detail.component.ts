@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -27,6 +27,7 @@ export class FinishedDetailComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   docnum: string = '';
   salesInvoice?: SalesInvoicesModel;
@@ -44,6 +45,7 @@ export class FinishedDetailComponent implements OnInit {
 
   getDetail() {
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .getFinishedDetail(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -51,10 +53,12 @@ export class FinishedDetailComponent implements OnInit {
         next: (data) => {
           this.loading = false;
           this.salesInvoice = data;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
           this.toastr.error('Gagal mengambil detail BON selesai.', 'Error');
+          this.cdr.markForCheck();
         },
       });
   }

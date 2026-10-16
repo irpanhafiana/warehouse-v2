@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
@@ -31,6 +31,7 @@ export class RouteGroupFormComponent implements OnInit {
   private routeGroupService = inject(RouteGroupService);
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
+  private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
   loadingData: HeaderRes[] = [];
@@ -116,6 +117,7 @@ export class RouteGroupFormComponent implements OnInit {
         this.removeDetail(detailIndex);
       }
     }
+    this.cdr.markForCheck();
   }
 
   isSelectedItem(item: HeaderRes): boolean {
@@ -132,18 +134,22 @@ export class RouteGroupFormComponent implements OnInit {
     }
 
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.routeGroupService
       .postRouteGroup(this.routeGroupForm.value)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.selectedItem = [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
           this.onBack();
           this.toastr.success('Jalur muat berhasil ditambahkan', 'Success');
         },
@@ -175,6 +181,7 @@ export class RouteGroupFormComponent implements OnInit {
 
   getLoadingList(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .getLoadingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -186,9 +193,11 @@ export class RouteGroupFormComponent implements OnInit {
           this.createArrArea(this.headerRes);
           this.createArrAlphabet(this.headerRes);
           this.groupCustomerData(this.filteredSalesInvoices);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -227,8 +236,11 @@ export class RouteGroupFormComponent implements OnInit {
               matchingGroup.total = response.Count;
             }
           });
+          this.cdr.markForCheck();
         },
-        error: () => {},
+        error: () => {
+          this.cdr.markForCheck();
+        },
       });
   }
 
@@ -263,6 +275,7 @@ export class RouteGroupFormComponent implements OnInit {
 
   onCloseDialogDetailDocnum(): void {
     this.isDialogDetailDocnum = false;
+    this.cdr.markForCheck();
   }
 
   openDialogDetailDocnum(docnum: string): void {
@@ -300,6 +313,7 @@ export class RouteGroupFormComponent implements OnInit {
     if (this.filteredSalesInvoices.length === 0) {
       this.filteredSalesInvoices = this.headerRes;
     }
+    this.cdr.markForCheck();
   }
 
   createArrAlphabet(data: HeaderRes[]): void {
@@ -327,6 +341,7 @@ export class RouteGroupFormComponent implements OnInit {
       const item = formArray.at(index);
       formArray.removeAt(index);
       formArray.insert(index - 1, item);
+      this.cdr.markForCheck();
     }
   }
 
@@ -336,11 +351,13 @@ export class RouteGroupFormComponent implements OnInit {
       const item = formArray.at(index);
       formArray.removeAt(index);
       formArray.insert(index + 1, item);
+      this.cdr.markForCheck();
     }
   }
 
   removeDetail(index: number): void {
     this.details.removeAt(index);
+    this.cdr.markForCheck();
   }
 }
 

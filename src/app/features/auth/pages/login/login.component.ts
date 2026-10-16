@@ -55,6 +55,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (!this.phoneName) {
       this.isDialogSetName = true;
     }
+    this.cdr.markForCheck();
 
     this.username = environment.posUsername || '';
     this.password = environment.posPassword || '';
@@ -70,14 +71,19 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.authService.postLoginCloud(this.username, this.password).subscribe({
           next: async (cloudLogin) => {
             await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
+            this.cdr.markForCheck();
           },
-          error: (e) => console.warn('Background cloud token fetch warning:', e),
+          error: (e) => {
+            console.warn('Background cloud token fetch warning:', e);
+            this.cdr.markForCheck();
+          },
         });
       }
     } else if (this.username || this.password) {
       // Belum ada token (pertama kali buka aplikasi atau habis clear cache / force close)
       this.onLogin();
     }
+    this.cdr.markForCheck();
   }
 
   ngOnDestroy(): void {
@@ -109,6 +115,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.postLogin(this.username, this.password).subscribe({
       next: async (apiLogin) => {
         await this.storage.setItem(STORAGE_KEYS.TOKEN, apiLogin.access_token);
+        this.cdr.markForCheck();
         // Begitu token lokal siap, segera ambil branch dan PIC
         this.fetchDataInParallel();
       },
@@ -123,9 +130,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.postLoginCloud(this.username, this.password).subscribe({
       next: async (cloudLogin) => {
         await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
+        this.cdr.markForCheck();
       },
       error: (e) => {
         console.warn('Cloud login warning (cloud features might be unavailable):', e);
+        this.cdr.markForCheck();
       },
     });
   }
@@ -137,7 +146,10 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.defaultBranch = branch;
         this.cdr.markForCheck();
       },
-      error: (e) => console.error('Fetch branch error:', e),
+      error: (e) => {
+        console.error('Fetch branch error:', e);
+        this.cdr.markForCheck();
+      },
     });
 
     this.sharedDataService.getPicList().subscribe({
@@ -178,12 +190,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   async onConfirmForceClose(): Promise<void> {
     this.isProcessForceClose = true;
     this.isDialogForceClose = false;
+    this.cdr.markForCheck();
 
     // 1. Bersihkan seluruh web storage & preferences
     await this.storage.clear();
     this.phoneName = null;
     this.pickingPic = [];
     this.defaultBranch = '';
+    this.cdr.markForCheck();
 
     // 2. Jika di Android native (Capacitor), panggil AppResetPlugin untuk membersihkan WebView cache & cache folder OS
     try {
@@ -200,6 +214,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     // 3. Fallback jika dijalankan di browser
     this.forceCloseTimer = setTimeout(() => {
       this.isProcessForceClose = false;
+      this.cdr.markForCheck();
       window.location.replace('/');
     }, 2500);
   }
@@ -208,6 +223,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.phoneName = picName;
     await this.storage.setItem(STORAGE_KEYS.PHONE_NAME, this.phoneName);
     this.isDialogSetName = false;
+    this.cdr.markForCheck();
   }
 }
 

@@ -114,6 +114,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get PIC list error:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -375,6 +376,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
 
     if (!this.checkRemarks(this.filteredData)) {
       this.isContra = true;
+      this.cdr.markForCheck();
       return;
     }
 
@@ -411,6 +413,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
         next: () => {
           this.loading = false;
           this.toastr.success('Berhasil Mengonfirmasi Item Diterima', 'Success');
+          this.cdr.markForCheck();
           this.getPickingPicList();
           this.fetchRequestReceiveChecklist();
         },
@@ -425,6 +428,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
 
   openFilterAlphabet(): void {
     this.isFilterAlphabet = true;
+    this.cdr.markForCheck();
   }
 
   closeFilterAlphabet(): void {
@@ -436,14 +440,17 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
 
   openDialogAddPic(): void {
     this.isDialogAddPic = true;
+    this.cdr.markForCheck();
   }
 
   openDialogBarcode(): void {
     this.isDialogOpenBarcode = true;
+    this.cdr.markForCheck();
   }
 
   closeDialogBarcode(): void {
     this.isDialogOpenBarcode = false;
+    this.cdr.markForCheck();
   }
 
   onBack(): void {

@@ -157,6 +157,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get picker data warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -252,44 +253,52 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   openDialogAmbilBON(docnum: string): void {
     this.docNumSelected = docnum;
     this.isDialogAmbilBON = true;
+    this.cdr.markForCheck();
   }
 
   openDialogGantiPIC(docnum: string): void {
     this.docNumSelected = docnum;
     this.isDialogGantiPIC = true;
+    this.cdr.markForCheck();
   }
 
   openDialogBantu(docnum: string, remarks: string): void {
     this.docNumSelected = docnum;
     this.remarksSelected = remarks;
     this.isDialogBantu = true;
+    this.cdr.markForCheck();
   }
 
   closeDialogBantu(): void {
     this.isDialogBantu = false;
     this.docNumSelected = '';
     this.remarksSelected = '';
+    this.cdr.markForCheck();
   }
 
   closeDialogAmbilBON(): void {
     this.isDialogAmbilBON = false;
     this.docNumSelected = '';
     this.location.replaceState('/main-reqtrans/picking/list');
+    this.cdr.markForCheck();
   }
 
   closeDialogGantiPIC(): void {
     this.isDialogGantiPIC = false;
     this.docNumSelected = '';
+    this.cdr.markForCheck();
   }
 
   onBantu(): void {
     this.isDialogBantu = false;
+    this.cdr.markForCheck();
     this.toChecklist(this.docNumSelected);
   }
 
   onPicSelectedForAmbil(pic: string): void {
     this.picName = pic.toUpperCase();
     this.isDialogAmbilBON = false;
+    this.cdr.markForCheck();
     void this.storage.setItem(STORAGE_KEYS.PHONE_NAME, this.picName);
     this.onAmbilBon();
   }
@@ -297,6 +306,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   onPicSelectedForGanti(pic: string): void {
     this.picName = pic.toUpperCase();
     this.isDialogGantiPIC = false;
+    this.cdr.markForCheck();
     void this.storage.setItem(STORAGE_KEYS.PHONE_NAME, this.picName);
     this.onGantiPIC();
   }
@@ -304,6 +314,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   onAmbilBon(): void {
     if (this.isActionLoading) return;
     this.isActionLoading = true;
+    this.cdr.markForCheck();
     const payload = {
       DocNum: this.docNumSelected,
       PIC: this.picName,
@@ -315,12 +326,14 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.isActionLoading = false;
+          this.cdr.markForCheck();
           this.toChecklist(this.docNumSelected);
         },
         error: (e) => {
           this.isActionLoading = false;
           console.error('Ambil BON error:', e);
           this.toastr.error('Gagal mengambil BON picking', 'Error');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -328,6 +341,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   onGantiPIC(): void {
     if (this.isActionLoading) return;
     this.isActionLoading = true;
+    this.cdr.markForCheck();
     const payloadUnlocked = {
       DocNum: this.docNumSelected,
       PIC: this.picName,
@@ -339,12 +353,14 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.isActionLoading = false;
+          this.cdr.markForCheck();
           this.onAmbilBon();
         },
         error: (e) => {
           this.isActionLoading = false;
           console.error('Ganti PIC error:', e);
           this.toastr.error('Gagal mengganti PIC', 'Error');
+          this.cdr.markForCheck();
         },
       });
   }

@@ -139,6 +139,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get loading detail by customer code error:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -193,6 +194,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get picking PIC list warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -220,6 +222,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get check BON warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -239,6 +242,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get not picked item warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -255,6 +259,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.warn('Get receh exist warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -391,6 +396,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(id, false);
+          this.cdr.markForCheck();
         },
         error: (e) => {
           console.error('Remark done error:', e);
@@ -406,6 +412,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     if (!this.picName) {
       this.isErrorPicSebagian = true;
       this.msgError = 'PIC belum dipilih, silahkan pilih PIC terlebih dahulu sebelum membatalkan!';
+      this.cdr.markForCheck();
       return;
     }
 
@@ -423,10 +430,12 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         next: () => {
           this.setLoadingState(id, false);
           localStorage.removeItem(this.docnum);
+          this.cdr.markForCheck();
         },
         error: (e) => {
           console.error('Cancel loading item error:', e);
           this.setLoadingState(id, false);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -480,6 +489,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     if (!this.pickingPic.includes(this.picName)) {
       this.pickingPic.push(this.picName);
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedAlphabet(char: string): void {

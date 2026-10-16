@@ -113,6 +113,7 @@ export class RequestReceiveListComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Check receive by docnum warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }

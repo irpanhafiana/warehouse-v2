@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, DatePipe, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -35,6 +35,7 @@ export class CheckoutDetailComponent implements OnInit {
   private location = inject(Location);
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   docnum = '';
   salesInvoice!: SalesInvoicesModel;
@@ -92,18 +93,22 @@ export class CheckoutDetailComponent implements OnInit {
           }));
 
           this.itemLoadedMapLength = this.itemLoadedMap.length;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.toastr.error('Gagal memeriksa status muatan BON.', 'Error');
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isShowAddDelivery = true;
+          this.cdr.markForCheck();
         },
       });
   }
 
   getDetail(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .getCheckoutDetail(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -148,13 +153,16 @@ export class CheckoutDetailComponent implements OnInit {
             SAPDocNum: item.SAPDocNum,
           }));
           this.salesInvoiceLength = this.salesInvoice.Details.length;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
           this.toastr.error('Gagal mengambil detail checkout.', 'Error');
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.getCheckBON(this.docnum);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -164,6 +172,7 @@ export class CheckoutDetailComponent implements OnInit {
     if (this.filteredData.length === 0) {
       this.filteredData = this.initialData;
     }
+    this.cdr.markForCheck();
   }
 
   filteredProducts(detail: Detail[]): Detail[] {
@@ -249,6 +258,7 @@ export class CheckoutDetailComponent implements OnInit {
 
     const storageKey = this.docnum ? `GOODS${this.docnum}` : 'GOODS_TEMP';
     void this.storageService.set(storageKey, JSON.stringify(this.selectedItems));
+    this.cdr.markForCheck();
   }
 
   onSelectAll(): void {
@@ -265,6 +275,7 @@ export class CheckoutDetailComponent implements OnInit {
 
     const storageKey = this.docnum ? `GOODS${this.docnum}` : 'GOODS_TEMP';
     void this.storageService.set(storageKey, JSON.stringify(this.selectedItems));
+    this.cdr.markForCheck();
   }
 
   toGoodsDelivery(): void {
@@ -278,12 +289,14 @@ export class CheckoutDetailComponent implements OnInit {
 
   openFilterAlphabet(): void {
     this.isFilterAlphabet = true;
+    this.cdr.markForCheck();
   }
 
   closeFilterAlphabet(): void {
     this.isFilterAlphabet = false;
     this.selectedAplhabet = '';
     this.filteredData = this.initialData;
+    this.cdr.markForCheck();
   }
 }
 

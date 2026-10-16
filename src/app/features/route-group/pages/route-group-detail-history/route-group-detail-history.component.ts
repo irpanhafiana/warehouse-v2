@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -32,6 +32,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
   alias = '';
@@ -101,6 +102,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   fetchRouteGroupDetail(alias: string): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.routeGroupService
       .getRouteGroupDetail(alias)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -122,13 +124,16 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
             );
 
           this.initialLength = this.data?.Details?.length || 0;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
           this.toastr.error('Gagal mengambil data detail rute riwayat.', 'Error');
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -146,12 +151,14 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     this.filteredDetails = this.dataDetails.filter((item) =>
       item.Name?.trim().toUpperCase().startsWith(letter)
     );
+    this.cdr.markForCheck();
   }
 
   resetFilter(): void {
     this.selectedLetter = null;
     this.selectedAplhabet = '';
     this.filteredDetails = this.dataDetails;
+    this.cdr.markForCheck();
   }
 
   toDetail(customerCode: string, docDate: string, docNum: string): void {
@@ -168,6 +175,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   getLoadingList(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.service
       .getLoadingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -179,9 +187,11 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           this.createArrArea(this.headerRes);
           this.createArrAlphabet(this.headerRes);
           this.groupCustomerData(this.filteredSalesInvoices);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -268,8 +278,11 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
               matchingGroup.total = response.Count;
             }
           });
+          this.cdr.markForCheck();
         },
-        error: () => {},
+        error: () => {
+          this.cdr.markForCheck();
+        },
       });
   }
 
@@ -308,6 +321,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     if (this.filteredSalesInvoices.length === 0) {
       this.filteredSalesInvoices = this.headerRes;
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedAlphabet(i: string): void {
@@ -343,6 +357,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         this.dataDetails.splice(detailIndex, 1);
       }
     }
+    this.cdr.markForCheck();
   }
 
   isSelected(item: HeaderRes): boolean {
@@ -354,6 +369,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   onSubmit(): void {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.cdr.markForCheck();
     const payload = {
       RouteName: this.data.RouteName,
       Alias: this.alias,
@@ -369,12 +385,15 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         next: () => {
           this.selectedItem = [];
           this.isUrutkan = false;
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
           if (this.alias) {
             this.fetchRouteGroupDetail(this.alias);
             this.getLoadingList();
@@ -406,6 +425,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
     if (this.selectedVehicleNo && this.selectedVehicleName) {
       this.isLoading = true;
+      this.cdr.markForCheck();
       this.routeGroupService
         .postFinishRouteGroup(payload)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -413,6 +433,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           next: () => {},
           error: () => {
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
           complete: () => {
             this.isLoading = false;
@@ -420,6 +441,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
               'Jalur muat telah selesai dimuat ke dalam mobil',
               'Success'
             );
+            this.cdr.markForCheck();
           },
         });
     } else {
@@ -432,6 +454,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   onRekapSebagian(): void {
     this.isDisabledButton = true;
+    this.cdr.markForCheck();
 
     const payload = {
       TransportUnit: this.selectedVehicleNo,
@@ -448,9 +471,11 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isDisabledButton = false;
+            this.cdr.markForCheck();
           },
           error: () => {
             this.isDisabledButton = false;
+            this.cdr.markForCheck();
           },
           complete: () => {
             this.isDisabledButton = false;
@@ -458,6 +483,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
             this.getLoadingList();
             this.closeDialogRekap();
             this.toastr.success('BON yang ditandai berhasil direkap!', 'Success');
+            this.cdr.markForCheck();
           },
         });
     } else {
@@ -470,6 +496,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   onRouteFinish(alias: string): void {
     this.isDisabledButton = true;
+    this.cdr.markForCheck();
     const payload = {
       TransportUnit: this.selectedVehicleNo,
       TransportDescription: this.selectedVehicleName,
@@ -486,12 +513,15 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           this.isDisabledButton = false;
           this.closeDialogRekap();
           this.selectedItem = [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isDisabledButton = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isDisabledButton = false;
+          this.cdr.markForCheck();
           this.onBack();
           this.onMobilSiapJalan();
         },
@@ -500,6 +530,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   onRouteFinishManual(alias: string): void {
     this.isDisabledButton = true;
+    this.cdr.markForCheck();
     const payload = {
       Alias: alias,
     };
@@ -511,12 +542,15 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         next: () => {
           this.isDisabledButton = false;
           this.selectedItem = [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isDisabledButton = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isDisabledButton = false;
+          this.cdr.markForCheck();
           this.onBack();
         },
       });
@@ -529,6 +563,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       this.onSubmit();
       this.isUrutkan = true;
     }
+    this.cdr.markForCheck();
   }
 
   moveUp(index: number): void {
@@ -539,6 +574,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         this.dataDetails[index],
       ];
       this.updateLineNumbers();
+      this.cdr.markForCheck();
     }
   }
 
@@ -550,6 +586,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         this.dataDetails[index],
       ];
       this.updateLineNumbers();
+      this.cdr.markForCheck();
     }
   }
 
@@ -563,11 +600,13 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     this.isDialogConfirmDelete = true;
     this.customerNameDeleted = customerName;
     this.idDeleted = id;
+    this.cdr.markForCheck();
   }
 
   onHapusBON(): void {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.cdr.markForCheck();
     const dataAfterDeleted = this.dataDetails.filter(
       (item) => item.Id !== this.idDeleted
     );
@@ -587,10 +626,12 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         next: () => {},
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
           this.isDialogConfirmDelete = false;
+          this.cdr.markForCheck();
           this.toastr.success('BON berhasil dihapus!', 'Success');
           this.getLoading();
         },
@@ -599,6 +640,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   onIs4Login(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.authService
       .generateIS4Token()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -607,9 +649,11 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           this.isLoading = false;
           localStorage.setItem('is4_token', data.access_token);
           localStorage.setItem('is4_refresh_token', data.refresh_token);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.getVehicles();
@@ -620,6 +664,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   getVehicles(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.service
       .getVehicles()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -627,15 +672,18 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         next: (data: any) => {
           this.isLoading = false;
           this.vehicles = data?.data || data || [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
 
   getDrivers(): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     this.service
       .getDrivers()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -643,9 +691,11 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
         next: (data: any) => {
           this.isLoading = false;
           this.drivers = data?.data || data || [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -654,6 +704,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     this.dataBONSelesai = [];
     this.isStatusDialog = status;
     this.isDialogConfirm = true;
+    this.cdr.markForCheck();
     this.onIs4Login();
 
     if (status === 'ALL') {
@@ -671,6 +722,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           this.dataBONSelesai.push({ Data: element.DocNum });
         });
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedVehicle(): void {
@@ -681,20 +733,24 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       this.selectedVehicleNo = '';
       this.selectedVehicleName = '';
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedDriver(e: any): void {
     this.selectedDriverName = e.target.value;
+    this.cdr.markForCheck();
   }
 
   toAddMarkRecap(item: any): void {
     item.isCanRekap = true;
+    this.cdr.markForCheck();
   }
 
   toCancelMarkRecap(item: any): void {
     const index = this.dataDetails.findIndex((x) => x.Code === item.Code);
     if (index > -1) {
       this.dataDetails[index] = { ...this.dataDetails[index], isCanRekap: false };
+      this.cdr.markForCheck();
     }
   }
 
@@ -704,6 +760,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       isCanRekap: false,
     }));
     this.isCanRekap = false;
+    this.cdr.markForCheck();
   }
 
   onBack(): void {
@@ -712,11 +769,13 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   openFilterAlphabet(): void {
     this.isFilterAlphabet = true;
+    this.cdr.markForCheck();
   }
 
   closeFilterAlphabet(): void {
     this.isFilterAlphabet = false;
     this.selectedAplhabet = '';
+    this.cdr.markForCheck();
   }
 
   closeDialogRekap(): void {
@@ -724,6 +783,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     this.selectedVehicleNo = '';
     this.selectedVehicleName = '';
     this.isDialogConfirm = false;
+    this.cdr.markForCheck();
   }
 }
 

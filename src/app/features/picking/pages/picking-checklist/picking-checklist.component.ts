@@ -99,6 +99,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     const savedTab = await this.storageService.get('selectedTab');
     if (savedTab === 'non-receh' || savedTab === 'receh') {
       this.selectedTab = savedTab;
+      this.cdr.markForCheck();
     }
 
     if (this.docnum) {
@@ -127,6 +128,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
 
   getDetail(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .getPickingDetail(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -137,10 +139,12 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
           this.checkPIC(data.Remarks);
           this.arrReceh = this.filterRecehDetails(data.Details || []);
           this.arrNonReceh = this.filterNonRecehDetails(data.Details || []);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
           this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          this.cdr.markForCheck();
         },
       });
   }
@@ -151,6 +155,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       void this.router.navigate(['/main/picking/list', this.docnum]);
     } else {
       this.selectedPic = picName;
+      this.cdr.markForCheck();
     }
   }
 
@@ -177,6 +182,10 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.pickingPic = data || [];
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
         },
       });
   }
@@ -184,10 +193,12 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
   openDialog(id: number): void {
     this.detailId = id;
     this.isDialogOpen = true;
+    this.cdr.markForCheck();
   }
 
   closeDialog(): void {
     this.isDialogOpen = false;
+    this.cdr.markForCheck();
   }
 
   onPickerSelectedFromDialog(picName: string): void {
@@ -201,6 +212,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     }
 
     this.setLoadingState(detailId, true);
+    this.cdr.markForCheck();
 
     const pic = (customPic || this.selectedPic).toUpperCase();
     const savePayload = {
@@ -218,10 +230,12 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
           this.closeDialog();
           // Realtime SignalR will update the state, but we also immediately reflect:
           this.updateItemLocally(detailId, pic);
+          this.cdr.markForCheck();
         },
         error: (err) => {
           console.error('Error saving item:', err);
           this.setLoadingState(detailId, false);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -237,12 +251,14 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     applyUpdate(this.arrNonReceh);
     this.arrReceh = [...this.arrReceh];
     this.arrNonReceh = [...this.arrNonReceh];
+    this.cdr.markForCheck();
   }
 
   onCancel(id: number): void {
     if (this.loadingPickDone) return;
     this.loadingPickDone = true;
     this.loadingId = id;
+    this.cdr.markForCheck();
 
     const payload = {
       DetailId: id,
@@ -264,18 +280,22 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
           clearRemark(this.arrNonReceh);
           this.arrReceh = [...this.arrReceh];
           this.arrNonReceh = [...this.arrNonReceh];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loadingPickDone = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.loadingPickDone = false;
+          this.cdr.markForCheck();
         },
       });
   }
 
   async onSelectedTab(tab: 'receh' | 'non-receh'): Promise<void> {
     this.selectedTab = tab;
+    this.cdr.markForCheck();
     await this.storageService.set('selectedTab', tab);
   }
 
@@ -337,6 +357,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
 
   setLoadingState(itemId: number, state: boolean): void {
     this.loadingStates[itemId] = state;
+    this.cdr.markForCheck();
   }
 
   isLoading(itemId: number): boolean {

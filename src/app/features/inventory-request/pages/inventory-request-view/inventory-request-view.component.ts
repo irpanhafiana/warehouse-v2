@@ -79,6 +79,7 @@ export class InventoryRequestViewComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get vehicles warning:', e);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -91,6 +92,7 @@ export class InventoryRequestViewComponent implements OnInit {
     } else {
       this.transportUnitModel = { Code: '' };
     }
+    this.cdr.markForCheck();
   }
 
   onSebagianValueChange(indicator: string, id: number): void {
@@ -167,6 +169,7 @@ export class InventoryRequestViewComponent implements OnInit {
           console.error('Post check delivery docnum error:', e);
           this.loadingSubmitted = false;
           this.isSelectTransportUnit = false;
+          this.cdr.markForCheck();
           this.toastr.warning('Pemeriksaan delivery mengarahkan kembali ke daftar picking', 'Info');
           this.toReqTransPicking();
           return EMPTY;
@@ -178,6 +181,7 @@ export class InventoryRequestViewComponent implements OnInit {
         next: () => {
           this.loadingSubmitted = false;
           this.isSelectTransportUnit = false;
+          this.cdr.markForCheck();
           this.toastr.success('Permintaan transfer berhasil diproses!', 'Success');
           this.toReqTransPicking();
         },

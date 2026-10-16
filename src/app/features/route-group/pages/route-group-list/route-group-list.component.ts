@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -29,6 +29,7 @@ export class RouteGroupListComponent implements OnInit {
   private routeGroupService = inject(RouteGroupService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 
   routeGroups: RouteGroup[] = [];
@@ -94,10 +95,12 @@ export class RouteGroupListComponent implements OnInit {
     if (this.filteredSalesInvoices.length === 0) {
       this.filteredSalesInvoices = this.routeGroups;
     }
+    this.cdr.markForCheck();
   }
 
   fetchRouteGroups(date: string, statusSelected: string): void {
     this.isLoading = true;
+    this.cdr.markForCheck();
     const request$ =
       statusSelected === 'HISTORY'
         ? this.routeGroupService.getRouteGroupHistories(date)
@@ -108,14 +111,17 @@ export class RouteGroupListComponent implements OnInit {
         this.routeGroups = response || [];
         this.filteredSalesInvoices = this.routeGroups;
         this.createArrAlphabet(this.routeGroups);
+        this.cdr.markForCheck();
       },
       error: () => {
         this.isLoading = false;
         this.toastr.error('Gagal mengambil daftar jalur muat.', 'Error');
+        this.cdr.markForCheck();
       },
       complete: () => {
         this.isDone = this.routeGroups.some((item) => item.Remarks === 'done');
         this.isLoading = false;
+        this.cdr.markForCheck();
       },
     });
   }

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -23,6 +23,7 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
   private salesInvoiceService = inject(SalesInvoiceService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
   loading = true;
@@ -55,6 +56,7 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
   fetchRouteGroupDetail(alias: string): void {
     this.loadingDetail = true;
+    this.cdr.markForCheck();
     this.routeGroupService
       .getRouteGroupDetail(alias)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -65,19 +67,23 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
             MarkBeforeRoute: true,
           }));
           this.routeNameInput = response.RouteName || '';
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loadingDetail = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.loadingDetail = false;
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
 
   fetchRouteGroups(date: string): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.routeGroupService
       .getAdditionalInvoices(date)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -85,6 +91,7 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
         next: (response: any[]) => {
           if (!Array.isArray(response)) {
             this.loading = false;
+            this.cdr.markForCheck();
             return;
           }
 
@@ -95,30 +102,37 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
           this.filteredSalesInvoices = [...this.headerRes];
           this.createArrArea(this.headerRes);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
 
   fetchRouteGroupList(date: string): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.routeGroupService
       .getRouteGroups(date)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: any[]) => {
           this.routeGroups = response || [];
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -162,6 +176,7 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
     if (this.filteredSalesInvoices.length === 0) {
       this.filteredSalesInvoices = this.headerRes;
     }
+    this.cdr.markForCheck();
   }
 
   createArrArea(data: HeaderRes[]): void {
@@ -192,15 +207,18 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
     this.BONtoRoute = this.filteredSalesInvoices.filter(
       (inv: any) => inv.MarkBeforeRoute
     );
+    this.cdr.markForCheck();
   }
 
   prikitiw(): void {
     this.isDialogAddToRoute = true;
+    this.cdr.markForCheck();
   }
 
   onSaveToJalurMuat(): void {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.cdr.markForCheck();
     const dataToAdd = [...this.BONExisting, ...this.BONtoRoute];
 
     const payload = {
@@ -218,9 +236,11 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
         next: () => {},
         error: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
+          this.cdr.markForCheck();
           this.toastr.success(
             `BON ditambahkan ke Jalur muat ${this.routeNameInput}`,
             'Success'

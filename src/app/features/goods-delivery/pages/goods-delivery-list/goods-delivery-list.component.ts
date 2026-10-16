@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -28,6 +28,7 @@ export class GoodsDeliveryListComponent implements OnInit {
   private service = inject(GoodsDeliveryService);
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   dateString = '';
   date = '';
@@ -47,6 +48,7 @@ export class GoodsDeliveryListComponent implements OnInit {
 
   getGoodsDeliveries(date: string, statusSelected: string): void {
     this.loading = true;
+    this.cdr.markForCheck();
     const request$ =
       statusSelected === 'ONGOING'
         ? this.service.getGoodsDeliveryList(date)
@@ -56,12 +58,15 @@ export class GoodsDeliveryListComponent implements OnInit {
       next: (data) => {
         this.loading = false;
         this.goodsDeliveries = data || [];
+        this.cdr.markForCheck();
       },
       error: () => {
         this.loading = false;
+        this.cdr.markForCheck();
       },
       complete: () => {
         this.loading = false;
+        this.cdr.markForCheck();
       },
     });
   }

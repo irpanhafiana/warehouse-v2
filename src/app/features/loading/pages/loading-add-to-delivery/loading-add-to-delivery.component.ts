@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -36,6 +36,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
   private storageService = inject(StorageService);
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   deliveryForm: FormGroup;
   docnum = '';
@@ -70,6 +71,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
         this.itemLoaded = [];
       }
     }
+    this.cdr.markForCheck();
 
     this.onIs4Login();
   }
@@ -82,15 +84,18 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       this.selectedVehicleNo = '';
       this.selectedVehicleName = '';
     }
+    this.cdr.markForCheck();
   }
 
   onSelectedDriver(e: Event): void {
     const select = e.target as HTMLSelectElement;
     this.selectedDriverName = select.value;
+    this.cdr.markForCheck();
   }
 
   onIs4Login(): void {
     this.loading = true;
+    this.cdr.markForCheck();
     this.authService
       .generateIS4Token()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -105,9 +110,11 @@ export class LoadingAddToDeliveryComponent implements OnInit {
           }
           this.getVehicles();
           this.getDrivers();
+          this.cdr.markForCheck();
         },
         error: () => {
           this.loading = false;
+          this.cdr.markForCheck();
         },
       });
   }
@@ -119,6 +126,10 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.vehicles = data?.data || data || [];
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
         },
       });
   }
@@ -130,6 +141,10 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.drivers = data?.data || data || [];
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
         },
       });
   }
@@ -143,16 +158,19 @@ export class LoadingAddToDeliveryComponent implements OnInit {
     if (!this.selectedVehicleNo || !this.selectedDriverName) {
       this.isItemsNull = true;
       this.msgError = 'Mohon untuk memilih mobil dan driver terlebih dahulu.';
+      this.cdr.markForCheck();
       return;
     }
 
     if (!this.itemLoaded || this.itemLoaded.length === 0) {
       this.isItemsNull = true;
       this.msgError = 'Tidak ada produk yang sudah dimuat. Silahkan periksa kembali.';
+      this.cdr.markForCheck();
       return;
     }
 
     this.isDialogConfirmSubmit = true;
+    this.cdr.markForCheck();
   }
 
   async onSubmit(): Promise<void> {
@@ -175,6 +193,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
     };
 
     this.loading = true;
+    this.cdr.markForCheck();
     this.service
       .postRouteGroup(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -184,6 +203,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
           this.isDialogConfirmSubmit = false;
           await this.storageService.remove(`GOODS${this.docnum}`);
           this.toastr.success('Berhasil menambahkan Goods Delivery', 'Success');
+          this.cdr.markForCheck();
           this.location.back();
         },
         error: (err) => {
@@ -191,6 +211,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
           this.isDialogConfirmSubmit = false;
           this.isItemsNull = true;
           this.msgError = err?.error?.message || 'Gagal menambahkan Goods Delivery.';
+          this.cdr.markForCheck();
         },
       });
   }

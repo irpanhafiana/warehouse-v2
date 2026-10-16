@@ -81,6 +81,7 @@ export class RequestReceiveDetailComponent implements OnInit {
           this.loadingSubmitted = false;
           const targetDocnum = resDocnum?.trim() || this.docnum;
           this.isConfirmDialogOpen = false;
+          this.cdr.markForCheck();
           this.toRequestReceiveChecklist(targetDocnum);
         },
         error: (e) => {

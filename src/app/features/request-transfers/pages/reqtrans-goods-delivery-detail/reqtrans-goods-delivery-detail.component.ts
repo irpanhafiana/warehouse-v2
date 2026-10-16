@@ -46,6 +46,7 @@ export class ReqtransGoodsDeliveryDetailComponent implements OnInit {
   onTransportUnitReady(): void {
     this.isErrorPicSebagian = true;
     this.msgError = 'Mohon cek ulang untuk memastikan mobil ini siap digunakan dalam pengiriman.';
+    this.cdr.markForCheck();
   }
 
   onSubmit(): void {
@@ -61,6 +62,7 @@ export class ReqtransGoodsDeliveryDetailComponent implements OnInit {
         next: () => {
           this.isLoading = false;
           this.isErrorPicSebagian = false;
+          this.cdr.markForCheck();
           void this.router.navigate(['/main-reqtrans/picking/list']).then(() => {
             this.toastr.success('Berhasil!. Loading telah selesai dikerjakan!', 'Success');
           });
@@ -142,6 +144,7 @@ export class ReqtransGoodsDeliveryDetailComponent implements OnInit {
 
   toggleExpand(item: any): void {
     item.isExpanded = !item.isExpanded;
+    this.cdr.markForCheck();
   }
 
   onReCheck(docnum: string): void {
@@ -149,6 +152,7 @@ export class ReqtransGoodsDeliveryDetailComponent implements OnInit {
     const documentNumber = docnum.replace(/_[^_]*$/, '');
     this.isLoadingRecheck = true;
     this.docnumReCheck = docnum;
+    this.cdr.markForCheck();
 
     this.service
       .onRecheckDeliveryByDocnum(documentNumber)

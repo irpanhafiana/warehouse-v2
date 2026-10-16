@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -20,6 +20,7 @@ export class GoodsDeliveryDetailComponent implements OnInit {
   private service = inject(GoodsDeliveryService);
   private toastr = inject(ToastrService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   date: string = '';
   transportUnit: string = '';
@@ -42,6 +43,7 @@ export class GoodsDeliveryDetailComponent implements OnInit {
       this.date = params.get('date') || this.route.snapshot.params['date'] || '';
       this.transportUnit = params.get('transportUnit') || this.route.snapshot.params['transportUnit'] || '';
       this.statusSelected = params.get('status') || this.route.snapshot.params['status'] || '';
+      this.cdr.markForCheck();
       if (this.date && this.transportUnit) {
         this.getDetailDelivery(this.statusSelected);
       }
@@ -58,11 +60,13 @@ export class GoodsDeliveryDetailComponent implements OnInit {
     this.isErrorPicSebagian = true;
     this.msgError =
       'Mohon cek ulang untuk memastikan mobil ini siap digunakan dalam pengiriman.';
+    this.cdr.markForCheck();
   }
 
   onSubmit() {
     if (this.isLoading) return;
     this.isLoading = true;
+    this.cdr.markForCheck();
 
     let payload: string[] = [];
 
@@ -79,11 +83,13 @@ export class GoodsDeliveryDetailComponent implements OnInit {
           this.isLoading = false;
           this.isErrorPicSebagian = false;
           this.toastr.error('Gagal menyimpan pengiriman mobil.', 'Error');
+          this.cdr.markForCheck();
         },
         complete: () => {
           this.isLoading = false;
           this.isErrorPicSebagian = false;
           this.toastr.success(`Pengiriman berhasil disimpan`, 'Success');
+          this.cdr.markForCheck();
           void this.router.navigate(['/main/goods-delivery/list']);
         },
       });
@@ -91,6 +97,7 @@ export class GoodsDeliveryDetailComponent implements OnInit {
 
   getDetailDelivery(status: string) {
     this.isLoading = true;
+    this.cdr.markForCheck();
 
     if (status === 'ONGOING') {
       this.service
@@ -107,13 +114,16 @@ export class GoodsDeliveryDetailComponent implements OnInit {
               })),
             }));
             this.groupDeliveries();
+            this.cdr.markForCheck();
           },
           error: () => {
             this.isLoading = false;
             this.toastr.error('Gagal mengambil detail pengiriman.', 'Error');
+            this.cdr.markForCheck();
           },
           complete: () => {
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
         });
     } else {
@@ -131,13 +141,16 @@ export class GoodsDeliveryDetailComponent implements OnInit {
               })),
             }));
             this.groupDeliveries();
+            this.cdr.markForCheck();
           },
           error: () => {
             this.isLoading = false;
             this.toastr.error('Gagal mengambil riwayat detail pengiriman.', 'Error');
+            this.cdr.markForCheck();
           },
           complete: () => {
             this.isLoading = false;
+            this.cdr.markForCheck();
           },
         });
     }
@@ -149,6 +162,7 @@ export class GoodsDeliveryDetailComponent implements OnInit {
 
   toggleExpand(item: any): void {
     item.isExpanded = !item.isExpanded;
+    this.cdr.markForCheck();
   }
 
   groupDeliveries() {
