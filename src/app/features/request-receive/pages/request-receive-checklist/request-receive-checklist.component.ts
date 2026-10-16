@@ -5,6 +5,7 @@ import {
   inject,
   ChangeDetectorRef,
   DestroyRef,
+  ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -28,6 +29,7 @@ import { RequestReceiveService } from '../../services/request-receive.service';
     DialogSetPicComponent,
   ],
   templateUrl: './request-receive-checklist.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -99,18 +101,21 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   }
 
   getPickingPicList(): void {
-    this.service.getPickingPicList().subscribe({
-      next: (data) => {
-        this.pickingPic = (data || []).sort((a, b) => a.localeCompare(b));
-        if (!this.picName && this.pickingPic.length > 0) {
-          this.picName = this.pickingPic[0].toUpperCase();
-        }
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get PIC list error:', e);
-      },
-    });
+    this.service
+      .getPickingPicList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pickingPic = (data || []).sort((a, b) => a.localeCompare(b));
+          if (!this.picName && this.pickingPic.length > 0) {
+            this.picName = this.pickingPic[0].toUpperCase();
+          }
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get PIC list error:', e);
+        },
+      });
   }
 
   onRefresh(): void {
@@ -121,38 +126,41 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.service.getRequestReceiveChecklist(this.docnum).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.inventoryRequest = data;
-        this.initialData = (data?.Details || []).map((d) => ({ ...d }));
+    this.service
+      .getRequestReceiveChecklist(this.docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.inventoryRequest = data;
+          this.initialData = (data?.Details || []).map((d) => ({ ...d }));
 
-        const letters = Array.from(
-          new Set(
-            this.initialData
-              .map((product) => {
-                const name = product.ProductModel?.Name?.trim();
-                if (!name) return '';
-                const firstValidChar = name.startsWith('~')
-                  ? name.charAt(1)
-                  : name.charAt(0);
-                return firstValidChar.toUpperCase();
-              })
-              .filter((char) => Boolean(char))
-          )
-        );
+          const letters = Array.from(
+            new Set(
+              this.initialData
+                .map((product) => {
+                  const name = product.ProductModel?.Name?.trim();
+                  if (!name) return '';
+                  const firstValidChar = name.startsWith('~')
+                    ? name.charAt(1)
+                    : name.charAt(0);
+                  return firstValidChar.toUpperCase();
+                })
+                .filter((char) => Boolean(char))
+            )
+          );
 
-        this.alphabet = letters.sort((a, b) => a.localeCompare(b));
-        this.applyFilter();
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Fetch checklist error:', e);
-        this.loading = false;
-        this.toastr.error('Gagal memuat checklist penerimaan', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+          this.alphabet = letters.sort((a, b) => a.localeCompare(b));
+          this.applyFilter();
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Fetch checklist error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal memuat checklist penerimaan', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   setLoadingState(itemId: number, state: boolean): void {
@@ -283,22 +291,25 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
       DocNum: this.docnum,
     };
 
-    this.service.putReceiveQueueFinish(payload).subscribe({
-      next: () => {
-        // Updated via SignalR event
-      },
-      error: (e) => {
-        console.error('Put receive queue finish error:', e);
-        this.isErrorPicSebagian = true;
-        this.msgError =
-          'Gagal menyimpan status checklist. Silakan periksa koneksi dan coba lagi.';
-        this.setLoadingState(item.Id, false);
-        this.cdr.markForCheck();
-      },
-      complete: () => {
-        this.setLoadingState(item.Id, false);
-      },
-    });
+    this.service
+      .putReceiveQueueFinish(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          // Updated via SignalR event
+        },
+        error: (e) => {
+          console.error('Put receive queue finish error:', e);
+          this.isErrorPicSebagian = true;
+          this.msgError =
+            'Gagal menyimpan status checklist. Silakan periksa koneksi dan coba lagi.';
+          this.setLoadingState(item.Id, false);
+          this.cdr.markForCheck();
+        },
+        complete: () => {
+          this.setLoadingState(item.Id, false);
+        },
+      });
   }
 
   onCancel(id: number): void {
@@ -309,17 +320,20 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
       PIC: this.picName,
     };
 
-    this.service.putCancelCheckList(payload).subscribe({
-      next: () => {
-        this.setLoadingState(id, false);
-      },
-      error: (e) => {
-        console.error('Cancel checklist item error:', e);
-        this.setLoadingState(id, false);
-        this.toastr.error('Gagal membatalkan item checklist', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.service
+      .putCancelCheckList(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+        },
+        error: (e) => {
+          console.error('Cancel checklist item error:', e);
+          this.setLoadingState(id, false);
+          this.toastr.error('Gagal membatalkan item checklist', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   increaseQty(index: number): void {
@@ -357,6 +371,8 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   }
 
   onConfirmReceive(): void {
+    if (this.loading) return;
+
     if (!this.checkRemarks(this.filteredData)) {
       this.isContra = true;
       return;
@@ -372,6 +388,9 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
+    this.loading = true;
+    this.cdr.markForCheck();
+
     const detailsPartial = data.map((element) => ({
       Id: element.Id,
       ItemCode: element.ProductModel?.Code,
@@ -385,18 +404,23 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
       Details: detailsPartial,
     };
 
-    this.service.putReceiveDocnum(payloadConfirm).subscribe({
-      next: () => {
-        this.toastr.success('Berhasil Mengonfirmasi Item Diterima', 'Success');
-        this.getPickingPicList();
-        this.fetchRequestReceiveChecklist();
-      },
-      error: (e) => {
-        console.error('Confirm receive error:', e);
-        this.toastr.error('Gagal mengonfirmasi penerimaan item', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.service
+      .putReceiveDocnum(payloadConfirm)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.toastr.success('Berhasil Mengonfirmasi Item Diterima', 'Success');
+          this.getPickingPicList();
+          this.fetchRequestReceiveChecklist();
+        },
+        error: (e) => {
+          console.error('Confirm receive error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal mengonfirmasi penerimaan item', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   openFilterAlphabet(): void {

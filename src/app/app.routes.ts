@@ -1,16 +1,13 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './features/auth/pages/login/login.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
-import { environment } from '../environments/environment';
 
 export const routes: Routes = [
   {
     path: '',
-    component: LoginComponent,
-    data: {
-      username: environment.posUsername,
-      password: environment.posPassword,
-    },
+    loadComponent: () =>
+      import('./features/auth/pages/login/login.component').then(
+        (m) => m.LoginComponent
+      ),
   },
   {
     path: 'main',

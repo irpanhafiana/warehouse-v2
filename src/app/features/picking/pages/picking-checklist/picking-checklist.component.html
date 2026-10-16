@@ -39,7 +39,7 @@
       }
 
       <h1 class="font-bold text-xl sm:text-2xl text-slate-800 text-center tracking-tight truncate px-2">
-        {{ getShortName(salesInvoice?.CustomerModel?.CustomerName) }}
+        {{ salesInvoice?.CustomerModel?.CustomerName | truncate:24 }}
       </h1>
 
       <!-- Segmented Tabs -->

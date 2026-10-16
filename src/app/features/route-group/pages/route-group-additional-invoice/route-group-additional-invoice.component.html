@@ -152,8 +152,8 @@
         Tutup
       </button>
       @if (routeNameAlias !== '') {
-      <button type="button" class="btn-no-shadow-success text-center cursor-pointer" (click)="onSaveToJalurMuat()">
-        Simpan
+      <button type="button" [disabled]="isLoading" class="btn-no-shadow-success text-center cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSaveToJalurMuat()">
+        {{ isLoading ? 'Menyimpan...' : 'Simpan' }}
       </button>
       }
     </div>

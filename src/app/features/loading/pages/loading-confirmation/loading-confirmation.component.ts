@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -12,6 +12,7 @@ import { StorageService } from '../../../../core/services/storage.service';
   imports: [CommonModule],
   templateUrl: './loading-confirmation.component.html',
   styleUrl: './loading-confirmation.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingConfirmationComponent implements OnInit {
   private router = inject(Router);
@@ -49,6 +50,7 @@ export class LoadingConfirmationComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.loading) return;
     this.loading = true;
     this.service
       .putLoadingListDetails(this.payload)

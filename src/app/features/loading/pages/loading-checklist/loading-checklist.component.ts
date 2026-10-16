@@ -1,11 +1,10 @@
-import { Component, ElementRef, ViewChild, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
+import { Component, ElementRef, viewChild, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
-import JsBarcode from 'jsbarcode';
 
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { LoadingService } from '../../services/loading.service';
@@ -17,6 +16,7 @@ import { Detail, SalesInvoicesModel, HeaderRes } from '../../../../core/models';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-pic/dialog-set-pic.component';
+import { TruncatePipe } from '../../../../shared/pipes';
 
 @Component({
   selector: 'app-loading-checklist',
@@ -27,12 +27,14 @@ import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-
     LoaderComponent,
     QRCodeComponent,
     DialogSetPicComponent,
+    TruncatePipe
   ],
   templateUrl: './loading-checklist.component.html',
   styleUrl: './loading-checklist.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingChecklistComponent implements OnInit, OnDestroy {
-  @ViewChild('scrollable') scrollableElement!: ElementRef;
+  readonly scrollableElement = viewChild<ElementRef>('scrollable');
 
   private route = inject(ActivatedRoute);
   private service = inject(SalesInvoiceService);
@@ -403,11 +405,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   onCancel(id: number): void {
+    if (this.isLoading(id)) return;
+
     if (!this.picName) {
       this.isErrorPicSebagian = true;
       this.msgError = 'PIC belum dipilih, silahkan pilih PIC terlebih dahulu!';
       return;
     }
+
+    this.setLoadingState(id, true);
 
     const payload = {
       DetailId: id,
@@ -420,6 +426,9 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.setLoadingState(id, false);
+        },
+        error: () => {
           this.setLoadingState(id, false);
         },
       });
@@ -557,13 +566,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   isLoading(itemId: number): boolean {
     return this.loadingStates[itemId] || false;
-  }
-
-  getShortName(fullName?: string): string {
-    const maxLength = 16;
-    if (!fullName) return '';
-    if (fullName.length <= maxLength) return fullName;
-    return fullName.substring(0, maxLength) + '...';
   }
 
   onBack(): void {

@@ -7,6 +7,7 @@ export * from './dashboard.model';
 export * from './driver.model';
 export * from './employee.model';
 export * from './goods-delivery.model';
+export * from './grouped-customer.model';
 export * from './header-response.model';
 export type { Inventory, InventoryDetail } from './inventory.model';
 export * from './item-group.model';

@@ -1,10 +1,11 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { Area, HeaderRes } from '../../../../core/models';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { SharedDataService } from '../../../../core/services/shared-data.service';
 import { SignalrService } from '../../../../core/services/signalr.service';
@@ -28,6 +29,7 @@ import { ReqtransPickingService } from '../../services/reqtrans-picking.service'
     DialogSetPicComponent,
   ],
   templateUrl: './reqtrans-picking-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   private service = inject(SalesInvoiceService);
@@ -58,6 +60,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   selectedAlphabet: string = '';
 
   loading: boolean = true;
+  isActionLoading: boolean = false;
   isDialogBantu: boolean = false;
   isDialogGantiPIC: boolean = false;
   isDialogAmbilBON: boolean = false;
@@ -110,60 +113,59 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   }
 
   private setDefaultDate(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
   }
 
   fetchPickingData(): void {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.pickingService.getPickingList(this.dateString).subscribe({
-      next: (data) => {
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes.filter((item) => !item.IsCheckout);
-        this.bonCheckout = this.headerRes.filter((item) => item.IsCheckout);
+    this.pickingService
+      .getPickingList(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes.filter((item) => !item.IsCheckout);
+          this.bonCheckout = this.headerRes.filter((item) => item.IsCheckout);
 
-        this.generateAreaList(this.headerRes);
-        this.generateAlphabet(this.headerRes);
-        this.applyFilter();
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Fetch picking list error:', e);
-        this.loading = false;
-        this.toastr.error('Gagal memuat daftar picking pengiriman', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+          this.generateAreaList(this.headerRes);
+          this.generateAlphabet(this.headerRes);
+          this.applyFilter();
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Fetch picking list error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal memuat daftar picking pengiriman', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   fetchPickerData(): void {
-    this.sharedDataService.getPicList().subscribe({
-      next: (data) => {
-        this.pickingPic = data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get picker data warning:', e);
-      },
-    });
+    this.sharedDataService
+      .getPicList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pickingPic = data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get picker data warning:', e);
+        },
+      });
   }
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
     if (input.value) {
       this.date = input.value;
-      this.dateString = input.value.replace(/-/g, '');
+      this.dateString = formatToApiDateString(input.value);
       this.fetchPickingData();
     }
   }
@@ -300,37 +302,51 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   }
 
   onAmbilBon(): void {
+    if (this.isActionLoading) return;
+    this.isActionLoading = true;
     const payload = {
       DocNum: this.docNumSelected,
       PIC: this.picName,
     };
 
-    this.pickingService.putPickingRemarks(payload).subscribe({
-      next: () => {
-        this.toChecklist(this.docNumSelected);
-      },
-      error: (e) => {
-        console.error('Ambil BON error:', e);
-        this.toastr.error('Gagal mengambil BON picking', 'Error');
-      },
-    });
+    this.pickingService
+      .putPickingRemarks(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isActionLoading = false;
+          this.toChecklist(this.docNumSelected);
+        },
+        error: (e) => {
+          this.isActionLoading = false;
+          console.error('Ambil BON error:', e);
+          this.toastr.error('Gagal mengambil BON picking', 'Error');
+        },
+      });
   }
 
   onGantiPIC(): void {
+    if (this.isActionLoading) return;
+    this.isActionLoading = true;
     const payloadUnlocked = {
       DocNum: this.docNumSelected,
       PIC: this.picName,
     };
 
-    this.service.putPickingRemarksUnlock(payloadUnlocked).subscribe({
-      next: () => {
-        this.onAmbilBon();
-      },
-      error: (e) => {
-        console.error('Ganti PIC error:', e);
-        this.toastr.error('Gagal mengganti PIC', 'Error');
-      },
-    });
+    this.service
+      .putPickingRemarksUnlock(payloadUnlocked)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isActionLoading = false;
+          this.onAmbilBon();
+        },
+        error: (e) => {
+          this.isActionLoading = false;
+          console.error('Ganti PIC error:', e);
+          this.toastr.error('Gagal mengganti PIC', 'Error');
+        },
+      });
   }
 
   toChecklist(docnum: string): void {

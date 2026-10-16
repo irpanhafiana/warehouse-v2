@@ -132,7 +132,7 @@
             <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
           </div>
           <span class="font-bold text-sm text-checkout bg-blue-50 px-2 py-1 rounded-lg">
-            {{ item.Details }} Item
+            {{ item.Details?.length || 0 }} Item
           </span>
         </div>
       </div>

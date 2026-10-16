@@ -7,7 +7,7 @@
           {{ !loading ? salesInvoice?.DocNum : 'Memuat...' }}
         </p>
         <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-50 sm:max-w-72">
-          {{ !loading ? getShortName(salesInvoice?.CustomerModel?.CustomerName) : 'Memuat...' }}
+          {{ !loading ? (salesInvoice?.CustomerModel?.CustomerName | truncate:16) : 'Memuat...' }}
         </h1>
       </div>
 
@@ -110,7 +110,7 @@
       <!-- Horizontal List of Customer BONs -->
       <div class="overflow-x-auto scrollbar-none py-1">
         <div class="flex flex-row gap-2.5 items-stretch">
-          @for (item of listBON; track $index) {
+          @for (item of listBON; track item.DocNum) {
           <div (click)="getLoadingDetail(item.DocNum, $index)"
             class="min-w-50 p-3 rounded-xl border transition-all cursor-pointer shrink-0 flex flex-col justify-between"
             [ngClass]="{

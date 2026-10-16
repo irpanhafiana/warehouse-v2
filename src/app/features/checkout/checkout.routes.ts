@@ -1,22 +1,25 @@
 import { Routes } from '@angular/router';
-import { CheckoutComponent } from './checkout.component';
-import { CheckoutListComponent } from './pages/checkout-list/checkout-list.component';
-import { CheckoutDetailComponent } from './pages/checkout-detail/checkout-detail.component';
 
 export const checkoutRoutes: Routes = [
   {
     path: 'checkout',
-    component: CheckoutComponent,
+    loadComponent: () =>
+      import('./checkout.component').then((m) => m.CheckoutComponent),
     children: [
       {
         path: 'list',
-        component: CheckoutListComponent,
+        loadComponent: () =>
+          import('./pages/checkout-list/checkout-list.component').then(
+            (m) => m.CheckoutListComponent
+          ),
       },
       {
         path: 'detail/:docnum',
-        component: CheckoutDetailComponent,
+        loadComponent: () =>
+          import('./pages/checkout-detail/checkout-detail.component').then(
+            (m) => m.CheckoutDetailComponent
+          ),
       },
     ],
   },
 ];
-

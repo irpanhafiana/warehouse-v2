@@ -1,16 +1,16 @@
 # AGENTS.md — Angular Senior Developer Guidelines
 
 > Industry standard guide for AI Coding Agents and Senior Engineers working on this codebase.  
-> Stack: **Angular 21+ (Modern Standalone Architecture)**, **TypeScript 5.9+**, **Tailwind CSS v4**, **Capacitor 8+ (Android)**, **RxJS / Signals**, **SignalR**.
+> Stack: **Angular 21+ (Zoneless & Implicit Standalone Architecture)**, **TypeScript 5.9+**, **Tailwind CSS v4**, **Capacitor 8+ (Android)**, **RxJS / Signals**, **SignalR**.
 
 ---
 
 ## 1. Project Philosophy & Core Stack
 
-- **Angular Version**: Angular 21 (Zoneless-ready / Zoneless-friendly, Standalone Components by default).
+- **Angular Version**: Angular 21 (`provideZonelessChangeDetection()`, Implicit Standalone Components by default).
 - **Styling**: Tailwind CSS v4 (`@import "tailwindcss";` in `src/styles.css`).
 - **Platform**: Web SPA + Hybrid Mobile via Capacitor (`@capacitor/android`, `@capacitor/core`).
-- **Data Flow**: Reactive paradigm with RxJS `Observable` for async HTTP/WebSocket streams; Angular Signals for local state management when applicable.
+- **Data Flow**: Reactive paradigm with Angular Signals for synchronous/local UI state; RxJS `Observable` for event streams, SignalR real-time messages, and complex async pipelines; `httpResource` / `rxResource` for reactive data fetching.
 - **Strict Typing**: Zero `any` where types can be modeled. Explicit interfaces in `src/app/core/models/`.
 
 ---
@@ -22,7 +22,7 @@ Follow the Feature-Driven Angular Architecture:
 ```text
 src/app/
 ├── core/                  # Singleton services, interceptors, models, app-level guards
-│   ├── interceptors/      # HTTP interceptors (functional preferred)
+│   ├── interceptors/      # HTTP interceptors (functional HttpInterceptorFn preferred)
 │   ├── models/            # Domain models and TypeScript contracts
 │   └── services/          # Core API services (providedIn: 'root')
 ├── features/              # Business domain modules/routes (lazy loaded)
@@ -38,7 +38,7 @@ src/app/
 ```
 
 ### Golden Rules for Modules and Dependencies
-1. **No `NgModule`**: Everything must be standalone (`standalone: true` or default in v17+).
+1. **Implicit Standalone**: Do NOT use `NgModule`. Do NOT explicitly write `standalone: true` inside `@Component`, `@Directive`, or `@Pipe` decorators (it is default in Angular 19+).
 2. **Feature Isolation**: Features must never import private components from other features. Reusable logic must be lifted to `shared/` or `core/`.
 3. **Barrels (`index.ts`)**: Keep public APIs clean using entry point exports in `index.ts`.
 
@@ -47,14 +47,15 @@ src/app/
 ## 3. Angular 21 Modern Syntax & Patterns
 
 ### 3.1 Control Flow (Mandatory)
-Always use modern control flow. **Never use legacy `*ngIf`, `*ngFor`, or `*ngSwitch`**.
+Always use built-in modern control flow (`@if`, `@for`, `@switch`, `@let`, `@defer`). **Never use legacy `*ngIf`, `*ngFor`, or `*ngSwitch`**.
 
 ```html
 <!-- Correct -->
+@let items = data();
 @if (loading()) {
-  <app-loader></app-loader>
-} @else if (data().length > 0) {
-  @for (item of data(); track item.id; let i = $index) {
+  <app-loader />
+} @else if (items.length > 0) {
+  @for (item of items; track item.id; let i = $index) {
     <app-item-card [item]="item" />
   }
 } @else {
@@ -74,26 +75,56 @@ export class SalesInvoiceComponent {
 }
 ```
 
-### 3.3 Signals & Reactive State
-- Use **Signals** (`signal()`, `computed()`) for component UI state.
-- Keep **RxJS** for event streams, debounce/switchMap operations, SignalR real-time messages, and HTTP calls.
-- Use `toSignal()` or `takeUntilDestroyed()` when bridging RxJS observables to component lifecycle.
+### 3.3 Signals, Component APIs & Reactive State
+- **Signal APIs (Mandatory)**: Never use `@Input()`, `@Output()`, `@ViewChild()`, or `@ContentChild()` decorators. Always use function-based signal APIs:
+  - Inputs: `readonly item = input.required<Item>();` or `readonly label = input('Default');`
+  - Two-way binding: `readonly checked = model(false);`
+  - Outputs: `readonly saved = output<Item>();`
+  - Queries: `readonly searchInput = viewChild<ElementRef>('searchInput');`
+- **State Management**:
+  - Use `signal()` and `computed()` for component UI state.
+  - Use `linkedSignal()` for mutable state that resets when a source signal changes.
+  - Avoid `effect()` for state synchronization; only use `effect()` for DOM manipulation, logging, or third-party non-reactive APIs.
+- **RxJS Interop**: Keep RxJS for complex event streams, debounce/switchMap operations, SignalR real-time messages, and HTTP calls. Bridge using `toSignal()`, `toObservable()`, `rxResource()`, `httpResource()`, or `takeUntilDestroyed()`.
 
 ```typescript
-readonly searchQuery = signal('');
-readonly filteredItems = computed(() => 
-  this.items().filter(item => item.name.toLowerCase().includes(this.searchQuery().toLowerCase()))
-);
+// Recommended Angular 21 Component Pattern
+@Component({
+  selector: 'app-item-card',
+  templateUrl: './item-card.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    'class': 'block w-full',
+    '(click)': 'onCardClick()'
+  }
+})
+export class ItemCardComponent {
+  readonly item = input.required<WarehouseItem>();
+  readonly selected = output<string>();
+
+  readonly searchQuery = signal('');
+  readonly isHighlighted = computed(() => this.item().qty > 100);
+
+  onCardClick(): void {
+    this.selected.emit(this.item().id);
+  }
+}
 ```
 
-### 3.4 Change Detection
-- Enforce `changeDetection: ChangeDetectionStrategy.OnPush` on all components to maximize performance and avoid unnecessary change detection cycles.
+### 3.4 Zoneless & Change Detection
+- Enforce `changeDetection: ChangeDetectionStrategy.OnPush` on all components.
+- Because the app is Zoneless-ready, **never rely on plain property mutations** after async callbacks to update the DOM. All state changes affecting the view must go through **Signals** or `AsyncPipe`.
+
+### 3.5 Host Bindings & Template Syntax
+- **Host Metadata**: Prefer the `host: { ... }` property inside `@Component` over `@HostBinding` and `@HostListener` decorators.
+- **Self-Closing Tags**: Always use self-closing tags for components without projected content in templates (e.g., `<app-loader />` instead of `<app-loader></app-loader>`).
+- **Class & Style Bindings**: Prefer native `[class.active]="isActive()"` or `[class]="computedClasses()"` over `ngClass` and `ngStyle`.
 
 ---
 
 ## 4. UI / Design System Standards (Warehouse V2)
 
-The UI standard follows [`picking-list.component.html`](file:///d:/github/warehouse-v2/src/app/features/picking/pages/picking-list/picking-list.component.html) and modern clean card design.
+The UI standard follows [`picking-list.component.html`](src/app/features/picking/pages/picking-list/picking-list.component.html) and modern clean card design.
 
 ### 4.1 Card Guidelines
 - **Standard Card**: Flat, modern 1px border with light background:
@@ -116,7 +147,7 @@ Use the defined flat utility classes in `src/styles.css`:
 - Small variants: `btn-sm-no-shadow-*`
 - Header Icon Button:
   ```html
-  <button type="button" class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5   transition-all cursor-pointer">
+  <button type="button" class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
     <img src="icon.png" alt="Icon" class="w-full h-full object-contain" />
   </button>
   ```
@@ -148,12 +179,12 @@ Use the defined flat utility classes in `src/styles.css`:
    - Respect file replacements in `angular.json` (`environment.ts` for prod vs `environment.development.ts` for dev).
 
 2. **HTTP Interceptors**:
-   - Authentication tokens and global errors are intercepted in `src/app/core/interceptors/`.
-   - Use `IdempotencyService` or request locking for critical mutating endpoints (e.g. queue submission, checkout submit).
+   - Authentication tokens and global errors are intercepted in `src/app/core/interceptors/` using functional `HttpInterceptorFn`.
+   - Use `IdempotencyService` or request locking for critical mutating endpoints (e.g., queue submission, checkout submit).
 
 3. **SignalR / Real-Time Events**:
    - Manage connection state responsibly in `SignalrService`.
-   - Subscriptions to real-time events must be cleaned up on component destruction or handled via reactive operators.
+   - Subscriptions to real-time events must be cleaned up on component destruction via `takeUntilDestroyed()` or converted to Signals cleanly.
 
 ---
 
@@ -181,4 +212,3 @@ Before completing any task, ensure:
 1. **On Point & Direct**: Jawab langsung ke inti persoalan tanpa bertele-tele, tanpa basa-basi pembuka/penutup yang tidak perlu.
 2. **Action-Oriented**: Fokus pada solusi konkret, kode yang presisi, atau status eksekusi.
 3. **Concise Explanations**: Jika penjelasan dibutuhkan, berikan seringkas dan sejelas mungkin dalam bentuk poin-poin singkat.
-

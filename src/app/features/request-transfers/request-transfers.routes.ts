@@ -1,51 +1,69 @@
 import { Routes } from '@angular/router';
-import { RequestTransfersComponent } from './request-transfers.component';
-import { ReqtransPickingListComponent } from './pages/reqtrans-picking-list/reqtrans-picking-list.component';
-import { ReqtransPickingChecklistComponent } from './pages/reqtrans-picking-checklist/reqtrans-picking-checklist.component';
-import { ReqtransLoadingListComponent } from './pages/reqtrans-loading-list/reqtrans-loading-list.component';
-import { ReqtransLoadingChecklistComponent } from './pages/reqtrans-loading-checklist/reqtrans-loading-checklist.component';
-import { ReqtransGoodsDeliveryListComponent } from './pages/reqtrans-goods-delivery-list/reqtrans-goods-delivery-list.component';
-import { ReqtransGoodsDeliveryFormComponent } from './pages/reqtrans-goods-delivery-form/reqtrans-goods-delivery-form.component';
-import { ReqtransGoodsDeliveryDetailComponent } from './pages/reqtrans-goods-delivery-detail/reqtrans-goods-delivery-detail.component';
 
 export const requestTransfersRoutes: Routes = [
   {
     path: '',
-    component: RequestTransfersComponent,
+    loadComponent: () =>
+      import('./request-transfers.component').then(
+        (m) => m.RequestTransfersComponent
+      ),
     children: [
       {
         path: 'picking/list',
-        component: ReqtransPickingListComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-picking-list/reqtrans-picking-list.component'
+          ).then((m) => m.ReqtransPickingListComponent),
       },
       {
         path: 'picking/list/:docnum',
-        component: ReqtransPickingListComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-picking-list/reqtrans-picking-list.component'
+          ).then((m) => m.ReqtransPickingListComponent),
       },
       {
         path: 'picking/checklist/:docnum/:date',
-        component: ReqtransPickingChecklistComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-picking-checklist/reqtrans-picking-checklist.component'
+          ).then((m) => m.ReqtransPickingChecklistComponent),
       },
       {
         path: 'loading/list',
-        component: ReqtransLoadingListComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-loading-list/reqtrans-loading-list.component'
+          ).then((m) => m.ReqtransLoadingListComponent),
       },
       {
         path: 'loading/checklist/:customerCode/:date/:docnum',
-        component: ReqtransLoadingChecklistComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-loading-checklist/reqtrans-loading-checklist.component'
+          ).then((m) => m.ReqtransLoadingChecklistComponent),
       },
       {
         path: 'goods-delivery/list',
-        component: ReqtransGoodsDeliveryListComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-goods-delivery-list/reqtrans-goods-delivery-list.component'
+          ).then((m) => m.ReqtransGoodsDeliveryListComponent),
       },
       {
         path: 'goods-delivery/add-to-delivery/:docnum/:customerName',
-        component: ReqtransGoodsDeliveryFormComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-goods-delivery-form/reqtrans-goods-delivery-form.component'
+          ).then((m) => m.ReqtransGoodsDeliveryFormComponent),
       },
       {
         path: 'goods-delivery/detail/:date/:transportUnit/:status',
-        component: ReqtransGoodsDeliveryDetailComponent,
+        loadComponent: () =>
+          import(
+            './pages/reqtrans-goods-delivery-detail/reqtrans-goods-delivery-detail.component'
+          ).then((m) => m.ReqtransGoodsDeliveryDetailComponent),
       },
     ],
   },
 ];
-

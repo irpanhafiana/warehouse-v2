@@ -1,34 +1,33 @@
 <div class="relative rounded-xl p-4" [ngClass]="{
-    'bg-emerald-300 border-2 border-emerald-400': isCompleted,
-    'bg-white border border-gray-200': !isCompleted
+    'bg-emerald-300 border-2 border-emerald-400': isCompleted(),
+    'bg-white border border-gray-200': !isCompleted()
   }">
   <div class="flex flex-col">
-    @if (salesInvoiceDetail.Remarks) {
+    @if (salesInvoiceDetail().Remarks) {
     <span class="inline-block text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md w-fit mb-1">
-      {{ salesInvoiceDetail.Remarks }}
+      {{ salesInvoiceDetail().Remarks }}
     </span>
     }
     <h2 class="font-bold text-slate-800 text-lg sm:text-xl leading-snug">
-      {{ salesInvoiceDetail.ProductModel.Name }}
+      {{ salesInvoiceDetail().ProductModel.Name }}
     </h2>
   </div>
 
   <div class="flex flex-row justify-between items-center mt-2">
     <div class="font-semibold text-gray-600 text-base">
-      @if (salesInvoiceDetail.Quantity !== salesInvoiceDetail.OpenQuantity) {
+      @if (salesInvoiceDetail().Quantity !== salesInvoiceDetail().OpenQuantity) {
       <div class="flex items-center gap-1.5 flex-wrap">
         <span class="line-through text-gray-400">
-          {{ salesInvoiceDetail.Quantity }} {{ salesInvoiceDetail.UoMModel.Code }} ({{ salesInvoiceDetail.BaseQuantity
-          }})
+          {{ salesInvoiceDetail().Quantity }} {{ salesInvoiceDetail().UoMModel.Code }} ({{ salesInvoiceDetail().BaseQuantity }})
         </span>
         <span class="text-gray-500 font-bold">➜</span>
         <span class="bg-red-600 text-white px-2 py-0.5 rounded-md text-sm font-bold">
-          {{ salesInvoiceDetail.SAPDocEntry }} {{ salesInvoiceDetail.SAPDocNum }}
+          {{ salesInvoiceDetail().SAPDocEntry }} {{ salesInvoiceDetail().SAPDocNum }}
         </span>
       </div>
       } @else {
       <span>
-        {{ salesInvoiceDetail.Quantity }} {{ salesInvoiceDetail.UoMModel.Code }} ({{ salesInvoiceDetail.BaseQuantity }})
+        {{ salesInvoiceDetail().Quantity }} {{ salesInvoiceDetail().UoMModel.Code }} ({{ salesInvoiceDetail().BaseQuantity }})
       </span>
       }
     </div>

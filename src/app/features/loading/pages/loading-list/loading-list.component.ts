@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { SalesInvoiceService } from '../../../../core/services/sales-invoice.ser
 import { LoadingService } from '../../services/loading.service';
 
 import { HeaderRes, SalesInvoicesModel, Area } from '../../../../core/models';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
@@ -33,6 +34,7 @@ interface GroupedCustomer {
   ],
   templateUrl: './loading-list.component.html',
   styleUrl: './loading-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingListComponent implements OnInit {
   private service = inject(SalesInvoiceService);
@@ -55,14 +57,9 @@ export class LoadingListComponent implements OnInit {
   alphabet: string[] = [];
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
 
     if (this.dateString) {
       this.getLoadingList();
@@ -91,7 +88,7 @@ export class LoadingListComponent implements OnInit {
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
     if (this.dateString) {
       this.getLoadingList();
     }

@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { HeaderRes } from '../../../../core/models';
 import { ButtonHomeComponent, LoaderComponent, NavbarReqrecComponent } from '../../../../shared/components';
@@ -17,12 +18,14 @@ import { RequestReceiveService } from '../../services/request-receive.service';
     NavbarReqrecComponent,
   ],
   templateUrl: './request-receive-list-processed.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequestReceiveListProcessedComponent implements OnInit {
   private service = inject(RequestReceiveService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -51,20 +54,23 @@ export class RequestReceiveListProcessedComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.service.getBONProcessedRequestReceive(this.dateString).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes;
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get BON processed error:', e);
-        this.loading = false;
-        this.toastr.error('Gagal memuat BON diproses', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.service
+      .getBONProcessedRequestReceive(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes;
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get BON processed error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal memuat BON diproses', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   onDateChange(e: Event): void {

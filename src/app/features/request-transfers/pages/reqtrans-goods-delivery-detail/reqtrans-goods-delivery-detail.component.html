@@ -70,7 +70,7 @@
         <!-- Detail List Accordion -->
         @if (item.isExpanded) {
         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200 flex flex-col gap-2">
-          @for (subItem of item.Details; track $index) {
+          @for (subItem of item.Details; track subItem.DetailId || subItem.Id) {
           <div class="w-full flex flex-col justify-between border-b border-gray-200 last:border-b-0 py-2">
             <p class="text-base font-bold text-slate-800">
               {{ subItem.Data.ProductModel.Name }}
@@ -86,14 +86,18 @@
         @if (statusSelected !== 'ONGOING') {
         @if (isReCheck) {
         <button type="button" class="btn-no-shadow-warning w-full py-2.5 text-base cursor-pointer"
+          [disabled]="isLoadingRecheck"
+          [ngClass]="{'opacity-50 pointer-events-none': isLoadingRecheck}"
           (click)="onReCheck(item.BasedSalesInvoiceDocNum)">
-          Cek Pengiriman
+          {{ isLoadingRecheck && docnumReCheck === item.BasedSalesInvoiceDocNum ? 'Mengecek...' : 'Cek Pengiriman' }}
         </button>
         }
         @if (isReentry && docnumReCheck === item.BasedSalesInvoiceDocNum) {
         <button type="button" class="btn-no-shadow-success w-full py-2.5 text-base cursor-pointer"
+          [disabled]="isLoading"
+          [ngClass]="{'opacity-50 pointer-events-none': isLoading}"
           (click)="onReprocess(item)">
-          Proses Ulang
+          {{ isLoading ? 'Memproses...' : 'Proses Ulang' }}
         </button>
         }
         }

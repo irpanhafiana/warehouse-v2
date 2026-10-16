@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { Detail, SalesInvoicesModel } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { CardPickingItemComponent } from '../../../../shared/components/card-picking-item/card-picking-item.component';
 import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-pic/dialog-set-pic.component';
+import { TruncatePipe } from '../../../../shared/pipes';
 
 @Component({
   selector: 'app-picking-checklist',
@@ -23,9 +24,11 @@ import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-
     LoaderComponent,
     CardPickingItemComponent,
     DialogSetPicComponent,
+    TruncatePipe
   ],
   templateUrl: './picking-checklist.component.html',
   styleUrl: './picking-checklist.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PickingChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -237,6 +240,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
   }
 
   onCancel(id: number): void {
+    if (this.loadingPickDone) return;
     this.loadingPickDone = true;
     this.loadingId = id;
 
@@ -260,6 +264,9 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
           clearRemark(this.arrNonReceh);
           this.arrReceh = [...this.arrReceh];
           this.arrNonReceh = [...this.arrNonReceh];
+        },
+        error: () => {
+          this.loadingPickDone = false;
         },
         complete: () => {
           this.loadingPickDone = false;
@@ -334,13 +341,6 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
 
   isLoading(itemId: number): boolean {
     return this.loadingStates[itemId] || false;
-  }
-
-  getShortName(fullName?: string): string {
-    const maxLength = 24;
-    if (!fullName) return '';
-    if (fullName.length <= maxLength) return fullName;
-    return fullName.substring(0, maxLength) + '...';
   }
 }
 

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderRes } from '../../../core/models';
 
@@ -10,10 +10,10 @@ import { HeaderRes } from '../../../core/models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardComponent {
-  @Input() dataFrom: string = 'LOADING';
-  @Input() salesInvoicesModel!: any;
-  @Input() headerRes!: HeaderRes;
-  @Output() dialogOpen: EventEmitter<void> = new EventEmitter();
+  readonly dataFrom = input<string>('LOADING');
+  readonly salesInvoicesModel = input<any>();
+  readonly headerRes = input<HeaderRes | undefined>(undefined);
+  readonly dialogOpen = output<void>();
 
   openDialogDetail(): void {
     this.dialogOpen.emit();

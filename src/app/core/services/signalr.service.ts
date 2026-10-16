@@ -1,5 +1,7 @@
 import { Injectable, inject, NgZone } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
+import { App as CapApp } from '@capacitor/app';
+import type { PluginListenerHandle } from '@capacitor/core';
 import { Observable, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -39,6 +41,9 @@ export class SignalrService {
   private isRetryLoopActive = false;
   private isManuallyStopped = false;
   private hasConnectedBefore = false;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private retryDelayTimer: ReturnType<typeof setTimeout> | null = null;
+  private appStateListenerHandle: PluginListenerHandle | null = null;
 
   // Registry handler: eventName -> Map<originalCallback, wrappedCallback>
   private readonly handlers = new Map<string, Map<SignalRCallback, SignalRCallback>>();
@@ -115,6 +120,14 @@ export class SignalrService {
 
   public stopConnection(): void {
     this.isManuallyStopped = true;
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    if (this.retryDelayTimer !== null) {
+      clearTimeout(this.retryDelayTimer);
+      this.retryDelayTimer = null;
+    }
     void this.hubConnection?.stop();
   }
 
@@ -143,7 +156,10 @@ export class SignalrService {
     connection.onclose((error) => {
       console.warn('❌ SignalR Connection Closed:', error?.message);
       if (!this.isManuallyStopped) {
-        setTimeout(() => void this.startConnectionWithRetry(), 3000);
+        if (this.reconnectTimer !== null) {
+          clearTimeout(this.reconnectTimer);
+        }
+        this.reconnectTimer = setTimeout(() => void this.startConnectionWithRetry(), 3000);
       }
     });
 
@@ -199,7 +215,12 @@ export class SignalrService {
         } catch {
           retries++;
           console.warn(`❌ SignalR Retry ${retries} failed. Retrying in ${retryDelay / 1000} seconds...`);
-          await new Promise((resolve) => setTimeout(resolve, retryDelay));
+          await new Promise<void>((resolve) => {
+            this.retryDelayTimer = setTimeout(() => {
+              this.retryDelayTimer = null;
+              resolve();
+            }, retryDelay);
+          });
           retryDelay = Math.min(retryDelay * 1.5, SignalrService.MAX_RETRY_DELAY_MS);
         }
       }
@@ -213,10 +234,6 @@ export class SignalrService {
    * Saat app kembali aktif / jaringan kembali, pastikan koneksi langsung dipulihkan.
    */
   private registerLifecycleListeners(): void {
-    if (typeof document === 'undefined' || typeof window === 'undefined') {
-      return;
-    }
-
     const ensureConnected = (): void => {
       if (this.isManuallyStopped) {
         return;
@@ -225,6 +242,24 @@ export class SignalrService {
         void this.startConnectionWithRetry();
       }
     };
+
+    try {
+      CapApp.addListener('appStateChange', ({ isActive }) => {
+        if (isActive) {
+          ensureConnected();
+        }
+      }).then((handle) => {
+        this.appStateListenerHandle = handle;
+      }).catch((e) => {
+        console.warn('CapApp appStateChange listener registration error:', e);
+      });
+    } catch (e) {
+      console.warn('CapApp listener registration failed:', e);
+    }
+
+    if (typeof document === 'undefined' || typeof window === 'undefined') {
+      return;
+    }
 
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {

@@ -52,6 +52,12 @@ export class SalesInvoiceService {
     );
   }
 
+  getLoadingAllList(date: string): Observable<HeaderRes[]> {
+    return this.http.get<HeaderRes[]>(
+      `${this.apiUrl}api/v1/SalesInvoices/Tab/Loading/Queue/All/${date}`
+    );
+  }
+
   getFinishedList(date: string): Observable<HeaderRes[]> {
     return this.http.get<HeaderRes[]>(
       `${this.apiUrl}api/v1/SalesInvoices/Tab/Loading/Finished/${date}`

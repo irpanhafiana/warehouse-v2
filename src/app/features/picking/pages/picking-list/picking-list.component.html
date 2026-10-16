@@ -90,7 +90,7 @@
       <!-- Section BON Checkout -->
       @if (bonCheckout.length > 0) {
       <div class="flex flex-col gap-3 mb-2">
-        @for (item of bonCheckout; track $index) {
+        @for (item of bonCheckout; track item.DocNum) {
         <div class="w-full bg-emerald-300 border border-emerald-300 rounded-xl p-4 transition-all">
           <div class="flex flex-col gap-2 w-full">
             <div class="flex flex-row gap-2 items-center">
@@ -169,7 +169,7 @@
       <!-- Section Filtered Sales Invoices -->
       @if (filteredSalesInvoices.length > 0) {
       <div class="flex flex-col gap-2">
-        @for (item of filteredSalesInvoices; track $index) {
+        @for (item of filteredSalesInvoices; track item.DocNum) {
         <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
           <div class="flex flex-col gap-2 w-full">
             <div class="flex flex-row gap-2 items-center">
@@ -300,9 +300,9 @@
 }
 
 <!-- Shared Dialog for Ambil BON -->
-<app-dialog-set-pic [isOpen]="isDialogAmbilBON" [title]="'Ambil BON'" [confirmText]="'Ambil'" [picList]="pickingPic"
+<app-dialog-set-pic [isOpen]="isDialogAmbilBON" [isLoading]="isSubmitting" [title]="'Ambil BON'" [confirmText]="'Ambil'" [picList]="pickingPic"
   (saved)="onAmbilBon($event)" (closed)="closeDialogAmbilBON()"></app-dialog-set-pic>
 
 <!-- Shared Dialog for Ganti PIC -->
-<app-dialog-set-pic [isOpen]="isDialogGantiPIC" [title]="'Ganti BON PIC'" [confirmText]="'Ganti PIC'"
+<app-dialog-set-pic [isOpen]="isDialogGantiPIC" [isLoading]="isSubmitting" [title]="'Ganti BON PIC'" [confirmText]="'Ganti PIC'"
   [picList]="pickingPic" (saved)="onGantiPIC($event)" (closed)="closeDialogGantiPIC()"></app-dialog-set-pic>

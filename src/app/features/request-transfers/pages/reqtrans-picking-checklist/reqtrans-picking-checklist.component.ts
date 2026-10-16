@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -14,6 +14,7 @@ import { ReqtransPickingService } from '../../services/reqtrans-picking.service'
   selector: 'app-reqtrans-picking-checklist',
   imports: [CommonModule, FormsModule, LoaderComponent, DialogSetPicComponent],
   templateUrl: './reqtrans-picking-checklist.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -118,22 +119,25 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.pickingService.getPickingDetail(this.docnum).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.salesInvoice = data;
-        this.checkPIC(this.salesInvoice?.Remarks || '');
-        this.arrReceh = this.filterRecehDetails(data?.Details || []);
-        this.arrNonReceh = this.filterNonRecehDetails(data?.Details || []);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get picking detail error:', e);
-        this.loading = false;
-        this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.pickingService
+      .getPickingDetail(this.docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.salesInvoice = data;
+          this.checkPIC(this.salesInvoice?.Remarks || '');
+          this.arrReceh = this.filterRecehDetails(data?.Details || []);
+          this.arrNonReceh = this.filterNonRecehDetails(data?.Details || []);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get picking detail error:', e);
+          this.loading = false;
+          this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   checkPIC(picName: string): void {
@@ -146,15 +150,18 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getPickingPicList(): void {
-    this.pickingService.getPickingPicList().subscribe({
-      next: (data) => {
-        this.pickingPic = data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get picking pic list warning:', e);
-      },
-    });
+    this.pickingService
+      .getPickingPicList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pickingPic = data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get picking pic list warning:', e);
+        },
+      });
   }
 
   private filterRecehDetails(details: Detail[]): Detail[] {
@@ -231,39 +238,46 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
       DocNum: this.docnum || '',
     };
 
-    this.pickingService.putPickingListDetails(payload).subscribe({
-      next: () => {
-        this.setLoadingState(detailId, false);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Save picking item error:', e);
-        this.toastr.error('Gagal menyelesaikan item picking', 'Error');
-        this.setLoadingState(detailId, false);
-        this.cdr.markForCheck();
-      },
-    });
+    this.pickingService
+      .putPickingListDetails(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(detailId, false);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Save picking item error:', e);
+          this.toastr.error('Gagal menyelesaikan item picking', 'Error');
+          this.setLoadingState(detailId, false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   onCancel(id: number): void {
+    if (this.isLoading(id)) return;
     this.setLoadingState(id, true);
     const payload = {
       DetailId: id,
       PIC: this.selectedPic,
     };
 
-    this.pickingService.putPickingCancel(payload).subscribe({
-      next: () => {
-        this.setLoadingState(id, false);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Cancel picking item error:', e);
-        this.toastr.error('Gagal membatalkan item picking', 'Error');
-        this.setLoadingState(id, false);
-        this.cdr.markForCheck();
-      },
-    });
+    this.pickingService
+      .putPickingCancel(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Cancel picking item error:', e);
+          this.toastr.error('Gagal membatalkan item picking', 'Error');
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   setLoadingState(itemId: number, state: boolean): void {

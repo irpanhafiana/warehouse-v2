@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/services/auth.service';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { SharedDataService } from '../../../../core/services/shared-data.service';
@@ -20,15 +21,17 @@ import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LoginComponent implements OnInit {
-  private route = inject(ActivatedRoute);
+export class LoginComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
   private salesInvoiceService = inject(SalesInvoiceService);
   private sharedDataService = inject(SharedDataService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
+
+  private forceCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
   username = '';
   password = '';
@@ -53,30 +56,35 @@ export class LoginComponent implements OnInit {
       this.isDialogSetName = true;
     }
 
-    this.route.data.subscribe(async (data) => {
-      this.username = data['username'] || '';
-      this.password = data['password'] || '';
+    this.username = environment.posUsername || '';
+    this.password = environment.posPassword || '';
 
-      const existingToken = await this.storage.getItem(STORAGE_KEYS.TOKEN);
-      if (existingToken) {
-        // Token sudah ada (belum clear cache / force close), jangan minta token lagi
-        this.fetchDataInParallel();
+    const existingToken = await this.storage.getItem(STORAGE_KEYS.TOKEN);
+    if (existingToken) {
+      // Token sudah ada (belum clear cache / force close), jangan minta token lagi
+      this.fetchDataInParallel();
 
-        // Cek apakah cloud_token juga perlu dilengkapi di background jika belum ada
-        const existingCloudToken = await this.storage.getItem(STORAGE_KEYS.CLOUD_TOKEN);
-        if (!existingCloudToken && (this.username || this.password)) {
-          this.authService.postLoginCloud(this.username, this.password).subscribe({
-            next: async (cloudLogin) => {
-              await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
-            },
-            error: (e) => console.warn('Background cloud token fetch warning:', e),
-          });
-        }
-      } else if (this.username || this.password) {
-        // Belum ada token (pertama kali buka aplikasi atau habis clear cache / force close)
-        this.onLogin();
+      // Cek apakah cloud_token juga perlu dilengkapi di background jika belum ada
+      const existingCloudToken = await this.storage.getItem(STORAGE_KEYS.CLOUD_TOKEN);
+      if (!existingCloudToken && (this.username || this.password)) {
+        this.authService.postLoginCloud(this.username, this.password).subscribe({
+          next: async (cloudLogin) => {
+            await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
+          },
+          error: (e) => console.warn('Background cloud token fetch warning:', e),
+        });
       }
-    });
+    } else if (this.username || this.password) {
+      // Belum ada token (pertama kali buka aplikasi atau habis clear cache / force close)
+      this.onLogin();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (this.forceCloseTimer !== null) {
+      clearTimeout(this.forceCloseTimer);
+      this.forceCloseTimer = null;
+    }
   }
 
   setGreeting(): void {
@@ -190,7 +198,7 @@ export class LoginComponent implements OnInit {
     }
 
     // 3. Fallback jika dijalankan di browser
-    setTimeout(() => {
+    this.forceCloseTimer = setTimeout(() => {
       this.isProcessForceClose = false;
       window.location.replace('/');
     }, 2500);

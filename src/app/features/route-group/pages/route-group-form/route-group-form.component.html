@@ -102,12 +102,12 @@
               }">
               Lihat BON
             </button>
-            <button type="submit" [disabled]="routeGroupForm.get('RouteName')?.invalid"
+            <button type="submit" [disabled]="routeGroupForm.get('RouteName')?.invalid || isLoading"
               class="w-full cursor-pointer text-center" [ngClass]="{
-                'btn-no-shadow-disabled': routeGroupForm.get('RouteName')?.invalid,
-                'btn-no-shadow-primary': routeGroupForm.get('RouteName')?.valid
+                'btn-no-shadow-disabled': routeGroupForm.get('RouteName')?.invalid || isLoading,
+                'btn-no-shadow-primary': routeGroupForm.get('RouteName')?.valid && !isLoading
               }">
-              Simpan
+              {{ isLoading ? 'Menyimpan...' : 'Simpan' }}
             </button>
           </div>
 

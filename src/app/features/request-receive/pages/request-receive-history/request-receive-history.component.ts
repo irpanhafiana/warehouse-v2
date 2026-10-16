@@ -1,7 +1,8 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { ButtonHomeComponent, LoaderComponent, NavbarReqrecComponent } from '../../../../shared/components';
 import { RequestReceiveService } from '../../services/request-receive.service';
@@ -16,12 +17,14 @@ import { RequestReceiveService } from '../../services/request-receive.service';
     ButtonHomeComponent,
   ],
   templateUrl: './request-receive-history.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RequestReceiveHistoryComponent implements OnInit {
   private service = inject(RequestReceiveService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   dateString: string = '';
   date: string = '';
@@ -49,19 +52,22 @@ export class RequestReceiveHistoryComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.service.getHistoryRequestReceive(date).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.goodsDeliveries = data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get history error:', e);
-        this.loading = false;
-        this.toastr.error('Gagal memuat riwayat penerimaan', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.service
+      .getHistoryRequestReceive(date)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.goodsDeliveries = data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get history error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal memuat riwayat penerimaan', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   toDetail(docnum: string): void {

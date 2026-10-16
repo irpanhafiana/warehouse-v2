@@ -2,7 +2,7 @@
   <div class="flex flex-col gap-2.5">
     <div class="grid grid-cols-1 w-full pb-2 border-b border-gray-100">
       <p class="font-bold text-sm text-gray-500 text-center">
-        {{ salesInvoice.DocDate | date:'dd MMMM yyyy' }}
+        {{ salesInvoice()?.DocDate | date:'dd MMMM yyyy' }}
       </p>
     </div>
 
@@ -10,14 +10,14 @@
       <div class="flex flex-col">
         <small class="text-gray-500 text-xs font-semibold">DocNum</small>
         <p class="font-bold text-lg text-slate-800">
-          {{ salesInvoice.DocNum }}
+          {{ salesInvoice()?.DocNum }}
         </p>
       </div>
 
       <div class="flex flex-col items-end">
         <small class="text-gray-500 text-xs font-semibold">Total Item</small>
-        <p class="font-bold text-lg text-[#2F4ACD]">
-          {{ salesInvoice.Details.length }}
+        <p class="font-bold text-lg text-checkout">
+          {{ salesInvoice()?.Details?.length }}
         </p>
       </div>
     </div>
@@ -26,17 +26,17 @@
       <div class="flex flex-col">
         <small class="text-gray-500 text-xs font-semibold">Nama Customer</small>
         <p class="font-bold text-lg text-slate-800">
-          {{ salesInvoice.CustomerModel.CustomerName }}
+          {{ salesInvoice()?.CustomerModel?.CustomerName }}
         </p>
       </div>
     </div>
 
-    @if (salesInvoice.Note) {
+    @if (salesInvoice()?.Note) {
     <div class="flex justify-start items-start bg-amber-50 border border-amber-200/60 rounded-xl p-2.5">
       <div class="flex flex-col">
         <small class="text-amber-700 text-xs font-semibold">Catatan</small>
         <p class="font-medium text-sm text-amber-900">
-          {{ salesInvoice.Note }}
+          {{ salesInvoice()?.Note }}
         </p>
       </div>
     </div>

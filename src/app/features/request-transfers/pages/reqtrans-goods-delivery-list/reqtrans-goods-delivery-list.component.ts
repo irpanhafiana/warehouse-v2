@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -19,11 +20,13 @@ import {
     ButtonHomeComponent,
   ],
   templateUrl: './reqtrans-goods-delivery-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransGoodsDeliveryListComponent implements OnInit {
   private service = inject(GoodsDeliveryService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   dateString: string = '';
   date: string = '';
@@ -62,19 +65,21 @@ export class ReqtransGoodsDeliveryListComponent implements OnInit {
         ? this.service.getGoodsDeliveryListTrans(date)
         : this.service.getReqTransHistoryList(date);
 
-    request$.subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.goodsDeliveries = data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get goods delivery list trans error:', e);
-        this.loading = false;
-        this.goodsDeliveries = [];
-        this.cdr.markForCheck();
-      },
-    });
+    request$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.goodsDeliveries = data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get goods delivery list trans error:', e);
+          this.loading = false;
+          this.goodsDeliveries = [];
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   toDetail(date: string, transportUnit: string): void {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -15,7 +15,6 @@ import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/ut
 
 @Component({
   selector: 'app-finished-list',
-  standalone: true,
   imports: [
     CommonModule,
     DatePipe,
@@ -28,6 +27,7 @@ import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/ut
   ],
   templateUrl: './finished-list.component.html',
   styleUrl: './finished-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FinishedListComponent implements OnInit {
   private service = inject(SalesInvoiceService);
@@ -119,21 +119,24 @@ export class FinishedListComponent implements OnInit {
   }
 
   getCountCustomer(dateString: string) {
-    this.service.getCountCustomer(dateString).subscribe({
-      next: (data: { Code: string; Count: number }[]) => {
-        if (!data || !Array.isArray(data)) return;
-        data.forEach((response) => {
-          const matchingGroup = this.groupResult.find(
-            (element: any) => element.customerCode === response.Code
-          );
+    this.service
+      .getCountCustomer(dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: { Code: string; Count: number }[]) => {
+          if (!data || !Array.isArray(data)) return;
+          data.forEach((response) => {
+            const matchingGroup = this.groupResult.find(
+              (element: any) => element.customerCode === response.Code
+            );
 
-          if (matchingGroup) {
-            matchingGroup.total = response.Count;
-          }
-        });
-      },
-      error: (e) => {},
-    });
+            if (matchingGroup) {
+              matchingGroup.total = response.Count;
+            }
+          });
+        },
+        error: (e) => {},
+      });
   }
 
   groupCustomerData(salesInvoices: HeaderRes[]) {

@@ -1,9 +1,10 @@
-import { Component, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 
 @Component({
   selector: 'app-dialog-force-close',
   imports: [],
   templateUrl: './dialog-force-close.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DialogForceCloseComponent {
   isOpen = input<boolean>(false);

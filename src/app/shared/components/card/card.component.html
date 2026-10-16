@@ -1,35 +1,35 @@
-﻿@if (dataFrom !== 'PICKING') {
+@if (dataFrom() !== 'PICKING') {
 <div class="w-full bg-white rounded-xl p-4 border border-gray-200 transition-all">
   <div class="flex flex-col gap-2">
     <div class="flex justify-between items-center">
       <div class="flex flex-row items-center gap-2">
         <img src="location.png" class="w-8 h-8 object-contain" alt="Location" />
         <div class="flex flex-col">
-          <p class="text-xl font-bold text-slate-800">{{ salesInvoicesModel?.data?.[0]?.Area }}</p>
+          <p class="text-xl font-bold text-slate-800">{{ salesInvoicesModel()?.data?.[0]?.Area }}</p>
         </div>
       </div>
       <p class="bg-checkout text-white text-xs font-bold px-3 py-1.5 rounded-lg tracking-wide">
-        @if (salesInvoicesModel?.data?.length === salesInvoicesModel?.total) {
-        {{ salesInvoicesModel.total }} BON
+        @if (salesInvoicesModel()?.data?.length === salesInvoicesModel()?.total) {
+        {{ salesInvoicesModel()?.total }} BON
         } @else {
-        {{ salesInvoicesModel?.data?.length }}/{{ salesInvoicesModel?.total }} BON
+        {{ salesInvoicesModel()?.data?.length }}/{{ salesInvoicesModel()?.total }} BON
         }
       </p>
     </div>
 
     <div class="flex justify-start items-start flex-col gap-1 mt-1">
-      @if (salesInvoicesModel?.docnum) {
+      @if (salesInvoicesModel()?.docnum) {
       <div class="flex flex-col">
         <small class="font-medium text-gray-500 text-xs">DocNum</small>
         <p class="font-bold text-xl text-slate-800">
-          {{ salesInvoicesModel.docnum }}
+          {{ salesInvoicesModel()?.docnum }}
         </p>
       </div>
       }
       <div class="flex flex-col">
         <small class="font-medium text-gray-500 text-xs">Customer</small>
         <p class="font-bold text-xl text-slate-800">
-          {{ salesInvoicesModel?.customerName }}
+          {{ salesInvoicesModel()?.customerName }}
         </p>
       </div>
     </div>
@@ -48,9 +48,9 @@
     <div class="flex flex-row items-center gap-2">
       <img src="location.png" class="w-7 h-7 object-contain" alt="Location" />
       <div class="flex flex-col">
-        <p class="font-bold uppercase text-lg text-slate-800">{{ headerRes.Area }}</p>
+        <p class="font-bold uppercase text-lg text-slate-800">{{ headerRes()?.Area }}</p>
         <small class="text-xs font-semibold text-gray-500">
-          {{ headerRes.DocDate | date:'dd MMM yyyy' }}
+          {{ headerRes()?.DocDate | date:'dd MMM yyyy' }}
         </small>
       </div>
     </div>
@@ -59,19 +59,19 @@
       <div class="flex flex-col">
         <small class="text-gray-500 text-xs font-medium">DocNum</small>
         <p class="font-bold text-lg text-slate-800">
-          {{ headerRes.DocNum }}
+          {{ headerRes()?.DocNum }}
         </p>
       </div>
 
       <div class="flex flex-col gap-1 items-end">
         <p class="font-bold text-sm text-slate-700">
           Receh: <span class="px-2 py-0.5 bg-[#FF8B00] text-white rounded-md text-xs font-bold">
-            {{ headerRes.Receh }}
+            {{ headerRes()?.Receh }}
           </span>
         </p>
         <p class="font-bold text-sm text-slate-700">
           NonRch: <span class="px-2 py-0.5 bg-checkout text-white rounded-md text-xs font-bold">
-            {{ headerRes.NonReceh }}
+            {{ headerRes()?.NonReceh }}
           </span>
         </p>
       </div>
@@ -81,26 +81,26 @@
       <div class="flex flex-col">
         <small class="text-gray-500 text-xs font-medium">Nama Customer</small>
         <p class="font-bold text-lg text-slate-800">
-          {{ headerRes.Name }}
+          {{ headerRes()?.Name }}
         </p>
       </div>
     </div>
 
-    @if (headerRes.Note) {
+    @if (headerRes()?.Note) {
     <div class="flex justify-start items-center bg-gray-50 rounded-lg p-2 border border-gray-100">
       <div class="flex flex-col">
         <small class="text-gray-500 text-xs font-medium">Catatan Kasir</small>
         <p class="font-semibold text-sm text-gray-800">
-          {{ headerRes.Note }}
+          {{ headerRes()?.Note }}
         </p>
       </div>
     </div>
     }
 
-    @if (headerRes.Remarks) {
+    @if (headerRes()?.Remarks) {
     <div class="flex justify-start items-center">
       <p class="font-bold text-sm rounded-lg bg-[#257180] px-2.5 py-1 text-white">
-        BON PIC: {{ headerRes.Remarks }}
+        BON PIC: {{ headerRes()?.Remarks }}
       </p>
     </div>
     }

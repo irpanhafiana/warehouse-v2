@@ -1,28 +1,34 @@
 import { Routes } from '@angular/router';
-import { PickingComponent } from './picking.component';
-import { PickingListComponent } from './pages/picking-list/picking-list.component';
-import { PickingChecklistComponent } from './pages/picking-checklist/picking-checklist.component';
 
 export const pickingRoutes: Routes = [
   {
     path: 'picking',
-    component: PickingComponent,
+    loadComponent: () =>
+      import('./picking.component').then((m) => m.PickingComponent),
     children: [
       {
         path: 'list',
-        component: PickingListComponent,
+        loadComponent: () =>
+          import('./pages/picking-list/picking-list.component').then(
+            (m) => m.PickingListComponent
+          ),
         data: { title: 'Picking List' },
       },
       {
         path: 'list/:docnum',
-        component: PickingListComponent,
+        loadComponent: () =>
+          import('./pages/picking-list/picking-list.component').then(
+            (m) => m.PickingListComponent
+          ),
         data: { title: 'Picking List' },
       },
       {
         path: 'checklist/:docnum/:date',
-        component: PickingChecklistComponent,
+        loadComponent: () =>
+          import(
+            './pages/picking-checklist/picking-checklist.component'
+          ).then((m) => m.PickingChecklistComponent),
       },
     ],
   },
 ];
-

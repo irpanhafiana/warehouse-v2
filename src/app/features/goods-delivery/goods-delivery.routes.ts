@@ -1,20 +1,26 @@
 import { Routes } from '@angular/router';
-import { GoodsDeliveryComponent } from './goods-delivery.component';
-import { GoodsDeliveryListComponent } from './pages/goods-delivery-list/goods-delivery-list.component';
-import { GoodsDeliveryDetailComponent } from './pages/goods-delivery-detail/goods-delivery-detail.component';
 
 export const goodsDeliveryRoutes: Routes = [
   {
     path: 'goods-delivery',
-    component: GoodsDeliveryComponent,
+    loadComponent: () =>
+      import('./goods-delivery.component').then(
+        (m) => m.GoodsDeliveryComponent
+      ),
     children: [
       {
         path: 'list',
-        component: GoodsDeliveryListComponent,
+        loadComponent: () =>
+          import(
+            './pages/goods-delivery-list/goods-delivery-list.component'
+          ).then((m) => m.GoodsDeliveryListComponent),
       },
       {
         path: 'detail/:date/:transportUnit/:status',
-        component: GoodsDeliveryDetailComponent,
+        loadComponent: () =>
+          import(
+            './pages/goods-delivery-detail/goods-delivery-detail.component'
+          ).then((m) => m.GoodsDeliveryDetailComponent),
       },
       {
         path: '',
@@ -24,4 +30,3 @@ export const goodsDeliveryRoutes: Routes = [
     ],
   },
 ];
-

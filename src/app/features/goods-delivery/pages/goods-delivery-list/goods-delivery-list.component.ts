@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -22,6 +22,7 @@ import { ButtonHomeComponent } from '../../../../shared/components/button-home/b
   ],
   templateUrl: './goods-delivery-list.component.html',
   styleUrl: './goods-delivery-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class GoodsDeliveryListComponent implements OnInit {
   private service = inject(GoodsDeliveryService);

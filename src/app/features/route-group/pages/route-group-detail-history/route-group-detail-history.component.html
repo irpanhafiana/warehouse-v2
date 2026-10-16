@@ -72,8 +72,8 @@
       <div class="flex flex-col gap-2 pb-8">
         <div class="flex flex-row justify-end gap-2">
           @if (isUrutkan) {
-          <button type="button" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer" (click)="onSubmit()">
-            Simpan Urutan
+          <button type="button" [disabled]="isLoading" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSubmit()">
+            {{ isLoading ? 'Menyimpan...' : 'Simpan Urutan' }}
           </button>
           } @else {
           @if (!isCanRekap) {
@@ -273,9 +273,11 @@
 @if (data && filteredDetails && filteredDetails.length > initialLength) {
 <div class="fixed bottom-32.5 right-3 z-30">
   <button type="button"
+    [disabled]="isLoading"
     class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl shadow-lg border border-white/30 text-sm cursor-pointer transition-all flex items-center gap-1.5"
+    [ngClass]="{'opacity-50 pointer-events-none': isLoading}"
     (click)="onSubmit()">
-    âœ” Simpan Perubahan
+    {{ isLoading ? 'Menyimpan...' : '✔ Simpan Perubahan' }}
   </button>
 </div>
 }
@@ -396,8 +398,8 @@
         (click)="isDialogConfirmDelete = false">
         Tutup
       </button>
-      <button type="button" class="btn-no-shadow-danger py-2.5 rounded-xl cursor-pointer" (click)="onHapusBON()">
-        Yakin
+      <button type="button" [disabled]="isLoading" class="btn-no-shadow-danger py-2.5 rounded-xl cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onHapusBON()">
+        {{ isLoading ? 'Menghapus...' : 'Yakin' }}
       </button>
     </div>
   </div>

@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,20 +9,24 @@ import { RouteGroupService } from '../../services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { HeaderRes, Area } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 
 @Component({
   selector: 'app-route-group-additional-invoice',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DatePipe],
   templateUrl: './route-group-additional-invoice.component.html',
   styleUrl: './route-group-additional-invoice.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouteGroupAdditionalInvoiceComponent implements OnInit {
   private routeGroupService = inject(RouteGroupService);
   private salesInvoiceService = inject(SalesInvoiceService);
   private router = inject(Router);
   private toastr = inject(ToastrService);
+  private readonly destroyRef = inject(DestroyRef);
 
   loading = true;
+  isLoading = false;
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
   dateString = '';
@@ -50,63 +55,72 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
   fetchRouteGroupDetail(alias: string): void {
     this.loadingDetail = true;
-    this.routeGroupService.getRouteGroupDetail(alias).subscribe({
-      next: (response: any) => {
-        this.BONExisting = (response.Details || []).map((item: any) => ({
-          ...item,
-          MarkBeforeRoute: true,
-        }));
-        this.routeNameInput = response.RouteName || '';
-      },
-      error: () => {
-        this.loadingDetail = false;
-      },
-      complete: () => {
-        this.loadingDetail = false;
-        this.loading = false;
-      },
-    });
+    this.routeGroupService
+      .getRouteGroupDetail(alias)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          this.BONExisting = (response.Details || []).map((item: any) => ({
+            ...item,
+            MarkBeforeRoute: true,
+          }));
+          this.routeNameInput = response.RouteName || '';
+        },
+        error: () => {
+          this.loadingDetail = false;
+        },
+        complete: () => {
+          this.loadingDetail = false;
+          this.loading = false;
+        },
+      });
   }
 
   fetchRouteGroups(date: string): void {
     this.loading = true;
-    this.routeGroupService.getAdditionalInvoices(date).subscribe({
-      next: (response: any[]) => {
-        if (!Array.isArray(response)) {
+    this.routeGroupService
+      .getAdditionalInvoices(date)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any[]) => {
+          if (!Array.isArray(response)) {
+            this.loading = false;
+            return;
+          }
+
+          this.headerRes = response.map((item) => ({
+            ...item,
+            MarkBeforeRoute: false,
+          }));
+
+          this.filteredSalesInvoices = [...this.headerRes];
+          this.createArrArea(this.headerRes);
+        },
+        error: () => {
           this.loading = false;
-          return;
-        }
-
-        this.headerRes = response.map((item) => ({
-          ...item,
-          MarkBeforeRoute: false,
-        }));
-
-        this.filteredSalesInvoices = [...this.headerRes];
-        this.createArrArea(this.headerRes);
-      },
-      error: () => {
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
   }
 
   fetchRouteGroupList(date: string): void {
     this.loading = true;
-    this.routeGroupService.getRouteGroups(date).subscribe({
-      next: (response: any[]) => {
-        this.routeGroups = response || [];
-      },
-      error: () => {
-        this.loading = false;
-      },
-      complete: () => {
-        this.loading = false;
-      },
-    });
+    this.routeGroupService
+      .getRouteGroups(date)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any[]) => {
+          this.routeGroups = response || [];
+        },
+        error: () => {
+          this.loading = false;
+        },
+        complete: () => {
+          this.loading = false;
+        },
+      });
   }
 
   openDialogDetailDocnum(customerCode: string, docnum: string): void {
@@ -117,7 +131,7 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
 
     if (this.dateString) {
       this.fetchRouteGroups(this.dateString);
@@ -185,6 +199,8 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
   }
 
   onSaveToJalurMuat(): void {
+    if (this.isLoading) return;
+    this.isLoading = true;
     const dataToAdd = [...this.BONExisting, ...this.BONtoRoute];
 
     const payload = {
@@ -195,32 +211,33 @@ export class RouteGroupAdditionalInvoiceComponent implements OnInit {
       Details: dataToAdd as any,
     };
 
-    this.routeGroupService.putRouteGroup(payload).subscribe({
-      next: () => {},
-      error: () => {},
-      complete: () => {
-        this.toastr.success(
-          `BON ditambahkan ke Jalur muat ${this.routeNameInput}`,
-          'Success'
-        );
+    this.routeGroupService
+      .putRouteGroup(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {},
+        error: () => {
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.toastr.success(
+            `BON ditambahkan ke Jalur muat ${this.routeNameInput}`,
+            'Success'
+          );
 
-        void this.router.navigate([
-          '/main/route-group/detail/',
-          this.routeNameAlias,
-        ]);
-      },
-    });
+          void this.router.navigate([
+            '/main/route-group/detail/',
+            this.routeNameAlias,
+          ]);
+        },
+      });
   }
 
   private setDefaultDate(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
   }
 }
 

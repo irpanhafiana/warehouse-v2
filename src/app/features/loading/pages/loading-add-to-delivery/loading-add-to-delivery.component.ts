@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -25,6 +25,7 @@ import { DialogConfirmComponent } from '../../../../shared/components/dialog-con
   imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './loading-add-to-delivery.component.html',
   styleUrl: './loading-add-to-delivery.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoadingAddToDeliveryComponent implements OnInit {
   private location = inject(Location);
@@ -155,6 +156,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
   }
 
   async onSubmit(): Promise<void> {
+    if (this.loading) return;
     const currentDate = new Date();
     const jsonDetails = this.itemLoaded.map((item: any) => ({
       LineNo: item.LineNo,

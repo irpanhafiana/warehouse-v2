@@ -72,8 +72,8 @@
       <div class="flex flex-col gap-2 pb-8">
         <div class="flex flex-row justify-end gap-2">
           @if (isUrutkan) {
-          <button type="button" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer" (click)="onSubmit()">
-            Simpan Urutan
+          <button type="button" [disabled]="isLoading" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSubmit()">
+            {{ isLoading ? 'Menyimpan...' : 'Simpan Urutan' }}
           </button>
           } @else {
           @if (!isCanRekap) {
@@ -271,9 +271,10 @@
 
 @if (data && filteredDetails && filteredDetails.length > initialLength) {
 <div class="fixed bottom-32.5 right-3 z-30">
-  <button type="button" class="btn-no-shadow-success text-sm py-2.5 px-4 rounded-xl cursor-pointer  "
+  <button type="button" [disabled]="isLoading" class="btn-no-shadow-success text-sm py-2.5 px-4 rounded-xl cursor-pointer"
+    [ngClass]="{'opacity-50 pointer-events-none': isLoading}"
     (click)="onSubmit()">
-    âœ” Simpan Perubahan
+    {{ isLoading ? 'Menyimpan...' : '✔ Simpan Perubahan' }}
   </button>
 </div>
 }

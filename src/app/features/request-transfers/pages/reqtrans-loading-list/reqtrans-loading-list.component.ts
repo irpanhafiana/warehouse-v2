@@ -1,8 +1,10 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Area, HeaderRes, SalesInvoicesModel } from '../../../../core/models';
+import { getDefaultDateFilter } from '../../../../core/utils/date.util';
 import {
   ButtonHomeComponent,
   CardComponent,
@@ -30,11 +32,13 @@ export interface GroupedCustomerLoading {
     ButtonHomeComponent,
   ],
   templateUrl: './reqtrans-loading-list.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransLoadingListComponent implements OnInit {
   private loadingService = inject(ReqTransLoadingService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -58,37 +62,33 @@ export class ReqtransLoadingListComponent implements OnInit {
   }
 
   private setDefaultDate(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
   }
 
   getLoadingList(): void {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.loadingService.getLoadingList(this.dateString).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes;
-        this.createArrArea(this.headerRes);
-        this.groupCustomerData(this.filteredSalesInvoices);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get loading list error:', e);
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
+    this.loadingService
+      .getLoadingList(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes;
+          this.createArrArea(this.headerRes);
+          this.groupCustomerData(this.filteredSalesInvoices);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get loading list error:', e);
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   createArrArea(data: HeaderRes[]): void {
@@ -162,22 +162,25 @@ export class ReqtransLoadingListComponent implements OnInit {
   }
 
   getCountCustomer(dateString: string): void {
-    this.loadingService.getCountCustomer(dateString).subscribe({
-      next: (data) => {
-        data?.forEach((response: { Code: string; Count: number }) => {
-          const matchingGroup = this.groupResult.find(
-            (elem) => elem.customerCode === response.Code
-          );
-          if (matchingGroup) {
-            matchingGroup.total = response.Count;
-          }
-        });
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get count customer warning:', e);
-      },
-    });
+    this.loadingService
+      .getCountCustomer(dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          data?.forEach((response: { Code: string; Count: number }) => {
+            const matchingGroup = this.groupResult.find(
+              (elem) => elem.customerCode === response.Code
+            );
+            if (matchingGroup) {
+              matchingGroup.total = response.Count;
+            }
+          });
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get count customer warning:', e);
+        },
+      });
   }
 
   openDialogDetailDocnum(customerCode: string, docnum: string): void {

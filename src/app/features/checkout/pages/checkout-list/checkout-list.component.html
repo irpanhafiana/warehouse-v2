@@ -135,7 +135,7 @@
             {{ item.DocDate | date : 'dd MMMM yyyy' }}
           </small>
           <small class="font-bold text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-lg border border-gray-200">
-            {{ item.Details }} Item
+            {{ item.Details.length || 0 }} Item
           </small>
         </div>
         <p class="font-bold text-lg text-[#202B6D] mt-1">{{ item.DocNum }}</p>

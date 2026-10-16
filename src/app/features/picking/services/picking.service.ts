@@ -19,8 +19,13 @@ export class PickingService {
   private pickingDetailSubject = new BehaviorSubject<Detail[]>([]);
   pickingDetail$: Observable<Detail[]> = this.pickingDetailSubject.asObservable();
 
-  private pickingDetailIncomingSubject = new BehaviorSubject<Detail>({} as Detail);
-  pickingDetailIncoming$: Observable<Detail> = this.pickingDetailIncomingSubject.asObservable();
+  private detailSubject = new BehaviorSubject<Detail | null>(null);
+  get detail$(): Observable<Detail | null> {
+    return this.detailSubject.asObservable();
+  }
+
+  private pickingDetailIncomingSubject = new BehaviorSubject<Detail | null>(null);
+  pickingDetailIncoming$: Observable<Detail | null> = this.pickingDetailIncomingSubject.asObservable();
 
   getPickingList(date: string): Observable<HeaderRes[]> {
     return this.http.get<HeaderRes[]>(
@@ -40,7 +45,13 @@ export class PickingService {
     this.pickingDetailSubject.next(data || []);
   }
 
-  setPickingDetailIncomingSubject(data: Detail): void {
+  setPickingDetailIncomingSubject(data: Detail | null): void {
+    this.pickingDetailIncomingSubject.next(data);
+    this.detailSubject.next(data);
+  }
+
+  setDetailSubject(data: Detail | null): void {
+    this.detailSubject.next(data);
     this.pickingDetailIncomingSubject.next(data);
   }
 }

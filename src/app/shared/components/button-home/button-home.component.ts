@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
   imports: [],
   templateUrl: './button-home.component.html',
   styleUrl: './button-home.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonHomeComponent {
   private router = inject(Router);

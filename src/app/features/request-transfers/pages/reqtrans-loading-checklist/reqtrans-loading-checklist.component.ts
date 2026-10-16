@@ -1,11 +1,10 @@
-import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, OnDestroy, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
-import JsBarcode from 'jsbarcode';
 import { Detail, HeaderRes, SalesInvoicesModel } from '../../../../core/models';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
@@ -23,6 +22,7 @@ import { ReqTransLoadingService } from '../../services/reqtrans-loading.service'
     DialogSetPicComponent,
   ],
   templateUrl: './reqtrans-loading-checklist.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
@@ -125,19 +125,22 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getDetailByCustomerCode(dateString: string, customerCode: string): void {
-    this.loadingService.getLoadingDetailByCustomerCode(dateString, customerCode).subscribe({
-      next: (data) => {
-        this.listBON = (data || []).sort((a: any, b: any) => {
-          const dateCompare = (b.DocDate || '').localeCompare(a.DocDate || '');
-          if (dateCompare !== 0) return dateCompare;
-          return (b.DocNum || '').localeCompare(a.DocNum || '');
-        });
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get loading detail by customer code error:', e);
-      },
-    });
+    this.loadingService
+      .getLoadingDetailByCustomerCode(dateString, customerCode)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.listBON = (data || []).sort((a: any, b: any) => {
+            const dateCompare = (b.DocDate || '').localeCompare(a.DocDate || '');
+            if (dateCompare !== 0) return dateCompare;
+            return (b.DocNum || '').localeCompare(a.DocNum || '');
+          });
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get loading detail by customer code error:', e);
+        },
+      });
   }
 
   getLoadingDetail(docnum: string, index?: number): void {
@@ -149,83 +152,95 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     this.getNotPickedItem();
     this.getRecehExist();
 
-    this.loadingService.getLoadingDetail(docnum).subscribe({
-      next: (data: SalesInvoicesModel) => {
-        this.loading = false;
-        data?.Details?.forEach((element: any) => {
-          element.isDone = false;
-          element.isSebagian = false;
-          element.sebagianValue = 0;
-        });
+    this.loadingService
+      .getLoadingDetail(docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: SalesInvoicesModel) => {
+          this.loading = false;
+          data?.Details?.forEach((element: any) => {
+            element.isDone = false;
+            element.isSebagian = false;
+            element.sebagianValue = 0;
+          });
 
-        this.salesInvoice = data;
-        this.initialData = data?.Details || [];
-        this.createAlphabetList(this.initialData);
-        this.applyFilter();
-        this.getCheckBON(this.selectedBON);
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.error('Get loading detail error:', e);
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
+          this.salesInvoice = data;
+          this.initialData = data?.Details || [];
+          this.createAlphabetList(this.initialData);
+          this.applyFilter();
+          this.getCheckBON(this.selectedBON);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Get loading detail error:', e);
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   getPickingPicList(): void {
-    this.salesInvoiceService.getPickingPicList().subscribe({
-      next: (data) => {
-        this.pickingPic = (data || []).sort((a, b) => a.localeCompare(b));
-        if (!this.picName && this.pickingPic.length > 0) {
-          this.picName = this.pickingPic[0];
-        }
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get picking PIC list warning:', e);
-      },
-    });
+    this.salesInvoiceService
+      .getPickingPicList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pickingPic = (data || []).sort((a, b) => a.localeCompare(b));
+          if (!this.picName && this.pickingPic.length > 0) {
+            this.picName = this.pickingPic[0];
+          }
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get picking PIC list warning:', e);
+        },
+      });
   }
 
   getCheckBON(docnum: string): void {
-    this.loadingService.getDeliveredItems(docnum).subscribe({
-      next: (data) => {
-        this.itemLoaded = [];
-        data?.forEach((element: any) => {
-          element?.Details?.forEach((el: any) => {
-            try {
-              this.itemLoaded.push({
-                id: el.Id,
-                data: JSON.parse(el.Data),
-              });
-            } catch {
-              this.itemLoaded.push({ id: el.Id, data: el.Data });
-            }
+    this.loadingService
+      .getDeliveredItems(docnum)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.itemLoaded = [];
+          data?.forEach((element: any) => {
+            element?.Details?.forEach((el: any) => {
+              try {
+                this.itemLoaded.push({
+                  id: el.Id,
+                  data: JSON.parse(el.Data),
+                });
+              } catch {
+                this.itemLoaded.push({ id: el.Id, data: el.Data });
+              }
+            });
           });
-        });
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get check BON warning:', e);
-      },
-    });
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get check BON warning:', e);
+        },
+      });
   }
 
   getNotPickedItem(): void {
     if (!this.selectedBON) return;
-    this.loadingService.getCheckItemNotPicked(this.selectedBON).subscribe({
-      next: (data) => {
-        this.notPickedItem = Number(data) || 0;
-        if (this.notPickedItem > 0) {
-          this.isBonNotFinishPick = true;
-        }
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get not picked item warning:', e);
-      },
-    });
+    this.loadingService
+      .getCheckItemNotPicked(this.selectedBON)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.notPickedItem = Number(data) || 0;
+          if (this.notPickedItem > 0) {
+            this.isBonNotFinishPick = true;
+          }
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get not picked item warning:', e);
+        },
+      });
   }
 
   getRecehExist(): void {
@@ -394,22 +409,26 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.isLoading(id)) return;
     this.setLoadingState(id, true);
     const payload = {
       DetailId: id,
       PIC: this.picName,
     };
 
-    this.loadingService.putLoadingCancel(payload).subscribe({
-      next: () => {
-        this.setLoadingState(id, false);
-        localStorage.removeItem(this.docnum);
-      },
-      error: (e) => {
-        console.error('Cancel loading item error:', e);
-        this.setLoadingState(id, false);
-      },
-    });
+    this.loadingService
+      .putLoadingCancel(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+          localStorage.removeItem(this.docnum);
+        },
+        error: (e) => {
+          console.error('Cancel loading item error:', e);
+          this.setLoadingState(id, false);
+        },
+      });
   }
 
   onSebagianValueChange(indicator: '+' | '-', id: number): void {
@@ -471,9 +490,9 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   getCardClass(item: any): string {
     const remarkNames = item.Remarks
       ? item.Remarks.replace('load by: ', '')
-          .split(',')
-          .map((n: string) => n.trim())
-          .filter(Boolean)
+        .split(',')
+        .map((n: string) => n.trim())
+        .filter(Boolean)
       : [];
 
     if (item.sebagianValue > 0 && item.sebagianValue !== item.Quantity) {

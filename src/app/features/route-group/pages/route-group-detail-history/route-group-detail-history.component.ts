@@ -1,15 +1,16 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { RouteGroupService } from '../../services';
-import { LoadingService } from '../../../loading/services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 
 @Component({
   selector: 'app-route-group-detail-history',
@@ -22,15 +23,16 @@ import { LoaderComponent } from '../../../../shared/components/loader/loader.com
   ],
   templateUrl: './route-group-detail-history.component.html',
   styleUrl: './route-group-detail-history.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouteGroupDetailHistoryComponent implements OnInit {
   private routeGroupService = inject(RouteGroupService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private loadingService = inject(LoadingService);
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private readonly destroyRef = inject(DestroyRef);
 
   alias = '';
   data!: RouteGroup;
@@ -80,14 +82,9 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
 
     if (this.alias) {
       this.fetchRouteGroupDetail(this.alias);
@@ -104,33 +101,36 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   fetchRouteGroupDetail(alias: string): void {
     this.isLoading = true;
-    this.routeGroupService.getRouteGroupDetail(alias).subscribe({
-      next: (response: any) => {
-        this.data = response;
-        this.dataDetails = (response?.Details || []).map((item: any) => ({
-          ...item,
-          isCanRekap: false,
-        }));
+    this.routeGroupService
+      .getRouteGroupDetail(alias)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response: any) => {
+          this.data = response;
+          this.dataDetails = (response?.Details || []).map((item: any) => ({
+            ...item,
+            isCanRekap: false,
+          }));
 
-        this.filteredDetails = this.dataDetails;
-        this.generateAvailableLetters();
+          this.filteredDetails = this.dataDetails;
+          this.generateAvailableLetters();
 
-        this.isAllBonDone =
-          this.dataDetails.length > 0 &&
-          this.dataDetails.every(
-            (item) => item.IsFinishLoad && item.IsDelivered
-          );
+          this.isAllBonDone =
+            this.dataDetails.length > 0 &&
+            this.dataDetails.every(
+              (item) => item.IsFinishLoad && item.IsDelivered
+            );
 
-        this.initialLength = this.data?.Details?.length || 0;
-      },
-      error: () => {
-        this.isLoading = false;
-        this.toastr.error('Gagal mengambil data detail rute riwayat.', 'Error');
-      },
-      complete: () => {
-        this.isLoading = false;
-      },
-    });
+          this.initialLength = this.data?.Details?.length || 0;
+        },
+        error: () => {
+          this.isLoading = false;
+          this.toastr.error('Gagal mengambil data detail rute riwayat.', 'Error');
+        },
+        complete: () => {
+          this.isLoading = false;
+        },
+      });
   }
 
   generateAvailableLetters(): void {
@@ -168,19 +168,22 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   getLoadingList(): void {
     this.isLoading = true;
-    this.loadingService.getLoadingList(this.dateString).subscribe({
-      next: (data) => {
-        this.isLoading = false;
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes;
-        this.createArrArea(this.headerRes);
-        this.createArrAlphabet(this.headerRes);
-        this.groupCustomerData(this.filteredSalesInvoices);
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
+    this.service
+      .getLoadingList(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.isLoading = false;
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes;
+          this.createArrArea(this.headerRes);
+          this.createArrAlphabet(this.headerRes);
+          this.groupCustomerData(this.filteredSalesInvoices);
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+      });
   }
 
   createArrArea(data: HeaderRes[]): void {
@@ -251,25 +254,28 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   }
 
   getCountCustomer(dateString: string): void {
-    this.service.getCountCustomer(dateString).subscribe({
-      next: (data: { Code: string; Count: number }[]) => {
-        data.forEach((response) => {
-          const matchingGroup = this.groupResult?.find(
-            (element: any) => element.customerCode === response.Code
-          );
+    this.service
+      .getCountCustomer(dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: { Code: string; Count: number }[]) => {
+          data.forEach((response) => {
+            const matchingGroup = this.groupResult?.find(
+              (element: any) => element.customerCode === response.Code
+            );
 
-          if (matchingGroup) {
-            matchingGroup.total = response.Count;
-          }
-        });
-      },
-      error: () => {},
-    });
+            if (matchingGroup) {
+              matchingGroup.total = response.Count;
+            }
+          });
+        },
+        error: () => {},
+      });
   }
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
 
     if (this.dateString) {
       this.getLoadingList();
@@ -346,6 +352,8 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isLoading) return;
+    this.isLoading = true;
     const payload = {
       RouteName: this.data.RouteName,
       Alias: this.alias,
@@ -354,25 +362,32 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       Remarks: '',
     };
 
-    this.routeGroupService.putRouteGroup(payload as any).subscribe({
-      next: () => {
-        this.selectedItem = [];
-        this.isUrutkan = false;
-      },
-      error: () => {},
-      complete: () => {
-        if (this.alias) {
-          this.fetchRouteGroupDetail(this.alias);
-          this.getLoadingList();
-        } else {
-          this.onBack();
-        }
-        this.toastr.success('Jalur muat berhasil diperbarui!', 'Success');
-      },
-    });
+    this.routeGroupService
+      .putRouteGroup(payload as any)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.selectedItem = [];
+          this.isUrutkan = false;
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+          if (this.alias) {
+            this.fetchRouteGroupDetail(this.alias);
+            this.getLoadingList();
+          } else {
+            this.onBack();
+          }
+          this.toastr.success('Jalur muat berhasil diperbarui!', 'Success');
+        },
+      });
   }
 
   onMobilSiapJalan(): void {
+    if (this.isLoading) return;
     if (this.dataBONSelesai.length === 0) {
       this.toastr.success(
         'Jalur muat telah selesai dimuat ke dalam mobil',
@@ -390,16 +405,23 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     };
 
     if (this.selectedVehicleNo && this.selectedVehicleName) {
-      this.routeGroupService.postFinishRouteGroup(payload).subscribe({
-        next: () => {},
-        error: () => {},
-        complete: () => {
-          this.toastr.success(
-            'Jalur muat telah selesai dimuat ke dalam mobil',
-            'Success'
-          );
-        },
-      });
+      this.isLoading = true;
+      this.routeGroupService
+        .postFinishRouteGroup(payload)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {},
+          error: () => {
+            this.isLoading = false;
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.toastr.success(
+              'Jalur muat telah selesai dimuat ke dalam mobil',
+              'Success'
+            );
+          },
+        });
     } else {
       this.toastr.error(
         'Silakan pilih mobil dan supir terlebih dahulu!',
@@ -420,21 +442,24 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     };
 
     if (this.selectedVehicleNo && this.selectedVehicleName) {
-      this.routeGroupService.postFinishRouteGroup(payload).subscribe({
-        next: () => {
-          this.isDisabledButton = false;
-        },
-        error: () => {
-          this.isDisabledButton = false;
-        },
-        complete: () => {
-          this.isDisabledButton = false;
-          this.fetchRouteGroupDetail(this.alias);
-          this.getLoadingList();
-          this.closeDialogRekap();
-          this.toastr.success('BON yang ditandai berhasil direkap!', 'Success');
-        },
-      });
+      this.routeGroupService
+        .postFinishRouteGroup(payload)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.isDisabledButton = false;
+          },
+          error: () => {
+            this.isDisabledButton = false;
+          },
+          complete: () => {
+            this.isDisabledButton = false;
+            this.fetchRouteGroupDetail(this.alias);
+            this.getLoadingList();
+            this.closeDialogRekap();
+            this.toastr.success('BON yang ditandai berhasil direkap!', 'Success');
+          },
+        });
     } else {
       this.toastr.error(
         'Silakan pilih mobil dan supir terlebih dahulu!',
@@ -453,21 +478,24 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       Remarks: this.data?.RouteName || '',
     };
 
-    this.routeGroupService.postFinishRouteGroup(payload).subscribe({
-      next: () => {
-        this.isDisabledButton = false;
-        this.closeDialogRekap();
-        this.selectedItem = [];
-      },
-      error: () => {
-        this.isDisabledButton = false;
-      },
-      complete: () => {
-        this.isDisabledButton = false;
-        this.onBack();
-        this.onMobilSiapJalan();
-      },
-    });
+    this.routeGroupService
+      .postFinishRouteGroup(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isDisabledButton = false;
+          this.closeDialogRekap();
+          this.selectedItem = [];
+        },
+        error: () => {
+          this.isDisabledButton = false;
+        },
+        complete: () => {
+          this.isDisabledButton = false;
+          this.onBack();
+          this.onMobilSiapJalan();
+        },
+      });
   }
 
   onRouteFinishManual(alias: string): void {
@@ -476,19 +504,22 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       Alias: alias,
     };
 
-    this.routeGroupService.putFinishRouteGroup(payload).subscribe({
-      next: () => {
-        this.isDisabledButton = false;
-        this.selectedItem = [];
-      },
-      error: () => {
-        this.isDisabledButton = false;
-      },
-      complete: () => {
-        this.isDisabledButton = false;
-        this.onBack();
-      },
-    });
+    this.routeGroupService
+      .putFinishRouteGroup(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isDisabledButton = false;
+          this.selectedItem = [];
+        },
+        error: () => {
+          this.isDisabledButton = false;
+        },
+        complete: () => {
+          this.isDisabledButton = false;
+          this.onBack();
+        },
+      });
   }
 
   onUrutanChange(urutan: boolean): void {
@@ -535,6 +566,8 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   }
 
   onHapusBON(): void {
+    if (this.isLoading) return;
+    this.isLoading = true;
     const dataAfterDeleted = this.dataDetails.filter(
       (item) => item.Id !== this.idDeleted
     );
@@ -547,59 +580,74 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       Remarks: '',
     };
 
-    this.routeGroupService.deleteRouteGroup(payload as any).subscribe({
-      next: () => {},
-      error: () => {},
-      complete: () => {
-        this.isDialogConfirmDelete = false;
-        this.toastr.success('BON berhasil dihapus!', 'Success');
-        this.getLoading();
-      },
-    });
+    this.routeGroupService
+      .deleteRouteGroup(payload as any)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {},
+        error: () => {
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.isDialogConfirmDelete = false;
+          this.toastr.success('BON berhasil dihapus!', 'Success');
+          this.getLoading();
+        },
+      });
   }
 
   onIs4Login(): void {
     this.isLoading = true;
-    this.authService.generateIS4Token().subscribe({
-      next: (data) => {
-        this.isLoading = false;
-        localStorage.setItem('is4_token', data.access_token);
-        localStorage.setItem('is4_refresh_token', data.refresh_token);
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-      complete: () => {
-        this.getVehicles();
-        this.getDrivers();
-      },
-    });
+    this.authService
+      .generateIS4Token()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.isLoading = false;
+          localStorage.setItem('is4_token', data.access_token);
+          localStorage.setItem('is4_refresh_token', data.refresh_token);
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.getVehicles();
+          this.getDrivers();
+        },
+      });
   }
 
   getVehicles(): void {
     this.isLoading = true;
-    this.service.getVehicles().subscribe({
-      next: (data: any) => {
-        this.isLoading = false;
-        this.vehicles = data?.data || data || [];
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
+    this.service
+      .getVehicles()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: any) => {
+          this.isLoading = false;
+          this.vehicles = data?.data || data || [];
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+      });
   }
 
   getDrivers(): void {
     this.isLoading = true;
-    this.service.getDrivers().subscribe({
-      next: (data: any) => {
-        this.isLoading = false;
-        this.drivers = data?.data || data || [];
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
+    this.service
+      .getDrivers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: any) => {
+          this.isLoading = false;
+          this.drivers = data?.data || data || [];
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+      });
   }
 
   onOpenDialog(status: string): void {

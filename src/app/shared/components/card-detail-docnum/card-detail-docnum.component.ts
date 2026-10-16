@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { SalesInvoicesModel } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 
@@ -10,6 +10,6 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardDetailDocnumComponent {
-  @Input() salesInvoice!: SalesInvoicesModel;
+  readonly salesInvoice = input<SalesInvoicesModel>();
 }
 

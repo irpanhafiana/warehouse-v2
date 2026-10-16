@@ -25,8 +25,8 @@ export class LoadingService {
   private detailItemSubject = new BehaviorSubject<Detail[]>([]);
   detailItem$: Observable<Detail[]> = this.detailItemSubject.asObservable();
 
-  private detailItemSubjectIncoming = new BehaviorSubject<Detail>({} as Detail);
-  detailItemIncoming$: Observable<Detail> = this.detailItemSubjectIncoming.asObservable();
+  private detailItemSubjectIncoming = new BehaviorSubject<Detail | null>(null);
+  detailItemIncoming$: Observable<Detail | null> = this.detailItemSubjectIncoming.asObservable();
 
   private headers = new HttpHeaders({
     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ export class LoadingService {
     this.docnumSubject.next(data);
   }
 
-  setDetailSubject(data: SalesInvoicesModel): void {
+  setDetailSubject(data: SalesInvoicesModel | null): void {
     this.detailSubject.next(data);
   }
 
@@ -51,7 +51,7 @@ export class LoadingService {
     this.detailItemSubject.next(data || []);
   }
 
-  setDetailItemSubjectIncoming(data: Detail): void {
+  setDetailItemSubjectIncoming(data: Detail | null): void {
     this.detailItemSubjectIncoming.next(data);
   }
 

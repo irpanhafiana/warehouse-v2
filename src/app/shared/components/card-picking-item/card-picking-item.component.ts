@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { Detail } from '../../../core/models';
 import { CommonModule } from '@angular/common';
 
@@ -10,12 +10,12 @@ import { CommonModule } from '@angular/common';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CardPickingItemComponent {
-  @Input() salesInvoiceDetail!: Detail;
-  @Input() loadingId!: number;
+  readonly salesInvoiceDetail = input.required<Detail>();
+  readonly loadingId = input<number>();
 
-  get isCompleted(): boolean {
-    const r = this.salesInvoiceDetail?.Remarks;
+  readonly isCompleted = computed(() => {
+    const r = this.salesInvoiceDetail()?.Remarks;
     return r !== null && r !== '' && r !== undefined;
-  }
+  });
 }
 

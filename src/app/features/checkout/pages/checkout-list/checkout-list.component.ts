@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { HeaderRes, Area, SalesInvoicesModel } from '../../../../core/models';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 import { CardComponent } from '../../../../shared/components/card/card.component';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
@@ -26,6 +27,7 @@ import { ToastrService } from 'ngx-toastr';
   ],
   templateUrl: './checkout-list.component.html',
   styleUrl: './checkout-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutListComponent implements OnInit {
   private service = inject(SalesInvoiceService);
@@ -47,14 +49,9 @@ export class CheckoutListComponent implements OnInit {
   alphabet: string[] = [];
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
 
     if (this.dateString) {
       this.getCheckoutList();
@@ -103,7 +100,7 @@ export class CheckoutListComponent implements OnInit {
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
 
     if (this.dateString) {
       this.getCheckoutList();
@@ -121,20 +118,23 @@ export class CheckoutListComponent implements OnInit {
   }
 
   getCountCustomer(dateString: string): void {
-    this.service.getCountCustomer(dateString).subscribe({
-      next: (data: { Code: string; Count: number }[]) => {
-        data.forEach((response) => {
-          const matchingGroup = this.groupResult.find(
-            (element: any) => element.customerCode === response.Code
-          );
+    this.service
+      .getCountCustomer(dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: { Code: string; Count: number }[]) => {
+          data.forEach((response) => {
+            const matchingGroup = this.groupResult.find(
+              (element: any) => element.customerCode === response.Code
+            );
 
-          if (matchingGroup) {
-            matchingGroup.total = response.Count;
-          }
-        });
-      },
-      error: () => {},
-    });
+            if (matchingGroup) {
+              matchingGroup.total = response.Count;
+            }
+          });
+        },
+        error: () => {},
+      });
   }
 
   groupCustomerData(salesInvoices: HeaderRes[]): void {

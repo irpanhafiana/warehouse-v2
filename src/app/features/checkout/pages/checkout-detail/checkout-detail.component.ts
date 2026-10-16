@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, DatePipe, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,6 +9,7 @@ import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.s
 import { StorageService } from '../../../../core/services/storage.service';
 import { Detail, SalesInvoicesModel } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { TruncatePipe } from '../../../../shared/pipes';
 import { ToastrService } from 'ngx-toastr';
 
 @Component({
@@ -19,9 +20,11 @@ import { ToastrService } from 'ngx-toastr';
     LoaderComponent,
     FormsModule,
     ReactiveFormsModule,
+    TruncatePipe
   ],
   templateUrl: './checkout-detail.component.html',
   styleUrl: './checkout-detail.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CheckoutDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
@@ -108,52 +111,52 @@ export class CheckoutDetailComponent implements OnInit {
         next: (data) => {
           this.loading = false;
           this.salesInvoice = data;
-        this.initialData = data.Details || [];
-        const alphabet = Array.from(
-          new Set(
-            this.initialData
-              .map((product: any) => {
-                const name = product.ProductModel?.Name?.trim();
-                if (!name) return '';
-                const firstValidChar = name.startsWith('~')
-                  ? name.charAt(1)
-                  : name.charAt(0);
-                return firstValidChar.toUpperCase();
-              })
-              .filter(Boolean)
-          )
-        );
+          this.initialData = data.Details || [];
+          const alphabet = Array.from(
+            new Set(
+              this.initialData
+                .map((product: any) => {
+                  const name = product.ProductModel?.Name?.trim();
+                  if (!name) return '';
+                  const firstValidChar = name.startsWith('~')
+                    ? name.charAt(1)
+                    : name.charAt(0);
+                  return firstValidChar.toUpperCase();
+                })
+                .filter(Boolean)
+            )
+          );
 
-        this.alphabet = alphabet.sort((a, b) => a.localeCompare(b));
-        this.applyFilter();
+          this.alphabet = alphabet.sort((a, b) => a.localeCompare(b));
+          this.applyFilter();
 
-        this.salesInvoice.Details = (this.salesInvoice.Details || []).map(
-          (item) => ({
-            ...item,
-            isSelected: false,
-          })
-        );
-        this.itemCheckedOut = (data.Details || []).map((item: Detail) => ({
-          id: item.Id,
-          productName: item.ProductModel?.Name,
-          remarks: item.Remarks,
-          openQuantity: item.OpenQuantity,
-          quantity: item.Quantity,
-          uomModelCode: item.UoMModel?.Code,
-          baseQuantity: item.BaseQuantity,
-          SAPDocEntry: item.SAPDocEntry,
-          SAPDocNum: item.SAPDocNum,
-        }));
-        this.salesInvoiceLength = this.salesInvoice.Details.length;
-      },
-      error: () => {
-        this.loading = false;
-        this.toastr.error('Gagal mengambil detail checkout.', 'Error');
-      },
-      complete: () => {
-        this.getCheckBON(this.docnum);
-      },
-    });
+          this.salesInvoice.Details = (this.salesInvoice.Details || []).map(
+            (item) => ({
+              ...item,
+              isSelected: false,
+            })
+          );
+          this.itemCheckedOut = (data.Details || []).map((item: Detail) => ({
+            id: item.Id,
+            productName: item.ProductModel?.Name,
+            remarks: item.Remarks,
+            openQuantity: item.OpenQuantity,
+            quantity: item.Quantity,
+            uomModelCode: item.UoMModel?.Code,
+            baseQuantity: item.BaseQuantity,
+            SAPDocEntry: item.SAPDocEntry,
+            SAPDocNum: item.SAPDocNum,
+          }));
+          this.salesInvoiceLength = this.salesInvoice.Details.length;
+        },
+        error: () => {
+          this.loading = false;
+          this.toastr.error('Gagal mengambil detail checkout.', 'Error');
+        },
+        complete: () => {
+          this.getCheckBON(this.docnum);
+        },
+      });
   }
 
   applyFilter(): void {
@@ -281,13 +284,6 @@ export class CheckoutDetailComponent implements OnInit {
     this.isFilterAlphabet = false;
     this.selectedAplhabet = '';
     this.filteredData = this.initialData;
-  }
-
-  getShortName(fullName: string): string {
-    const maxLength = 18;
-    if (!fullName) return '';
-    if (fullName.length <= maxLength) return fullName;
-    return fullName.substring(0, maxLength) + '...';
   }
 }
 

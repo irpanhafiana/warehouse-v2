@@ -7,7 +7,7 @@
           Checkout &bull; {{ loading ? '...' : (salesInvoice ? salesInvoice.DocNum : '') }}
         </p>
         <h1 class="font-bold text-lg sm:text-xl tracking-tight truncate max-w-48 sm:max-w-72">
-          {{ getShortName(loading ? 'Memuat...' : (salesInvoice ? salesInvoice.CustomerModel.CustomerName : '')) }}
+          {{ (loading ? 'Memuat...' : (salesInvoice ? salesInvoice.CustomerModel.CustomerName : '')) | truncate:18 }}
         </h1>
       </div>
       <div class="flex flex-row gap-1.5">

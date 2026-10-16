@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ToastrService } from 'ngx-toastr';
@@ -9,6 +9,7 @@ import { HeaderRes } from '../../core/models';
   selector: 'app-route-group',
   imports: [RouterOutlet, CommonModule],
   template: '<router-outlet></router-outlet>',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouteGroupComponent implements OnInit, OnDestroy {
   private signalrService = inject(SignalrService);

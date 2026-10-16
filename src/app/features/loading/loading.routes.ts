@@ -1,36 +1,46 @@
 import { Routes } from '@angular/router';
-import { LoadingComponent } from './loading.component';
-import { LoadingListComponent } from './pages/loading-list/loading-list.component';
-import { LoadingChecklistComponent } from './pages/loading-checklist/loading-checklist.component';
-import { LoadingAddToDeliveryComponent } from './pages/loading-add-to-delivery/loading-add-to-delivery.component';
-import { LoadingConfirmationComponent } from './pages/loading-confirmation/loading-confirmation.component';
 
 export const loadingRoutes: Routes = [
   {
     path: 'loading',
-    component: LoadingComponent,
+    loadComponent: () =>
+      import('./loading.component').then((m) => m.LoadingComponent),
     children: [
       {
         path: 'list',
-        component: LoadingListComponent,
+        loadComponent: () =>
+          import('./pages/loading-list/loading-list.component').then(
+            (m) => m.LoadingListComponent
+          ),
       },
       {
         path: 'checklist/:customerCode/:date/:docnum',
-        component: LoadingChecklistComponent,
+        loadComponent: () =>
+          import(
+            './pages/loading-checklist/loading-checklist.component'
+          ).then((m) => m.LoadingChecklistComponent),
       },
       {
         path: 'checklist/:docnum',
-        component: LoadingChecklistComponent,
+        loadComponent: () =>
+          import(
+            './pages/loading-checklist/loading-checklist.component'
+          ).then((m) => m.LoadingChecklistComponent),
       },
       {
         path: 'add-to-delivery/:docnum',
-        component: LoadingAddToDeliveryComponent,
+        loadComponent: () =>
+          import(
+            './pages/loading-add-to-delivery/loading-add-to-delivery.component'
+          ).then((m) => m.LoadingAddToDeliveryComponent),
       },
       {
         path: 'confirmation/:docnum',
-        component: LoadingConfirmationComponent,
+        loadComponent: () =>
+          import(
+            './pages/loading-confirmation/loading-confirmation.component'
+          ).then((m) => m.LoadingConfirmationComponent),
       },
     ],
   },
 ];
-

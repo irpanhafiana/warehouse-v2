@@ -86,7 +86,7 @@
       } @else {
       @if (groupResult.length > 0) {
       <div class="flex flex-col gap-2">
-        @for (item of groupResult; track $index) {
+        @for (item of groupResult; track item.customerCode) {
         <app-card [dataFrom]="'LOADING'" [salesInvoicesModel]="item"
           (dialogOpen)="openDialogDetailDocnum(item.customerCode, item.data[0].DocNum)">
         </app-card>
@@ -123,7 +123,7 @@
       </button>
     </div>
     <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">
-      @for (item of detailDocnumCustomer; track $index) {
+      @for (item of detailDocnumCustomer; track item.DocNum) {
       <div class="border border-gray-200 hover:border-checkout w-full rounded-xl p-3 cursor-pointer transition-all"
         (click)="toChecklist(item.DocNum)">
         <div class="flex justify-between items-center">
@@ -132,7 +132,7 @@
             <p class="font-bold text-base text-slate-800">{{ item.DocNum }}</p>
           </div>
           <span class="font-bold text-sm text-checkout bg-blue-50 px-2 py-1 rounded-lg">
-            {{ item.Details }} Item
+            {{ item.Details.length || 0 }} Item
           </span>
         </div>
       </div>

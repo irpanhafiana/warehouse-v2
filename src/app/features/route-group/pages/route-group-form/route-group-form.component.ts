@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
@@ -12,24 +13,25 @@ import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 
 import { RouteGroupService } from '../../services';
-import { LoadingService } from '../../../loading/services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { HeaderRes, Area, RouteGroup } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
+import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
 
 @Component({
   selector: 'app-route-group-form',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent],
   templateUrl: './route-group-form.component.html',
   styleUrls: ['./route-group-form.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RouteGroupFormComponent implements OnInit {
   private router = inject(Router);
   private fb = inject(FormBuilder);
-  private loadingService = inject(LoadingService);
   private routeGroupService = inject(RouteGroupService);
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
+  private readonly destroyRef = inject(DestroyRef);
 
   loadingData: HeaderRes[] = [];
   filteredHeaderRes: HeaderRes[] = [];
@@ -66,14 +68,9 @@ export class RouteGroupFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
 
     if (this.dateString) {
       this.getLoadingList();
@@ -128,21 +125,29 @@ export class RouteGroupFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.isLoading) return;
     if (this.routeGroupForm.value.Details.length === 0) {
       this.toastr.error('Pilih setidaknya 1 BON untuk membuat jalur muat', 'Error');
       return;
     }
 
-    this.routeGroupService.postRouteGroup(this.routeGroupForm.value).subscribe({
-      next: () => {
-        this.selectedItem = [];
-      },
-      error: () => {},
-      complete: () => {
-        this.onBack();
-        this.toastr.success('Jalur muat berhasil ditambahkan', 'Success');
-      },
-    });
+    this.isLoading = true;
+    this.routeGroupService
+      .postRouteGroup(this.routeGroupForm.value)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.selectedItem = [];
+        },
+        error: () => {
+          this.isLoading = false;
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.onBack();
+          this.toastr.success('Jalur muat berhasil ditambahkan', 'Success');
+        },
+      });
   }
 
   onBack(): void {
@@ -170,24 +175,27 @@ export class RouteGroupFormComponent implements OnInit {
 
   getLoadingList(): void {
     this.loading = true;
-    this.loadingService.getLoadingList(this.dateString).subscribe({
-      next: (data) => {
-        this.loading = false;
-        this.headerRes = data || [];
-        this.filteredSalesInvoices = this.headerRes;
-        this.createArrArea(this.headerRes);
-        this.createArrAlphabet(this.headerRes);
-        this.groupCustomerData(this.filteredSalesInvoices);
-      },
-      error: () => {
-        this.loading = false;
-      },
-    });
+    this.service
+      .getLoadingList(this.dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          this.headerRes = data || [];
+          this.filteredSalesInvoices = this.headerRes;
+          this.createArrArea(this.headerRes);
+          this.createArrAlphabet(this.headerRes);
+          this.groupCustomerData(this.filteredSalesInvoices);
+        },
+        error: () => {
+          this.loading = false;
+        },
+      });
   }
 
   onDateChange(e: Event): void {
     const input = e.target as HTMLInputElement;
-    this.dateString = input.value.replace(/-/g, '');
+    this.dateString = formatToApiDateString(input.value);
 
     if (this.dateString) {
       this.getLoadingList();
@@ -196,7 +204,6 @@ export class RouteGroupFormComponent implements OnInit {
 
   toChecklist(docnum: string): void {
     void this.router.navigate(['/main/loading/checklist', docnum]);
-    this.loadingService.setDocnumSubject(docnum);
   }
 
   onOptionSelect(e: any): void {
@@ -206,20 +213,23 @@ export class RouteGroupFormComponent implements OnInit {
   }
 
   getCountCustomer(dateString: string): void {
-    this.service.getCountCustomer(dateString).subscribe({
-      next: (data: { Code: string; Count: number }[]) => {
-        data.forEach((response) => {
-          const matchingGroup = this.groupResult?.find(
-            (element: any) => element.customerCode === response.Code
-          );
+    this.service
+      .getCountCustomer(dateString)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data: { Code: string; Count: number }[]) => {
+          data.forEach((response) => {
+            const matchingGroup = this.groupResult?.find(
+              (element: any) => element.customerCode === response.Code
+            );
 
-          if (matchingGroup) {
-            matchingGroup.total = response.Count;
-          }
-        });
-      },
-      error: () => {},
-    });
+            if (matchingGroup) {
+              matchingGroup.total = response.Count;
+            }
+          });
+        },
+        error: () => {},
+      });
   }
 
   groupCustomerData(salesInvoices: HeaderRes[]): void {

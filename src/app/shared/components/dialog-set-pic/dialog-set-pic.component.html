@@ -5,7 +5,9 @@
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">{{ title() }}</h2>
       @if (canClose()) {
-      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer" (click)="onClose()" aria-label="Tutup">
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="onClose()" aria-label="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -15,13 +17,13 @@
 
     <div class="flex flex-col gap-1 mt-4">
       <input id="picName" type="text" placeholder="Ketik nama di sini..."
-        class="w-full border border-gray-300 focus:border-checkout focus:ring-2 focus:ring-[#2F4ACD]/20 rounded-xl p-3 focus:outline-none text-base text-gray-800 font-medium"
+        class="w-full border border-gray-300 focus:border-checkout focus:ring-2 focus:ring-checkout/20 rounded-xl p-3 focus:outline-none text-base text-gray-800 font-medium"
         [ngModel]="tempName()" (ngModelChange)="tempName.set($event)" />
     </div>
 
     @if (isLoading()) {
     <div class="flex flex-col items-center justify-center p-6 gap-2">
-      <div class="w-8 h-8 border-3 border-[#2F4ACD] border-t-transparent rounded-full animate-spin"></div>
+      <div class="w-8 h-8 border-3 border-checkout border-t-transparent rounded-full animate-spin"></div>
       <p class="text-xs font-medium text-gray-500">Memuat daftar nama PIC...</p>
     </div>
     } @else if (picList().length !== 0) {
@@ -29,11 +31,11 @@
       <label for="picName" class="font-semibold text-gray-600 text-xs tracking-wider uppercase">
         Atau pilih salah satu di bawah:
       </label>
-      <div class="w-full max-h-[180px] overflow-y-auto flex flex-wrap gap-2 p-1">
+      <div class="w-full max-h-45 overflow-y-auto flex flex-wrap gap-2 p-1">
         @for (item of picList(); track $index) {
         <button type="button" class="px-3.5 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer border"
           [ngClass]="{
-            'bg-checkout text-white border-[#2F4ACD] font-semibold':
+            'bg-checkout text-white border-checkout font-semibold':
               tempName() === item,
             'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100':
               tempName() !== item

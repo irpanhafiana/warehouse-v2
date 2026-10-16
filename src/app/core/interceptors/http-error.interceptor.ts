@@ -7,6 +7,7 @@ import {
   HttpInterceptorFn,
   HttpResponse,
 } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -19,6 +20,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
 ): Observable<HttpEvent<unknown>> => {
   const toastr = inject(ToastrService);
   const storage = inject(StorageService);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -38,6 +40,15 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
       if (error.status === 401) {
         storage.removeItem(STORAGE_KEYS.TOKEN);
         storage.removeItem(STORAGE_KEYS.CLOUD_TOKEN);
+
+        // Hindari loop redirect jika user sudah di halaman login atau error berasal dari request token itu sendiri
+        const currentUrl = router.url;
+        const isLoginUrl = currentUrl === '/' || currentUrl === '' || currentUrl.startsWith('/?');
+        const isAuthRequest = req.url.includes('token') || req.url.includes('connect/token');
+
+        if (!isLoginUrl && !isAuthRequest) {
+          router.navigateByUrl('/');
+        }
       }
 
       if (error.status === 0) {

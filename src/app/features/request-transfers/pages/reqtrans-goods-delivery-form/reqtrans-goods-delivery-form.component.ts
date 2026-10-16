@@ -1,4 +1,5 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,6 +13,7 @@ import { ReqTransLoadingService } from '../../services/reqtrans-loading.service'
   selector: 'app-reqtrans-goods-delivery-form',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DialogConfirmComponent],
   templateUrl: './reqtrans-goods-delivery-form.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReqtransGoodsDeliveryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -22,6 +24,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
   private loadingService = inject(ReqTransLoadingService);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   deliveryForm: FormGroup = this.fb.group({
     TransportUnit: ['', Validators.required],
@@ -78,48 +81,57 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.authService.generateIS4Token().subscribe({
-      next: (data) => {
-        localStorage.setItem('is4_token', data.access_token);
-        localStorage.setItem('is4_refresh_token', data.refresh_token);
-        this.getVehicles();
-        this.getDrivers();
-      },
-      error: (e) => {
-        console.error('IS4 token error:', e);
-        this.loading = false;
-        this.toastr.error('Gagal otentikasi IS4', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.authService
+      .generateIS4Token()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          localStorage.setItem('is4_token', data.access_token);
+          localStorage.setItem('is4_refresh_token', data.refresh_token);
+          this.getVehicles();
+          this.getDrivers();
+        },
+        error: (e) => {
+          console.error('IS4 token error:', e);
+          this.loading = false;
+          this.toastr.error('Gagal otentikasi IS4', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   getVehicles(): void {
-    this.loadingService.getVehicles().subscribe({
-      next: (res) => {
-        this.vehicles = res?.data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get vehicles warning:', e);
-      },
-      complete: () => {
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
+    this.loadingService
+      .getVehicles()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.vehicles = res?.data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get vehicles warning:', e);
+        },
+        complete: () => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   getDrivers(): void {
-    this.loadingService.getDrivers().subscribe({
-      next: (res) => {
-        this.drivers = res?.data || [];
-        this.cdr.markForCheck();
-      },
-      error: (e) => {
-        console.warn('Get drivers warning:', e);
-      },
-    });
+    this.loadingService
+      .getDrivers()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (res) => {
+          this.drivers = res?.data || [];
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.warn('Get drivers warning:', e);
+        },
+      });
   }
 
   onBack(): void {
@@ -149,6 +161,7 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (this.loading) return;
     this.loading = true;
     this.cdr.markForCheck();
 
@@ -182,22 +195,25 @@ export class ReqtransGoodsDeliveryFormComponent implements OnInit {
       CustomerName: this.customerName,
     };
 
-    this.loadingService.postGoodsDeliveryReqTrans(payload).subscribe({
-      next: () => {
-        this.loading = false;
-        this.isDialogConfirmSubmit = false;
-        this.clearLocalStorage();
-        this.toastr.success('Berhasil Menambahkan Goods Delivery', 'Success');
-        this.location.back();
-      },
-      error: (e) => {
-        console.error('Post goods delivery reqtrans error:', e);
-        this.loading = false;
-        this.isDialogConfirmSubmit = false;
-        this.toastr.error('Gagal menambahkan Goods Delivery', 'Error');
-        this.cdr.markForCheck();
-      },
-    });
+    this.loadingService
+      .postGoodsDeliveryReqTrans(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.isDialogConfirmSubmit = false;
+          this.clearLocalStorage();
+          this.toastr.success('Berhasil Menambahkan Goods Delivery', 'Success');
+          this.location.back();
+        },
+        error: (e) => {
+          console.error('Post goods delivery reqtrans error:', e);
+          this.loading = false;
+          this.isDialogConfirmSubmit = false;
+          this.toastr.error('Gagal menambahkan Goods Delivery', 'Error');
+          this.cdr.markForCheck();
+        },
+      });
   }
 }
 

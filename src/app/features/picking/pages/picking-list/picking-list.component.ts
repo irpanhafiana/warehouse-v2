@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -36,6 +36,7 @@ declare const window: FlutterWindow;
   ],
   templateUrl: './picking-list.component.html',
   styleUrl: './picking-list.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PickingListComponent implements OnInit, OnDestroy {
   private service = inject(SalesInvoiceService);
@@ -66,6 +67,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   selectedAlphabet = '';
 
   loading = true;
+  isSubmitting = false;
   isDialogBantu = false;
   isDialogGantiPIC = false;
   isDialogAmbilBON = false;
@@ -268,6 +270,8 @@ export class PickingListComponent implements OnInit, OnDestroy {
   }
 
   onAmbilBon(picName: string): void {
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
     const targetDocNum = this.docNumSelected;
     const payload = {
       DocNum: targetDocNum,
@@ -279,16 +283,20 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.isSubmitting = false;
           this.closeDialogAmbilBON();
           this.toChecklist(targetDocNum);
         },
         error: (err) => {
+          this.isSubmitting = false;
           console.error('Failed to take BON:', err);
         },
       });
   }
 
   onGantiPIC(newPic: string): void {
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
     const targetDocNum = this.docNumSelected;
     const payloadUnlocked = {
       DocNum: targetDocNum,
@@ -300,10 +308,12 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.isSubmitting = false;
           this.closeDialogGantiPIC();
           this.toChecklist(targetDocNum);
         },
         error: (err) => {
+          this.isSubmitting = false;
           console.error('Failed to change PIC:', err);
         },
       });

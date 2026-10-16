@@ -1,22 +1,27 @@
 import { Routes } from '@angular/router';
-import { InventoryRequestComponent } from './inventory-request.component';
-import { InventoryRequestListComponent } from './pages/inventory-request-list/inventory-request-list.component';
-import { InventoryRequestViewComponent } from './pages/inventory-request-view/inventory-request-view.component';
 
 export const inventoryRequestRoutes: Routes = [
   {
     path: 'inventory-request',
-    component: InventoryRequestComponent,
+    loadComponent: () =>
+      import('./inventory-request.component').then(
+        (m) => m.InventoryRequestComponent
+      ),
     children: [
       {
         path: 'list',
-        component: InventoryRequestListComponent,
+        loadComponent: () =>
+          import(
+            './pages/inventory-request-list/inventory-request-list.component'
+          ).then((m) => m.InventoryRequestListComponent),
       },
       {
         path: 'view/:docnum',
-        component: InventoryRequestViewComponent,
+        loadComponent: () =>
+          import(
+            './pages/inventory-request-view/inventory-request-view.component'
+          ).then((m) => m.InventoryRequestViewComponent),
       },
     ],
   },
 ];
-

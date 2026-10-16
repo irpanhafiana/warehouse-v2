@@ -37,80 +37,64 @@ body {
 }
 
 .card {
-  @apply w-full bg-white p-4 rounded-3xl;
+  @apply w-full bg-white p-4 rounded-xl border border-gray-200 shadow-xs;
 }
 
 .bottomsheet {
-  @apply w-full bg-white p-4 border-2 border-black rounded-t-2xl;
+  @apply w-full bg-white p-4 border border-gray-200 rounded-t-2xl shadow-xl;
 }
 
 .card-no-click {
-  @apply w-full bg-white p-4 border-2 border-black rounded-xl cursor-pointer;
+  @apply w-full bg-white p-4 border border-gray-200 rounded-xl cursor-pointer shadow-xs transition-all;
 }
 
 .btn-success {
-  @apply text-xl bg-green-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
 }
 
 .btn-warning {
-  @apply text-xl bg-accent text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-[#FF8B00] hover:bg-[#e67d00] text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
 }
 
 .btn-primary {
-  @apply text-xl bg-primary text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-checkout hover:bg-[#202B6D] text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
 }
 
 .btn-secondary {
-  @apply text-xl bg-gray-600 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
 }
 
 .btn-disabled {
-  @apply text-xl bg-gray-400 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-gray-400 text-white rounded-xl font-semibold px-4 py-2.5 cursor-not-allowed;
 }
 
 .btn-danger {
-  @apply text-xl bg-red-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-base bg-red-700 hover:bg-red-800 text-white rounded-xl font-semibold px-4 py-2.5 active:scale-95 transition-all;
 }
 
 .nav-primary {
-  @apply bg-primary py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
-  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.1s ease;
+  @apply bg-primary py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
 }
 
 .nav-danger {
-  @apply bg-red-700 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
-  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.1s ease;
+  @apply bg-red-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
 }
 
 .nav-success {
-  @apply bg-green-700 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
-  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.1s ease;
+  @apply bg-green-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
 }
 
 .nav-accent {
-  @apply bg-accent py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
-  box-shadow: 0px 6px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.1s ease;
+  @apply bg-accent py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
 }
 
 .nav-secondary {
-  @apply bg-gray-500 py-3 text-white rounded-xl font-bold text-xl text-center border-2 border-black active:scale-90;
-  transition: transform 0.1s ease;
+  @apply bg-gray-500 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
 }
 
 .input-name {
-  @apply w-full border-2 border-black rounded-xl p-3 focus:outline-none;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
-  transition: transform 0.2s ease;
+  @apply w-full border border-gray-300 focus:border-checkout rounded-xl p-3 focus:outline-none text-gray-800 shadow-xs;
+  transition: border-color 0.2s ease;
 }
 
 .input-name-no-shadow {
@@ -118,8 +102,17 @@ body {
   transition: border-color 0.2s ease;
 }
 
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.pt-safe {
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+
 .nav-wrap {
-  @apply bg-white w-full pt-4 mx-auto text-center items-center p-3 fixed left-0 right-0 bottom-0 text-black border-t border-gray-200  ;
+  @apply bg-white w-full pt-4 mx-auto text-center items-center p-3 fixed left-0 right-0 bottom-0 text-black border-t border-gray-200;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
 }
 
 .input-date {
@@ -128,8 +121,8 @@ body {
 }
 
 .label-pic {
-  @apply inline-flex m-1 text-xl font-semibold border-2 rounded-xl border-black px-4 py-2;
-  transition: transform 0.2s ease;
+  @apply inline-flex m-1 text-base font-semibold border border-gray-200 rounded-xl px-4 py-2 bg-white text-gray-800 shadow-xs;
+  transition: all 0.2s ease;
 }
 
 .fix-top {
@@ -137,33 +130,27 @@ body {
 }
 
 .btn-sm-success {
-  @apply text-base bg-green-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-green-700 hover:bg-green-800 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
 }
 
 .btn-sm-warning {
-  @apply text-base bg-accent text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-accent text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
 }
 
 .btn-sm-primary {
-  @apply text-base bg-primary text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-checkout hover:bg-[#202B6D] text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
 }
 
 .btn-sm-secondary {
-  @apply text-base bg-gray-600 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-gray-500 hover:bg-gray-600 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
 }
 
 .btn-sm-disabled {
-  @apply text-base bg-gray-400 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-gray-400 text-white rounded-xl font-semibold px-3 py-2 cursor-not-allowed;
 }
 
 .btn-sm-danger {
-  @apply text-base bg-red-700 text-white rounded-xl font-semibold px-6 py-2 border-2 border-black active:scale-90;
-  box-shadow: 0px 4px 0px rgba(0, 0, 0, 1);
+  @apply text-xs sm:text-sm bg-red-700 hover:bg-red-800 text-white rounded-xl font-semibold px-3 py-2 active:scale-95 transition-all;
 }
 
 .btn-no-shadow-success {
