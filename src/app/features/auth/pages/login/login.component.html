@@ -1,5 +1,5 @@
 @if (!isProcessForceClose) {
-<div class="w-full h-screen flex flex-col bg-checkout">
+<div class="w-full h-screen flex flex-col bg-checkout safe-area-top safe-area-bottom">
   <div class="w-full h-[25%] flex flex-col justify-between p-4"
     [ngClass]="{ 'h-[28%]': phoneName ? phoneName.length > 10 : false }">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -10,6 +10,7 @@
         <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
           Warehouse V2
         </h1>
+        <span class="text-[10px] text-white/60 font-mono font-medium">{{ appVersion }}</span>
       </div>
       <div class="flex flex-col items-center gap-1 shrink-0">
         <button type="button" (click)="isDialogForceClose = true"

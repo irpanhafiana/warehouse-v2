@@ -28,6 +28,16 @@
 body {
   font-family: 'Poppins', sans-serif;
   user-select: none;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-area-top {
+  padding-top: max(env(safe-area-inset-top, 0px), 1rem);
+}
+
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
 }
 
 @media (hover: hover) and (pointer: fine) {

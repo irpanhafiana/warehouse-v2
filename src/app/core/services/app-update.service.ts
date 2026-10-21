@@ -26,14 +26,16 @@ export class AppUpdateService {
   readonly updateAvailable = computed(() => {
     const data = this.updateData();
     if (!data) return false;
-    return data.versionCode > this.localVersionCode();
+    const isHigher = Number(data.versionCode) > Number(this.localVersionCode());
+    console.log(`[AppUpdate] serverCode: ${data.versionCode}, localCode: ${this.localVersionCode()}, isHigher: ${isHigher}`);
+    return isHigher;
   });
 
   readonly isForceUpdate = computed(() => {
     const data = this.updateData();
     if (!data) return false;
     if (data.forceUpdate) return true;
-    if (data.minVersionCode && this.localVersionCode() < data.minVersionCode) {
+    if (data.minVersionCode && Number(this.localVersionCode()) < Number(data.minVersionCode)) {
       return true;
     }
     return false;
@@ -45,6 +47,7 @@ export class AppUpdateService {
       const code = parseInt(info.build || '1', 10);
       this.localVersionCode.set(isNaN(code) ? 1 : code);
       this.localVersionName.set(info.version || '1.0');
+      console.log(`[AppUpdate] Local version detected: ${info.version} (Build ${code})`);
     } catch (e) {
       console.warn('[AppUpdate] Native App.getInfo() fallback:', e);
       this.localVersionCode.set(1);
@@ -74,6 +77,8 @@ export class AppUpdateService {
           })
         )
       );
+
+      console.log('[AppUpdate] Server response:', res);
 
       if (res && res.versionCode) {
         this.updateData.set(res);

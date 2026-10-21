@@ -10,6 +10,7 @@ import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.
 import { LoaderForceCloseComponent } from '../../../../shared/components/loader-force-close/loader-force-close.component';
 import { DialogForceCloseComponent } from '../../../../shared/components/dialog-force-close/dialog-force-close.component';
 import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-pic/dialog-set-pic.component';
+import { App as CapApp } from '@capacitor/app';
 
 @Component({
   selector: 'app-login',
@@ -39,6 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   defaultBranch = '';
 
   phoneName: string | null = null;
+  appVersion = 'v1.0.1';
   pickingPic: string[] = [];
 
   isLoadingPic = false;
@@ -48,6 +50,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.setGreeting();
+    try { const info = await CapApp.getInfo(); this.appVersion = 'v' + info.version + ' (Build ' + info.build + ')'; } catch {}
 
     this.phoneName = await this.storage.getItem(STORAGE_KEYS.PHONE_NAME);
 
