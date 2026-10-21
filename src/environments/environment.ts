@@ -17,5 +17,8 @@ export const environment = {
   is4ClientSecret: '2e3340b2-65e1-49a1-95ad-1f207f74c605',
   is4Scope:
     'General-B2C-5Ecd}3+uX3g=%Mxk CRUD-B2C-BB3)99Ib5~}Qv(f£ B2C-CMS-Scope-2£8KF8w+9]$B offline_access',
-};
 
+  // Centralized App Update Center (appsmanager.tokossonlineshop.com)
+  appId: 'com.sjmart.warehouse',
+  versionCheckUrl: 'https://appsmanager.tokossonlineshop.com/api/public/check-update.php',
+};

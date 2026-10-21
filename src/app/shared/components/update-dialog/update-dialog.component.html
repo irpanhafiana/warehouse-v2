@@ -1,0 +1,92 @@
+@if (updateService.updateAvailable(); as available) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+    <div class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4">
+      
+      <!-- Header Icon & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-checkout shrink-0">
+          <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-gray-900 leading-tight">Pembaruan Tersedia</h3>
+          <p class="text-xs text-gray-500">Versi {{ currentVersion() }} &rarr; <span class="font-bold text-blue-600">v{{ newVersion() }}</span></p>
+        </div>
+      </div>
+
+      <!-- Description / Changelog -->
+      @if (!isDownloading()) {
+        <div class="bg-gray-50 rounded-xl p-3.5 border border-gray-100 flex flex-col gap-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Catatan Pembaruan:</span>
+          @if (updateData()?.changelog && updateData()!.changelog!.length > 0) {
+            <ul class="text-sm text-gray-700 list-disc list-inside space-y-1">
+              @for (note of updateData()!.changelog!; track $index) {
+                <li>{{ note }}</li>
+              }
+            </ul>
+          } @else {
+            <p class="text-sm text-gray-600">Pembaruan performa dan perbaikan sistem terbaru.</p>
+          }
+        </div>
+      }
+
+      <!-- Progress Section when Downloading -->
+      @if (isDownloading()) {
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col gap-2.5">
+          <div class="flex items-center justify-between text-xs font-bold text-blue-900">
+            <span>Mengunduh Pembaruan...</span>
+            <span>{{ progress() }}%</span>
+          </div>
+          <!-- Progress Bar -->
+          <div class="w-full bg-blue-200/60 rounded-full h-3 overflow-hidden p-0.5">
+            <div
+              class="bg-blue-600 h-full rounded-full transition-all duration-200"
+              [style.width.%]="progress()">
+            </div>
+          </div>
+          <p class="text-[11px] text-blue-700 font-medium text-center">Jangan tutup aplikasi saat proses mengunduh berjalan.</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium">
+          {{ error() }}
+        </div>
+      }
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col gap-2 pt-2">
+        @if (!isDownloading()) {
+          <button
+            type="button"
+            (click)="onDownload()"
+            class="btn-no-shadow-primary w-full py-3 flex items-center justify-center gap-2 text-sm sm:text-base font-bold shadow-xs">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Perbarui Sekarang
+          </button>
+
+          @if (!isForce()) {
+            <button
+              type="button"
+              (click)="onDismiss()"
+              class="btn-no-shadow-secondary w-full py-2.5 text-xs sm:text-sm font-semibold">
+              Nanti Saja
+            </button>
+          }
+        } @else {
+          <button
+            type="button"
+            disabled
+            class="w-full py-3 bg-gray-200 text-gray-500 rounded-xl font-bold text-sm cursor-not-allowed flex items-center justify-center gap-2">
+            <div class="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+            Mengunduh... {{ progress() }}%
+          </button>
+        }
+      </div>
+
+    </div>
+  </div>
+}

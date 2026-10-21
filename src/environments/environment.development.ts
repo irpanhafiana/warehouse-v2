@@ -18,5 +18,8 @@ export const environment = {
   is4ClientSecret: 'B2C_Customer_CMS',
   is4Scope:
     'B2C_CMS_Scope Create Update Delete Read General_Scope offline_access',
-};
 
+  // Centralized App Update Center (appsmanager.tokossonlineshop.com)
+  appId: 'com.sjmart.warehouse',
+  versionCheckUrl: 'https://appsmanager.tokossonlineshop.com/api/public/check-update.php',
+};
