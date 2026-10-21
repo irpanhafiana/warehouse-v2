@@ -122,13 +122,18 @@
               <span class="bg-blue-50 text-checkout px-2 py-0.5 rounded-md font-bold">{{ item.Details }} Items</span>
             </div>
             <p class="font-bold text-sm text-slate-800 mt-1">{{ item.DocNum }}</p>
-            <div class="flex items-center gap-1.5 mt-1">
+            <div class="flex flex-col items-start gap-1.5 mt-1">
               @if (item.IsCash) {
               <span class="px-1.5 py-0.5 bg-green-700 text-white text-xs font-bold rounded">Cash</span>
               } @else {
               <span class="px-1.5 py-0.5 bg-[#FF8B00] text-white text-xs font-bold rounded">Credit</span>
               }
-              <span class="text-xs text-gray-600 truncate">{{ item.Name }}</span>
+
+              @if(item.Remarks !== '') {
+              <span class="text-xs text-gray-600 truncate ">{{ item.Remarks }}</span>
+              } @else {
+              <span class="text-xs text-gray-600 truncate ">(Tidak ada catatan)</span>
+              }
             </div>
           </div>
           }
@@ -302,8 +307,7 @@
 @if (isErrorPicSebagian()) {
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div
-    class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-lg font-bold text-red-600">Perhatian!</h2>
       <button type="button"
@@ -331,8 +335,7 @@
 @if (isBonNotFinishPick()) {
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div
-    class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-lg font-bold text-amber-600">Pengingat!</h2>
       <button type="button"
@@ -367,8 +370,7 @@
 @if (isRecehExist()) {
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
-  <div
-    class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
+  <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-lg font-bold text-amber-600">Pengingat!</h2>
       <button type="button"

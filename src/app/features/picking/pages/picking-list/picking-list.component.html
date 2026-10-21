@@ -7,7 +7,7 @@
           Sales Invoice
         </p>
         <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
-          BON Picking
+          BON Picking [{{filteredSalesInvoices.length}}]
         </h1>
       </div>
       <div class="flex flex-row items-center gap-2 shrink-0">
@@ -300,9 +300,10 @@
 }
 
 <!-- Shared Dialog for Ambil BON -->
-<app-dialog-set-pic [isOpen]="isDialogAmbilBON" [isLoading]="isSubmitting" [title]="'Ambil BON'" [confirmText]="'Ambil'" [picList]="pickingPic"
-  (saved)="onAmbilBon($event)" (closed)="closeDialogAmbilBON()"></app-dialog-set-pic>
+<app-dialog-set-pic [isOpen]="isDialogAmbilBON" [isLoading]="isSubmitting" [title]="'Ambil BON'" [confirmText]="'Ambil'"
+  [picList]="pickingPic" (saved)="onAmbilBon($event)" (closed)="closeDialogAmbilBON()"></app-dialog-set-pic>
 
 <!-- Shared Dialog for Ganti PIC -->
-<app-dialog-set-pic [isOpen]="isDialogGantiPIC" [isLoading]="isSubmitting" [title]="'Ganti BON PIC'" [confirmText]="'Ganti PIC'"
-  [picList]="pickingPic" (saved)="onGantiPIC($event)" (closed)="closeDialogGantiPIC()"></app-dialog-set-pic>
+<app-dialog-set-pic [isOpen]="isDialogGantiPIC" [isLoading]="isSubmitting" [title]="'Ganti BON PIC'"
+  [confirmText]="'Ganti PIC'" [picList]="pickingPic" (saved)="onGantiPIC($event)"
+  (closed)="closeDialogGantiPIC()"></app-dialog-set-pic>
