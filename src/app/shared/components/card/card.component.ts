@@ -8,6 +8,9 @@ import { HeaderRes } from '../../../core/models';
   templateUrl: './card.component.html',
   styleUrl: './card.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: {
+    class: 'block w-full',
+  },
 })
 export class CardComponent {
   readonly dataFrom = input<string>('LOADING');
@@ -19,4 +22,3 @@ export class CardComponent {
     this.dialogOpen.emit();
   }
 }
-

@@ -31,7 +31,7 @@
   <!-- Body (Container list + scrollable) -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-32">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[110px]'"></app-loader>
@@ -39,7 +39,6 @@
         <app-loader [width]="'w-full'" [height]="'h-[110px]'"></app-loader>
       </div>
       } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-      <div class="min-h-full">
         <div class="flex flex-col gap-3 pb-8">
           <p class="font-bold text-base text-slate-700 px-1">
             Item yang dikirim:
@@ -60,7 +59,6 @@
           </div>
           }
         </div>
-      </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-20">
         <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
