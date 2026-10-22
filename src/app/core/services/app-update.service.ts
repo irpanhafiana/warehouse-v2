@@ -1,5 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Capacitor } from '@capacitor/core';
 import { App as CapApp } from '@capacitor/app';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { FileOpener } from '@capawesome-team/capacitor-file-opener';
@@ -23,7 +24,10 @@ export class AppUpdateService {
   readonly downloadProgress = signal<number>(0);
   readonly downloadError = signal<string | null>(null);
 
+  readonly isAndroid = signal<boolean>(Capacitor.getPlatform() === 'android');
+
   readonly updateAvailable = computed(() => {
+    if (!this.isAndroid()) return false;
     const data = this.updateData();
     if (!data) return false;
     const isHigher = Number(data.versionCode) > Number(this.localVersionCode());
@@ -42,6 +46,11 @@ export class AppUpdateService {
   });
 
   async initVersionCheck(): Promise<void> {
+    if (!this.isAndroid()) {
+      console.log('[AppUpdate] Skip version check: platform is not Android');
+      return;
+    }
+
     try {
       const info = await CapApp.getInfo();
       const code = parseInt(info.build || '1', 10);

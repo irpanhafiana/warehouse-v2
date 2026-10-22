@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Atas (fix) -->
   <div class="w-full flex flex-col p-4 shrink-0 gap-3">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -78,14 +78,14 @@
 
   <!-- Bawah (container list + scrollable) -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 overflow-y-auto flex flex-col gap-2 pr-1 pb-32">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-32">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
       </div>
       } @else {
-      <div class="h-full">
+      <div class="min-h-full">
         @if (groupResult.length > 0) {
         <div class="flex flex-col gap-2">
           @for (item of groupResult; track item.customerCode || $index) {
@@ -125,7 +125,7 @@
       </button>
     </div>
 
-    <div class="flex-1 overflow-y-auto flex flex-col gap-3 py-1">
+    <div class="flex-1 scrollable-body flex flex-col gap-3 py-1">
       @for (item of detailDocnumCustomer; track item.DocNum || $index) {
       <div
         class="border border-gray-200 hover:border-[#202B6D] bg-white w-full rounded-xl p-4 cursor-pointer transition-all"

@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
   <div class="w-full flex flex-col p-4 shrink-0 gap-3">
     <div class="flex flex-row justify-between items-center gap-2">
@@ -7,7 +7,7 @@
           Loading Gudang
         </p>
         <h1 class="font-bold text-xl sm:text-2xl text-white tracking-tight">
-          Muat Barang BON Picking [{{ groupResult().length }}]
+          Muat Barang [{{ groupResult().length }}]
         </h1>
       </div>
       <div class="flex flex-row items-center gap-2 shrink-0">
@@ -76,7 +76,7 @@
 
   <!-- Main Content Card List -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
       @if (loading()) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
@@ -123,7 +123,7 @@
         </svg>
       </button>
     </div>
-    <div class="flex flex-col gap-2 mt-4 max-h-[60vh] overflow-y-auto">
+    <div class="flex flex-col gap-2 mt-4 max-h-[60vh] scrollable-body">
       @for (item of detailDocnumCustomer(); track item.DocNum) {
       <div class="border border-gray-200 hover:border-checkout w-full rounded-xl p-3 cursor-pointer transition-all"
         (click)="toChecklist(item.DocNum)">

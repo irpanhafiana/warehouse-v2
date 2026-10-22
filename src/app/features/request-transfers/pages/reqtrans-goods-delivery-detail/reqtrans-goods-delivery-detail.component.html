@@ -1,4 +1,4 @@
-<div class="w-full h-screen flex flex-col bg-checkout overflow-hidden">
+<div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar -->
   <div class="w-full p-4 shrink-0 flex flex-col transition-all duration-200">
     <div class="flex flex-row justify-between gap-2 items-center">
@@ -27,7 +27,7 @@
 
   <!-- Kontainer List (Scrollable) -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pr-1 pb-32">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-4 pr-1 pb-32">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>

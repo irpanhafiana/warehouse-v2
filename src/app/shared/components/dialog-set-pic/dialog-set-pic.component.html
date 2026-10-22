@@ -31,7 +31,7 @@
       <label for="picName" class="font-semibold text-gray-600 text-xs tracking-wider uppercase">
         Atau pilih salah satu di bawah:
       </label>
-      <div class="w-full max-h-45 overflow-y-auto flex flex-wrap gap-2 p-1">
+      <div class="w-full max-h-45 scrollable-body flex flex-wrap gap-2 p-1">
         @for (item of picList(); track $index) {
         <button type="button" class="px-3.5 py-1.5 rounded-xl text-sm font-medium transition-all cursor-pointer border"
           [ngClass]="{
