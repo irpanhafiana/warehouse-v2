@@ -24,7 +24,6 @@ import { TruncatePipe } from '../../../../shared/pipes';
     LoaderComponent,
     CardPickingItemComponent,
     DialogSetPicComponent,
-    TruncatePipe
   ],
   templateUrl: './picking-checklist.component.html',
   styleUrl: './picking-checklist.component.css',
@@ -96,11 +95,18 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.docnum = this.route.snapshot.params['docnum'] || '';
     this.dateString = this.route.snapshot.params['date'] || '';
 
-    const savedTab = await this.storageService.get('selectedTab');
+    const [savedTab, cachedPic] = await Promise.all([
+      this.storageService.get('selectedTab'),
+      this.storageService.get('phoneName'),
+    ]);
+
     if (savedTab === 'non-receh' || savedTab === 'receh') {
       this.selectedTab = savedTab;
-      this.cdr.markForCheck();
     }
+    if (cachedPic && !this.selectedPic) {
+      this.selectedPic = cachedPic.toUpperCase();
+    }
+    this.cdr.markForCheck();
 
     if (this.docnum) {
       this.getDetail();
@@ -115,7 +121,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.docnum) {
-          this.getDetail();
+          this.getDetail(true);
         }
       });
   }
@@ -126,37 +132,55 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.off('NotifyPickingLockedUnlocked', this.notifyPickingLockedUnlockedHandler);
   }
 
-  getDetail(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
+  getDetail(silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
     this.service
       .getPickingDetail(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: SalesInvoicesModel) => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.salesInvoice = data;
-          this.checkPIC(data.Remarks);
+          this.checkPIC(data.Remarks, silent);
           this.arrReceh = this.filterRecehDetails(data.Details || []);
           this.arrNonReceh = this.filterNonRecehDetails(data.Details || []);
           this.cdr.markForCheck();
         },
         error: () => {
-          this.loading = false;
-          this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          if (!silent) {
+            this.loading = false;
+            this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          }
           this.cdr.markForCheck();
         },
       });
   }
 
-  checkPIC(picName?: string): void {
-    if (!picName) {
-      this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
-      void this.router.navigate(['/main/picking/list', this.docnum]);
-    } else {
+  checkPIC(picName?: string, isBackgroundSync = false): void {
+    if (picName && picName.trim() !== '') {
       this.selectedPic = picName;
       this.cdr.markForCheck();
+      return;
     }
+
+    // Jika pengguna sudah memiliki selectedPic (sedang aktif mengerjakan BON), pertahankan dan jangan kick out
+    if (this.selectedPic) {
+      return;
+    }
+
+    // Jika ini adalah background sync / reconnect, jangan kick out
+    if (isBackgroundSync) {
+      return;
+    }
+
+    // Hanya tendang keluar jika saat initial load memang tidak ada PIC sama sekali
+    this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
+    void this.router.navigate(['/main/picking/list', this.docnum]);
   }
 
   private filterRecehDetails(details: Detail[]): Detail[] {

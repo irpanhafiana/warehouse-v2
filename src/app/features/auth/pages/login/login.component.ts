@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/services/auth.service';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
@@ -64,23 +63,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.password = environment.posPassword || '';
 
     const existingToken = await this.storage.getItem(STORAGE_KEYS.TOKEN);
+    const existingCloudToken = await this.storage.getItem(STORAGE_KEYS.CLOUD_TOKEN);
+
     if (existingToken) {
-      // Token sudah ada (belum clear cache / force close), jangan minta token lagi
+      // Token lokal sudah ada, fetch data master cabang & PIC
       this.fetchDataInParallel();
 
-      // Cek apakah cloud_token juga perlu dilengkapi di background jika belum ada
-      const existingCloudToken = await this.storage.getItem(STORAGE_KEYS.CLOUD_TOKEN);
+      // Jika cloud_token belum ada, ambil segera
       if (!existingCloudToken && (this.username || this.password)) {
-        this.authService.postLoginCloud(this.username, this.password).subscribe({
-          next: async (cloudLogin) => {
-            await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
-            this.cdr.markForCheck();
-          },
-          error: (e) => {
-            console.warn('Background cloud token fetch warning:', e);
-            this.cdr.markForCheck();
-          },
-        });
+        this.fetchCloudToken();
       }
     } else if (this.username || this.password) {
       // Belum ada token (pertama kali buka aplikasi atau habis clear cache / force close)
@@ -114,12 +105,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.isLoadingPic = true;
     this.cdr.markForCheck();
 
-    // 1. Login ke API lokal gudang (server utama untuk operasional picking, loading, PIC)
+    // 1. Login ke API lokal gudang
     this.authService.postLogin(this.username, this.password).subscribe({
       next: async (apiLogin) => {
         await this.storage.setItem(STORAGE_KEYS.TOKEN, apiLogin.access_token);
         this.cdr.markForCheck();
-        // Begitu token lokal siap, segera ambil branch dan PIC
         this.fetchDataInParallel();
       },
       error: (e) => {
@@ -127,9 +117,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.isLoadingPic = false;
         this.cdr.markForCheck();
       },
+      complete: () => {
+        // 2. Login ke Cloud berurutan setelah API lokal diproses (mengikuti alur stabil)
+        this.fetchCloudToken();
+      },
     });
+  }
 
-    // 2. Login ke Cloud secara paralel (tidak memblokir operasional gudang lokal jika koneksi luar terkendala)
+  fetchCloudToken(): void {
     this.authService.postLoginCloud(this.username, this.password).subscribe({
       next: async (cloudLogin) => {
         await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
@@ -229,4 +224,3 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 }
-

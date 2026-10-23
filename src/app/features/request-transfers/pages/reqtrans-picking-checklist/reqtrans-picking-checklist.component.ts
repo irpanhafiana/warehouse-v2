@@ -54,7 +54,7 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
   private notifyNewDeliveryBoxUsedHandler = (salesInvoiceModel: string): void => {
     const resp = parseSignalRPayload<{ DocNum?: string }>(salesInvoiceModel);
     if (resp?.DocNum === this.docnum) {
-      this.getDetail();
+      this.getDetail(true);
     }
   };
 
@@ -103,7 +103,7 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.docnum) {
-          this.getDetail();
+          this.getDetail(true);
         }
       });
   }
@@ -115,38 +115,57 @@ export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
     this.signalRService.off('NotifyDeliveryPickingLockedUnlocked', this.notifyDeliveryPickingLockedUnlockedHandler);
   }
 
-  getDetail(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
+  getDetail(silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
 
     this.pickingService
       .getPickingDetail(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.salesInvoice = data;
-          this.checkPIC(this.salesInvoice?.Remarks || '');
+          this.checkPIC(this.salesInvoice?.Remarks || '', silent);
           this.arrReceh = this.filterRecehDetails(data?.Details || []);
           this.arrNonReceh = this.filterNonRecehDetails(data?.Details || []);
           this.cdr.markForCheck();
         },
         error: (e) => {
           console.error('Get picking detail error:', e);
-          this.loading = false;
-          this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          if (!silent) {
+            this.loading = false;
+            this.toastr.error('Terjadi kesalahan saat mengambil data detail', 'Error');
+          }
           this.cdr.markForCheck();
         },
       });
   }
 
-  checkPIC(picName: string): void {
-    if (!picName || picName.trim() === '') {
-      this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
-      void this.router.navigate(['/main-reqtrans/picking/list', this.docnum]);
-    } else {
+  checkPIC(picName: string, isBackgroundSync = false): void {
+    if (picName && picName.trim() !== '') {
       this.selectedPic = picName;
+      this.cdr.markForCheck();
+      return;
     }
+
+    // Jika pengguna sudah memiliki selectedPic (sedang aktif mengerjakan BON), pertahankan dan jangan kick out
+    if (this.selectedPic) {
+      return;
+    }
+
+    // Jika ini adalah background sync / reconnect, jangan kick out
+    if (isBackgroundSync) {
+      return;
+    }
+
+    // Hanya tendang keluar jika saat initial load memang tidak ada PIC sama sekali
+    this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
+    void this.router.navigate(['/main-reqtrans/picking/list', this.docnum]);
   }
 
   getPickingPicList(): void {

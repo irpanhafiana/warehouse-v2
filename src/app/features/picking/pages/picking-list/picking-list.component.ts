@@ -103,7 +103,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.dateString) {
-          this.fetchPickingData();
+          this.fetchPickingData(true);
         }
       });
   }
@@ -160,9 +160,11 @@ export class PickingListComponent implements OnInit, OnDestroy {
     return false;
   }
 
-  fetchPickingData(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
+  fetchPickingData(silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
     this.pickingService
       .getPickingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -179,11 +181,15 @@ export class PickingListComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (): void => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.cdr.markForCheck();
         },
         complete: (): void => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.cdr.markForCheck();
         },
       });

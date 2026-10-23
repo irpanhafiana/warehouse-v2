@@ -51,17 +51,19 @@ export function authInterceptor(
     return false;
   };
 
-  // Tentukan jenis target URL (jangan attach Bearer token untuk endpoint request token)
-  if (req.url.startsWith(environment.is4urlTOKEN)) {
+  // PENTING: Urutan evaluasi harus memeriksa isIS4CloudTarget() SEBELUM is4urlTOKEN
+  // karena pada environment.ts, is4urlTOKEN ('https://tokosuburjaya.com/') merupakan prefix
+  // dari is4urlCloud ('https://tokosuburjaya.com:17800/pos-api/').
+  if (!isTokenRequest && isIS4CloudTarget()) {
+    if (cloudToken) {
+      headers['Authorization'] = `Bearer ${cloudToken}`;
+    }
+  } else if (req.url.startsWith(environment.is4urlTOKEN)) {
     const credentials = btoa(`${environment.is4ClientID}:${environment.is4ClientSecret}`);
     headers['Authorization'] = `Basic ${credentials}`;
   } else if (req.url.startsWith(environment.is4urlCMS)) {
     if (is4Token) {
       headers['Authorization'] = `Bearer ${is4Token}`;
-    }
-  } else if (!isTokenRequest && isIS4CloudTarget()) {
-    if (cloudToken) {
-      headers['Authorization'] = `Bearer ${cloudToken}`;
     }
   } else if (!isTokenRequest && req.url.startsWith(environment.api)) {
     if (authToken) {
@@ -75,4 +77,3 @@ export function authInterceptor(
 
   return next(req);
 }
-

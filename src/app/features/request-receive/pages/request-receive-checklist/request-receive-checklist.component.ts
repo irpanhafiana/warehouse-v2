@@ -85,7 +85,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
 
     this.signalRService.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.fetchRequestReceiveChecklist());
+      .subscribe(() => this.fetchRequestReceiveChecklist(true));
   }
 
   ngOnDestroy(): void {
@@ -123,16 +123,20 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
     this.fetchRequestReceiveChecklist();
   }
 
-  fetchRequestReceiveChecklist(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
+  fetchRequestReceiveChecklist(silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
 
     this.service
       .getRequestReceiveChecklist(this.docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.inventoryRequest = data;
           this.initialData = (data?.Details || []).map((d) => ({ ...d }));
 
@@ -157,8 +161,10 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.error('Fetch checklist error:', e);
-          this.loading = false;
-          this.toastr.error('Gagal memuat checklist penerimaan', 'Error');
+          if (!silent) {
+            this.loading = false;
+            this.toastr.error('Gagal memuat checklist penerimaan', 'Error');
+          }
           this.cdr.markForCheck();
         },
       });

@@ -148,7 +148,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
     this.signalrService.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.onRefresh());
+      .subscribe(() => this.onRefresh(true));
   }
 
   ngOnDestroy(): void {
@@ -157,14 +157,18 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.off('NotifyNewReturn', this.notifyNewReturnHandler);
   }
 
-  getDetailByCustomerCode(dateString: string, customerCode: string): void {
-    this.loadingBonBaru.set(true);
+  getDetailByCustomerCode(dateString: string, customerCode: string, silent = false): void {
+    if (!silent) {
+      this.loadingBonBaru.set(true);
+    }
     this.loadingService
       .getLoadingDetailByCustomerCode(dateString, customerCode)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: HeaderRes[]) => {
-          this.loadingBonBaru.set(false);
+          if (!silent) {
+            this.loadingBonBaru.set(false);
+          }
           const sorted = [...(data || [])].sort((a, b) => {
             const dateCompare = (b.DocDate || '').localeCompare(a.DocDate || '');
             if (dateCompare !== 0) return dateCompare;
@@ -174,25 +178,31 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: () => {
-          this.loadingBonBaru.set(false);
+          if (!silent) {
+            this.loadingBonBaru.set(false);
+          }
           this.cdr.markForCheck();
         },
       });
   }
 
-  getLoadingDetail(docnum: string, index?: number): void {
+  getLoadingDetail(docnum: string, index?: number, silent = false): void {
     this.selectedBON.set(docnum);
     if (index !== undefined) {
       this.toggleText(index);
     }
 
-    this.loading.set(true);
+    if (!silent) {
+      this.loading.set(true);
+    }
     this.loadingService
       .getLoadingDetail(docnum)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: SalesInvoicesModel) => {
-          this.loading.set(false);
+          if (!silent) {
+            this.loading.set(false);
+          }
           (data.Details || []).forEach((element) => {
             element.isDone = false;
             element.isSebagian = false;
@@ -218,11 +228,12 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: () => {
-          this.loading.set(false);
-          this.isErrorUnknown.set(true);
+          if (!silent) {
+            this.loading.set(false);
+            this.isErrorUnknown.set(true);
+            this.toastr.error('Silahkan cek item yang belum di pick', 'Peringatan');
+          }
           this.cdr.markForCheck();
-          this.toastr.error('Silahkan cek item yang belum di pick', 'Peringatan');
-          void this.router.navigate(['/main/picking/checklist', this.docnum(), this.dateString()]);
         },
         complete: () => {
           this.getPickingPicList();
@@ -605,9 +616,9 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  onRefresh(): void {
-    this.getDetailByCustomerCode(this.dateString(), this.docnum());
-    this.getLoadingDetail(this.selectedBON());
+  onRefresh(silent = false): void {
+    this.getDetailByCustomerCode(this.dateString(), this.docnum(), silent);
+    this.getLoadingDetail(this.selectedBON(), undefined, silent);
   }
 
   toCheckout(docnum: string): void {

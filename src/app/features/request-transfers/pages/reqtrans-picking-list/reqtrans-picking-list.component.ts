@@ -96,7 +96,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         if (this.dateString) {
-          this.fetchPickingData();
+          this.fetchPickingData(true);
         }
       });
   }
@@ -118,9 +118,11 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
     this.dateString = filter.dateString;
   }
 
-  fetchPickingData(): void {
-    this.loading = true;
-    this.cdr.markForCheck();
+  fetchPickingData(silent = false): void {
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
 
     this.pickingService
       .getPickingList(this.dateString)
@@ -134,13 +136,17 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
           this.generateAreaList(this.headerRes);
           this.generateAlphabet(this.headerRes);
           this.applyFilter();
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.cdr.markForCheck();
         },
         error: (e) => {
           console.error('Fetch picking list error:', e);
-          this.loading = false;
-          this.toastr.error('Gagal memuat daftar picking pengiriman', 'Error');
+          if (!silent) {
+            this.loading = false;
+            this.toastr.error('Gagal memuat daftar picking pengiriman', 'Error');
+          }
           this.cdr.markForCheck();
         },
       });

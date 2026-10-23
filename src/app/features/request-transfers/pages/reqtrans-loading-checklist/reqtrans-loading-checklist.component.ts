@@ -115,7 +115,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
 
     this.signalRService.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.onRefresh());
+      .subscribe(() => this.onRefresh(true));
   }
 
   ngOnDestroy(): void {
@@ -144,10 +144,12 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getLoadingDetail(docnum: string, index?: number): void {
+  getLoadingDetail(docnum: string, index?: number, silent = false): void {
     this.selectedBON = docnum;
-    this.loading = true;
-    this.cdr.markForCheck();
+    if (!silent) {
+      this.loading = true;
+      this.cdr.markForCheck();
+    }
 
     this.getPickingPicList();
     this.getNotPickedItem();
@@ -158,7 +160,9 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: SalesInvoicesModel) => {
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           data?.Details?.forEach((element: any) => {
             element.isDone = false;
             element.isSebagian = false;
@@ -174,7 +178,9 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: (e) => {
           console.error('Get loading detail error:', e);
-          this.loading = false;
+          if (!silent) {
+            this.loading = false;
+          }
           this.cdr.markForCheck();
         },
       });
@@ -575,9 +581,9 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     this.location.back();
   }
 
-  onRefresh(): void {
+  onRefresh(silent = false): void {
     this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
-    this.getLoadingDetail(this.selectedBON);
+    this.getLoadingDetail(this.selectedBON, undefined, silent);
   }
 }
 

@@ -13,6 +13,7 @@ import { catchError } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
 import { StorageService, STORAGE_KEYS } from '../services/storage.service';
+import { environment } from '../../../environments/environment';
 
 export const httpErrorInterceptor: HttpInterceptorFn = (
   req: HttpRequest<unknown>,
@@ -38,15 +39,23 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
       const targetUrl = req.url;
 
       if (error.status === 401) {
-        storage.removeItem(STORAGE_KEYS.TOKEN);
-        storage.removeItem(STORAGE_KEYS.CLOUD_TOKEN);
+        const isCloudError = !!(environment.is4urlCloud && req.url.startsWith(environment.is4urlCloud));
+
+        if (isCloudError) {
+          // Hanya hapus cloud token agar sesi operasional lokal gudang tidak ikut terputus
+          storage.removeItem(STORAGE_KEYS.CLOUD_TOKEN);
+        } else {
+          storage.removeItem(STORAGE_KEYS.TOKEN);
+          storage.removeItem(STORAGE_KEYS.CLOUD_TOKEN);
+        }
 
         // Hindari loop redirect jika user sudah di halaman login atau error berasal dari request token itu sendiri
         const currentUrl = router.url;
         const isLoginUrl = currentUrl === '/' || currentUrl === '' || currentUrl.startsWith('/?');
         const isAuthRequest = req.url.includes('token') || req.url.includes('connect/token');
 
-        if (!isLoginUrl && !isAuthRequest) {
+        // Jika error 401 hanya dari cloud request, jangan paksa kickout ke root halaman login utama gudang
+        if (!isLoginUrl && !isAuthRequest && !isCloudError) {
           router.navigateByUrl('/');
         }
       }
@@ -84,4 +93,3 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
     })
   );
 };
-
