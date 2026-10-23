@@ -71,7 +71,7 @@
       @if (arrReceh.length > 0) {
       <div class="flex flex-col gap-2">
         @for (item of arrReceh; track item.Id) {
-        @if (item.ProductModel?.Name?.toLowerCase() !== 'receh') {
+        @if (item.ProductModel.Name.toLowerCase() !== 'receh') {
         <div class="relative rounded-xl p-4 transition-all duration-200 border" [ngClass]="{
           'bg-emerald-300 border-emerald-400': item.Remarks,
           'bg-white border-gray-200': !item.Remarks
@@ -84,13 +84,13 @@
             </span>
             }
             <h2 class="font-bold text-slate-800 text-base sm:text-lg leading-snug">
-              {{ item.ProductModel?.Name }}
+              {{ item.ProductModel.Name }}
             </h2>
           </div>
 
           <div class="flex flex-row justify-between items-center mt-2">
             <span class="font-semibold text-gray-600 text-sm sm:text-base">
-              {{ item.Quantity }} {{ item.UoMModel?.Code }} ({{ item.BaseQuantity }})
+              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
             </span>
           </div>
 
@@ -145,13 +145,13 @@
             </span>
             }
             <h2 class="font-bold text-slate-800 text-base sm:text-lg leading-snug">
-              {{ item.ProductModel?.Name }}
+              {{ item.ProductModel.Name }}
             </h2>
           </div>
 
           <div class="flex flex-row justify-between items-center mt-2">
             <span class="font-semibold text-gray-600 text-sm sm:text-base">
-              {{ item.Quantity }} {{ item.UoMModel?.Code }} ({{ item.BaseQuantity }})
+              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
             </span>
           </div>
 
@@ -205,3 +205,4 @@
 <!-- Modal Picker -->
 <app-dialog-set-pic [isOpen]="isDialogOpen" title="Pilih Picker" confirmText="Pilih & Selesai" [currentPic]="picName"
   [picList]="pickingPic" (saved)="onPicSelected($event)" (closed)="isDialogOpen = false"></app-dialog-set-pic>
+
