@@ -16,7 +16,7 @@
           aria-label="Refresh">
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
-        <app-button-home></app-button-home>
+        <app-button-home />
       </div>
     </div>
 
@@ -186,12 +186,12 @@
   }
 </div>
 
-<app-navbar></app-navbar>
+<app-navbar />
 
 <!-- Floating trigger button -->
 <div class="fixed bottom-23.75 right-3 z-30">
   <button type="button"
-    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all shadow-md"
+    class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all shadow-xs"
     (click)="isShowMenu = true" aria-label="Menu Aksi">
     <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
   </button>

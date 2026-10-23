@@ -128,6 +128,10 @@ export class SignalrService {
       clearTimeout(this.retryDelayTimer);
       this.retryDelayTimer = null;
     }
+    if (this.appStateListenerHandle) {
+      void this.appStateListenerHandle.remove();
+      this.appStateListenerHandle = null;
+    }
     void this.hubConnection?.stop();
   }
 

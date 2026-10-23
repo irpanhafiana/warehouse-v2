@@ -16,7 +16,7 @@
           aria-label="Refresh">
           <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
-        <app-button-home></app-button-home>
+        <app-button-home />
       </div>
     </div>
 
@@ -106,12 +106,12 @@
 </div>
 
 <!-- Bottom Navigation Bar -->
-<app-navbar></app-navbar>
+<app-navbar />
 
 <!-- Dialog Detail Docnum -->
 @if (isDialogDetailDocnum) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
-  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200">
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+  <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">DocNum Selesai</h2>
       <button type="button"

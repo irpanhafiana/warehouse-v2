@@ -194,6 +194,10 @@ Use the defined flat utility classes in `src/styles.css`:
 - **Assets Sync**: After building web code with `ng build`, always synchronize via `npx cap sync android`.
 - **Hardware Integration**: Barcode scanner, camera, or push notifications must use verified Capacitor plugins or fallback web APIs gracefully.
 - **Safe Areas**: Account for top status bars and bottom navigation bars on Android devices (avoid content cutoff).
+- **APK Production Release Versioning**: Setiap kali ada perintah untuk **build APK PRODUCTION RELEASE**, WAJIB melakukan auto-increment pada ndroid/app/build.gradle sebelum proses build:
+  - `versionCode`: increment bertambah 1 (contoh: `2` -> `3`).
+  - `versionName`: increment patch version bertambah 1 (contoh: `"1.0.1"` -> `"1.0.2"`).
+  - Pastikan juga versi yang ditampilkan di UI (`appVersion` di `src/app/features/auth/pages/login/login.component.ts`) diselaraskan dengan `versionName` baru tersebut.
 
 ---
 

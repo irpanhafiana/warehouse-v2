@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef, ChangeDetectionStrategy, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../../environments/environment';
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private sharedDataService = inject(SharedDataService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   private forceCloseTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -39,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   defaultBranch = '';
 
   phoneName: string | null = null;
-  appVersion = 'v1.0.1';
+  appVersion = 'v1.0.2';
   pickingPic: string[] = [];
 
   isLoadingPic = false;
@@ -106,7 +108,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
 
     // 1. Login ke API lokal gudang
-    this.authService.postLogin(this.username, this.password).subscribe({
+    this.authService.postLogin(this.username, this.password).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (apiLogin) => {
         await this.storage.setItem(STORAGE_KEYS.TOKEN, apiLogin.access_token);
         this.cdr.markForCheck();
@@ -125,7 +127,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   fetchCloudToken(): void {
-    this.authService.postLoginCloud(this.username, this.password).subscribe({
+    this.authService.postLoginCloud(this.username, this.password).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (cloudLogin) => {
         await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, cloudLogin.access_token);
         this.cdr.markForCheck();
@@ -138,7 +140,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   fetchDataInParallel(): void {
-    this.salesInvoiceService.getDefaultBranch().subscribe({
+    this.salesInvoiceService.getDefaultBranch().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (branch) => {
         await this.storage.setItem(STORAGE_KEYS.DEFAULT_BRANCH, branch);
         this.defaultBranch = branch;
@@ -150,7 +152,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
     });
 
-    this.sharedDataService.getPicList().subscribe({
+    this.sharedDataService.getPicList().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (pics) => {
         this.pickingPic = pics;
         this.sharedDataService.setPicList(pics);

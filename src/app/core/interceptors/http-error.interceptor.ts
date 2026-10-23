@@ -27,8 +27,16 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
       // Jika status HTTP 200 tapi masuk catchError, berarti server mengembalikan string non-JSON (sukses)
       if (error.status === 200) {
+        let parsedBody: unknown = error.error?.text ?? error.message ?? null;
+        if (typeof parsedBody === 'string') {
+          try {
+            parsedBody = JSON.parse(parsedBody);
+          } catch {
+            // Biarkan format string jika memang bukan JSON
+          }
+        }
         return of(new HttpResponse({
-          body: error.error?.text ?? error.message ?? null,
+          body: parsedBody,
           status: 200,
           statusText: 'OK',
           url: req.url,
