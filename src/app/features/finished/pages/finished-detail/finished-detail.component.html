@@ -2,7 +2,7 @@
   <!-- Top Bar -->
   <div class="w-full flex flex-col p-4 shrink-0">
     <div class="flex flex-row justify-between items-center gap-2">
-      <div class="flex flex-row items-center gap-3">
+      <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="onBack()"
           class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
           <img src="/arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
@@ -23,7 +23,7 @@
 
   <!-- Content Container -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Items List -->
-      <div class="flex flex-col gap-3 mt-2">
+      <div class="flex flex-col gap-2 mt-2">
         <h2 class="font-bold text-base text-slate-700 px-1">Daftar Item:</h2>
         @for (item of salesInvoice.Details; track item.Id || item.DetailId || $index) {
         <div class="w-full rounded-xl p-4 relative border transition-all" [ngClass]="{

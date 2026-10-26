@@ -62,7 +62,7 @@
 
   <!-- Content Container -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
@@ -72,7 +72,8 @@
       <div class="flex flex-col gap-2 pb-8">
         <div class="flex flex-row justify-end gap-2">
           @if (isUrutkan) {
-          <button type="button" [disabled]="isLoading" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSubmit()">
+          <button type="button" [disabled]="isLoading" class="btn-no-shadow-primary text-sm py-2 px-4 cursor-pointer"
+            [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSubmit()">
             {{ isLoading ? 'Menyimpan...' : 'Simpan Urutan' }}
           </button>
           } @else {
@@ -95,7 +96,7 @@
         </div>
 
         @if (!isUrutkan) {
-        <div class="flex flex-col gap-3 mt-1">
+        <div class="flex flex-col gap-2 mt-1">
           @for (item of filteredDetails; track item.Id || item.DocNum || $index) {
           <div class="w-full border rounded-xl p-4 transition-all" [ngClass]="{
               'bg-amber-200 border-amber-300': item.newlyAdded,
@@ -201,7 +202,7 @@
           }
         </div>
         } @else {
-        <div class="flex flex-col gap-3 mt-1">
+        <div class="flex flex-col gap-2 mt-1">
           @for (item of filteredDetails; let i = $index; let first = $first; let last = $last; track item.Id || i) {
           <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all">
             <div class="flex flex-col gap-2">
@@ -272,11 +273,9 @@
 
 @if (data && filteredDetails && filteredDetails.length > initialLength) {
 <div class="fixed bottom-32.5 right-3 z-30">
-  <button type="button"
-    [disabled]="isLoading"
+  <button type="button" [disabled]="isLoading"
     class="btn-no-shadow-success py-2.5 px-5 text-sm cursor-pointer transition-all flex items-center gap-1.5"
-    [ngClass]="{'opacity-50 pointer-events-none': isLoading}"
-    (click)="onSubmit()">
+    [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onSubmit()">
     {{ isLoading ? 'Menyimpan...' : '✔ Simpan Perubahan' }}
   </button>
 </div>
@@ -338,7 +337,7 @@
     }
 
     @if (selectedDriverName && selectedVehicle) {
-    <div class="grid grid-cols-2 gap-3 mt-4">
+    <div class="grid grid-cols-2 gap-2 mt-4">
       <button type="button" class="btn-no-shadow-secondary py-2.5 rounded-xl cursor-pointer"
         (click)="closeDialogRekap()">
         Tutup
@@ -393,12 +392,13 @@
         akan dihapus dari jalur ini?
       </p>
     </div>
-    <div class="grid grid-cols-2 gap-3 mt-4">
+    <div class="grid grid-cols-2 gap-2 mt-4">
       <button type="button" class="btn-no-shadow-secondary py-2.5 rounded-xl cursor-pointer"
         (click)="isDialogConfirmDelete = false">
         Tutup
       </button>
-      <button type="button" [disabled]="isLoading" class="btn-no-shadow-danger py-2.5 rounded-xl cursor-pointer" [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onHapusBON()">
+      <button type="button" [disabled]="isLoading" class="btn-no-shadow-danger py-2.5 rounded-xl cursor-pointer"
+        [ngClass]="{'opacity-50 pointer-events-none': isLoading}" (click)="onHapusBON()">
         {{ isLoading ? 'Menghapus...' : 'Yakin' }}
       </button>
     </div>

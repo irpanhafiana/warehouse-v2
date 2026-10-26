@@ -1,6 +1,6 @@
 <div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full flex flex-col p-4 shrink-0 gap-3">
+  <div class="w-full flex flex-col p-4 shrink-0 gap-2">
     <div class="flex flex-row justify-between gap-2 items-center">
       <div class="flex flex-col min-w-0">
         <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
@@ -30,7 +30,7 @@
   <!-- Body Container -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
@@ -38,76 +38,76 @@
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
       </div>
       } @else {
-        @if (filteredSalesInvoices.length > 0) {
-        <div class="flex flex-col gap-3 mt-1">
-          @for (item of filteredSalesInvoices; track item.DocNum || $index) {
-          <div class="w-full flex items-start bg-white border border-gray-200 rounded-xl p-4 transition-all h-auto">
-            <div class="flex flex-col gap-2 w-full">
-              <div class="flex flex-row gap-2 items-center">
-                <img src="location.png" class="w-8 sm:w-10 object-contain" alt="Location" />
-                <div class="flex flex-col">
-                  <p class="text-xl sm:text-2xl font-bold text-slate-800">{{ item.Area }}</p>
-                  <p class="text-xs sm:text-sm font-semibold text-gray-500">
-                    {{ item.DocDate | date : 'dd MMM yyyy' }}
-                  </p>
-                </div>
-              </div>
-
-              <div class="flex justify-between items-center bg-gray-50 rounded-xl p-2.5">
-                <div class="flex flex-col">
-                  <small class="text-gray-500 text-xs sm:text-sm font-semibold">DocNum</small>
-                  <p class="font-bold text-base sm:text-lg text-slate-800">
-                    {{ item.DocNum }}
-                  </p>
-                </div>
-                <div class="flex flex-col text-end">
-                  <small class="text-gray-500 text-xs sm:text-sm font-semibold">Total Item</small>
-                  <p class="font-bold text-base sm:text-lg text-slate-800">
-                    {{ item.Details }}
-                  </p>
-                </div>
-              </div>
-
+      @if (filteredSalesInvoices.length > 0) {
+      <div class="flex flex-col gap-2 mt-1">
+        @for (item of filteredSalesInvoices; track item.DocNum || $index) {
+        <div class="w-full flex items-start bg-white border border-gray-200 rounded-xl p-4 transition-all h-auto">
+          <div class="flex flex-col gap-2 w-full">
+            <div class="flex flex-row gap-2 items-center">
+              <img src="location.png" class="w-8 sm:w-10 object-contain" alt="Location" />
               <div class="flex flex-col">
-                <p class="font-semibold text-xs sm:text-sm text-gray-500">Dari Toko Cabang</p>
-                <p class="font-bold text-lg sm:text-xl text-slate-800">{{ item.Name }}</p>
-              </div>
-
-              @if (item.Note) {
-              <div class="flex flex-col bg-amber-50 rounded-xl p-2 border border-amber-200">
-                <p class="font-bold text-xs text-amber-700">Catatan Kasir</p>
-                <p class="font-medium text-xs sm:text-sm text-slate-800">{{ item.Note }}</p>
-              </div>
-              }
-
-              @if (item.Remarks) {
-              <div class="flex flex-col">
-                <p class="font-medium text-xs sm:text-sm text-slate-600">
-                  BON dikerjakan oleh
-                  <span class="underline font-bold uppercase text-slate-800">{{ item.Remarks }}</span>
+                <p class="text-xl sm:text-2xl font-bold text-slate-800">{{ item.Area }}</p>
+                <p class="text-xs sm:text-sm font-semibold text-gray-500">
+                  {{ item.DocDate | date : 'dd MMM yyyy' }}
                 </p>
               </div>
-              }
+            </div>
 
-              <div class="mt-2">
-                <button type="button"
-                  class="btn-no-shadow-primary w-full py-2.5 text-base font-bold text-center rounded-xl cursor-pointer"
-                  (click)="toDetail(item.DocNum)">
-                  Lihat Detail
-                </button>
+            <div class="flex justify-between items-center bg-gray-50 rounded-xl p-2.5">
+              <div class="flex flex-col">
+                <small class="text-gray-500 text-xs sm:text-sm font-semibold">DocNum</small>
+                <p class="font-bold text-base sm:text-lg text-slate-800">
+                  {{ item.DocNum }}
+                </p>
+              </div>
+              <div class="flex flex-col text-end">
+                <small class="text-gray-500 text-xs sm:text-sm font-semibold">Total Item</small>
+                <p class="font-bold text-base sm:text-lg text-slate-800">
+                  {{ item.Details }}
+                </p>
               </div>
             </div>
+
+            <div class="flex flex-col">
+              <p class="font-semibold text-xs sm:text-sm text-gray-500">Dari Toko Cabang</p>
+              <p class="font-bold text-lg sm:text-xl text-slate-800">{{ item.Name }}</p>
+            </div>
+
+            @if (item.Note) {
+            <div class="flex flex-col bg-amber-50 rounded-xl p-2 border border-amber-200">
+              <p class="font-bold text-xs text-amber-700">Catatan Kasir</p>
+              <p class="font-medium text-xs sm:text-sm text-slate-800">{{ item.Note }}</p>
+            </div>
+            }
+
+            @if (item.Remarks) {
+            <div class="flex flex-col">
+              <p class="font-medium text-xs sm:text-sm text-slate-600">
+                BON dikerjakan oleh
+                <span class="underline font-bold uppercase text-slate-800">{{ item.Remarks }}</span>
+              </p>
+            </div>
+            }
+
+            <div class="mt-2">
+              <button type="button"
+                class="btn-no-shadow-primary w-full py-2.5 text-base font-bold text-center rounded-xl cursor-pointer"
+                (click)="toDetail(item.DocNum)">
+                Lihat Detail
+              </button>
+            </div>
           </div>
-          }
-        </div>
-        } @else {
-        <div class="flex items-center justify-center flex-col pt-20">
-          <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
-          <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
-            Ooops, tidak ada BON penerimaan di tanggal ini :(
-          </p>
         </div>
         }
+      </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-20">
+        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
+        <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
+          Ooops, tidak ada BON penerimaan di tanggal ini :(
+        </p>
+      </div>
+      }
       }
     </div>
   </div>

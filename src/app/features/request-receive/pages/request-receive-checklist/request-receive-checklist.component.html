@@ -62,7 +62,7 @@
 
   <!-- Body Container -->
   <div
-    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col gap-3 overflow-hidden">
+    class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col gap-2 overflow-hidden">
     <!-- Catatan Kasir (jika ada) -->
     @if (!loading && inventoryRequest?.Note && inventoryRequest?.Note !== '\r\n') {
     <div class="w-full bg-amber-50 border border-amber-200 rounded-xl p-3">
@@ -74,7 +74,7 @@
     }
 
     <!-- Scrollable Content -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
@@ -83,7 +83,7 @@
       </div>
       } @else {
       <!-- PIC Selector & Actions -->
-      <div class="flex flex-col gap-3 mt-1">
+      <div class="flex flex-col gap-2 mt-1">
         <div class="flex flex-row justify-between w-full gap-2 items-center">
           <div class="flex-1">
             <select id="dropdown" name="dropdown"
@@ -136,7 +136,7 @@
         }
 
         <!-- Checklist Item Cards -->
-        <div class="flex flex-col gap-3 mb-24">
+        <div class="flex flex-col gap-2 mb-24">
           @for (item of filteredData; track item.Id || item.LineNo || $index) {
           <div class="w-full relative border rounded-xl p-4 transition-all duration-200" [ngClass]="getCardClass(item)">
             @if (item.LineStatus === 'Close') {
@@ -178,7 +178,7 @@
                 Batalkan
               </button>
               } @else {
-              <div class="flex justify-end items-center gap-3">
+              <div class="flex justify-end items-center gap-2">
                 <button type="button" (click)="decreaseQty($index)"
                   class="w-8 h-8 flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white rounded-lg font-bold text-lg disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer active:scale-95 transition-all"
                   [disabled]="item.Quantity <= 1">
@@ -234,7 +234,9 @@
   <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Bagikan BON</h2>
-      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer" (click)="closeDialogBarcode()" aria-label="Tutup">
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="closeDialogBarcode()" aria-label="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -261,7 +263,9 @@
   <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-red-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-red-600">Peringatan!</h2>
-      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer" (click)="isContra = false" aria-label="Tutup">
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isContra = false" aria-label="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -290,7 +294,9 @@
   <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
     <div class="flex justify-between items-center pb-3 border-b border-gray-200">
       <h2 class="text-xl font-bold text-[#202B6D]">Perhatian</h2>
-      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer" (click)="isErrorPicSebagian = false" aria-label="Tutup">
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="isErrorPicSebagian = false" aria-label="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
         </svg>

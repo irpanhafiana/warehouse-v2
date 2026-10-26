@@ -31,7 +31,7 @@
   <!-- Body (Container list + scrollable) -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[110px]'"></app-loader>
@@ -39,26 +39,26 @@
         <app-loader [width]="'w-full'" [height]="'h-[110px]'"></app-loader>
       </div>
       } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-        <div class="flex flex-col gap-3 pb-8">
-          <p class="font-bold text-base text-slate-700 px-1">
-            Item yang dikirim:
+      <div class="flex flex-col gap-2 pb-8">
+        <p class="font-bold text-base text-slate-700 px-1">
+          Item yang dikirim:
+        </p>
+        @for (item of inventoryRequest.Details; track item.Id || item.LineNo || $index) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-1.5">
+          @if (item.Remarks) {
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+            {{ item.Remarks }}
           </p>
-          @for (item of inventoryRequest.Details; track item.Id || item.LineNo || $index) {
-          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-1.5">
-            @if (item.Remarks) {
-            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              {{ item.Remarks }}
-            </p>
-            }
-            <h2 class="text-lg sm:text-xl text-slate-800 font-bold leading-snug">
-              {{ item.ProductModel.Name }}
-            </h2>
-            <p class="text-base font-bold text-slate-700">
-              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-            </p>
-          </div>
           }
+          <h2 class="text-lg sm:text-xl text-slate-800 font-bold leading-snug">
+            {{ item.ProductModel.Name }}
+          </h2>
+          <p class="text-base font-bold text-slate-700">
+            {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+          </p>
         </div>
+        }
+      </div>
       } @else {
       <div class="flex items-center justify-center flex-col pt-20">
         <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
@@ -110,7 +110,7 @@
       </p>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mt-2">
+    <div class="grid grid-cols-2 gap-2 mt-2">
       <button type="button"
         class="btn-no-shadow-secondary w-full py-2.5 text-center rounded-xl font-bold cursor-pointer"
         (click)="isConfirmDialogOpen = false">

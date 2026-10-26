@@ -23,7 +23,7 @@
   </div>
 
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
@@ -34,7 +34,7 @@
 
       @if(statusSelected === 'ONGOING'){
       @for (item of deliveriesWithoutRemarks; track item.Alias || item.DocNum || $index) {
-      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-3">
+      <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-2">
         <div class="grid grid-cols-2 justify-between">
           <div class="flex flex-col items-start">
             <small class="text-gray-500 text-xs font-semibold">Tanggal</small>
@@ -94,15 +94,15 @@
 
       @if(statusSelected === 'HISTORY') {
       @for (remarksKey of objectKeys(deliveriesWithRemarks); track remarksKey) {
-      <div class="w-full bg-white border border-gray-200 rounded-xl overflow-hidden mb-4">
-        <div class="w-full bg-[#202B6D] py-2.5 px-4">
+      <div class="w-full bg-white border border-gray-200 rounded-xl mb-4">
+        <div class="w-full bg-[#202B6D] py-2.5 px-4 rounded-t-xl">
           <p class="font-bold text-base text-white text-start">
             Nomor: {{ remarksKey }}
           </p>
         </div>
-        <div class="p-3 flex flex-col gap-3">
+        <div class="p-3 flex flex-col gap-2">
           @for (item of deliveriesWithRemarks[remarksKey]; track item.Alias || item.DocNum || $index) {
-          <div class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col gap-3">
+          <div class="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 flex flex-col gap-2">
             <div class="grid grid-cols-2 justify-between">
               <div class="flex flex-col items-start">
                 <small class="text-gray-500 text-xs font-semibold">Tanggal</small>
@@ -180,13 +180,7 @@
 }
 
 @if (isErrorPicSebagian) {
-<app-dialog-confirm
-  [title]="'Konfirmasi Mobil Siap Jalan'"
-  [message]="msgError"
-  [confirmText]="'Ya, Siap Jalan'"
-  [confirmBtnClass]="'btn-no-shadow-primary'"
-  [isLoading]="isLoading"
-  (cancel)="isErrorPicSebagian = false"
-  (confirm)="onSubmit()"
-/>
+<app-dialog-confirm [title]="'Konfirmasi Mobil Siap Jalan'" [message]="msgError" [confirmText]="'Ya, Siap Jalan'"
+  [confirmBtnClass]="'btn-no-shadow-primary'" [isLoading]="isLoading" (cancel)="isErrorPicSebagian = false"
+  (confirm)="onSubmit()" />
 }

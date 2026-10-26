@@ -1,6 +1,6 @@
 <div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Header (Fixed Top) -->
-  <div class="w-full flex flex-col p-4 shrink-0 gap-3">
+  <div class="w-full flex flex-col p-4 shrink-0 gap-2">
     <div class="flex flex-row justify-between gap-2 items-center">
       <div class="flex flex-col min-w-0">
         <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
@@ -23,7 +23,7 @@
   <!-- Body (Container list + scrollable) -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (isLoading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
@@ -31,65 +31,65 @@
         <app-loader [width]="'w-full'" [height]="'h-[200px]'"></app-loader>
       </div>
       } @else {
-        @if (inventoryRequests.length > 0) {
-        <div class="flex flex-col gap-2">
-          @for (item of inventoryRequests; track item.DocNum || $index) {
-          <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-2">
-            <div class="flex flex-row justify-between items-center">
-              <div class="flex flex-col">
-                <small class="text-gray-500 text-xs font-semibold text-start">
-                  DocNum
-                </small>
-                <p class="font-bold text-lg text-slate-800 text-start">
-                  {{ item.DocNum }}
-                </p>
-              </div>
-              <div class="flex flex-col items-end">
-                <small class="text-gray-500 text-xs font-semibold text-start">
-                  Total Items
-                </small>
-                <p class="font-bold text-lg text-slate-800 text-center">
-                  {{ item.DetailsCount }}
-                </p>
-              </div>
-            </div>
-
+      @if (inventoryRequests.length > 0) {
+      <div class="flex flex-col gap-2">
+        @for (item of inventoryRequests; track item.DocNum || $index) {
+        <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-2">
+          <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col">
               <small class="text-gray-500 text-xs font-semibold text-start">
-                Pengiriman Dari:
+                DocNum
               </small>
-              <p class="font-bold text-base sm:text-lg text-slate-800 text-start">
-                {{ item.WarehouseModel.Code }} - {{ item.WarehouseModel.Description }}
+              <p class="font-bold text-lg text-slate-800 text-start">
+                {{ item.DocNum }}
               </p>
             </div>
-
-            <div class="flex flex-col">
+            <div class="flex flex-col items-end">
               <small class="text-gray-500 text-xs font-semibold text-start">
-                Tanggal Pengiriman:
+                Total Items
               </small>
-              <p class="font-bold text-sm sm:text-base text-slate-700 text-start">
-                {{ item.DocDate | date : "dd MMM yyyy" }}
+              <p class="font-bold text-lg text-slate-800 text-center">
+                {{ item.DetailsCount }}
               </p>
-            </div>
-
-            <div class="flex justify-between w-full mt-2">
-              <button type="button"
-                class="btn-no-shadow-primary w-full py-2.5 font-bold text-base rounded-xl cursor-pointer"
-                (click)="toInventoryRequestView(item.DocNum)">
-                Lihat Detail
-              </button>
             </div>
           </div>
-          }
-        </div>
-        } @else {
-        <div class="flex items-center justify-center flex-col pt-20">
-          <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
-          <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
-            Ooops, tidak ada BON Permintaan Antar Toko :(
-          </p>
+
+          <div class="flex flex-col">
+            <small class="text-gray-500 text-xs font-semibold text-start">
+              Pengiriman Dari:
+            </small>
+            <p class="font-bold text-base sm:text-lg text-slate-800 text-start">
+              {{ item.WarehouseModel.Code }} - {{ item.WarehouseModel.Description }}
+            </p>
+          </div>
+
+          <div class="flex flex-col">
+            <small class="text-gray-500 text-xs font-semibold text-start">
+              Tanggal Pengiriman:
+            </small>
+            <p class="font-bold text-sm sm:text-base text-slate-700 text-start">
+              {{ item.DocDate | date : "dd MMM yyyy" }}
+            </p>
+          </div>
+
+          <div class="flex justify-between w-full mt-2">
+            <button type="button"
+              class="btn-no-shadow-primary w-full py-2.5 font-bold text-base rounded-xl cursor-pointer"
+              (click)="toInventoryRequestView(item.DocNum)">
+              Lihat Detail
+            </button>
+          </div>
         </div>
         }
+      </div>
+      } @else {
+      <div class="flex items-center justify-center flex-col pt-20">
+        <img src="new-assets/data-not-founds.png" class="w-1/2 max-w-50 mx-auto" alt="Data Not Found" />
+        <p class="w-3/4 text-center font-medium text-lg text-checkout mt-4">
+          Ooops, tidak ada BON Permintaan Antar Toko :(
+        </p>
+      </div>
+      }
       }
     </div>
   </div>

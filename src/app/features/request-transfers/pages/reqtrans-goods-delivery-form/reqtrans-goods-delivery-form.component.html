@@ -27,7 +27,7 @@
 
   <!-- Content Container -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[160px]'"></app-loader>
@@ -35,7 +35,7 @@
       </div>
       } @else {
       <!-- Selection Card -->
-      <div class="bg-white rounded-xl p-4 border border-gray-200 flex flex-col gap-3">
+      <div class="bg-white rounded-xl p-4 border border-gray-200 flex flex-col gap-2">
         @if (vehicles.length > 0) {
         <div class="flex flex-col gap-1.5">
           <label for="vehicleSelect" class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
@@ -80,15 +80,10 @@
 
       <!-- Dialog Konfirmasi Simpan ke Pengiriman -->
       @if (isDialogConfirmSubmit) {
-      <app-dialog-confirm
-        [title]="'Konfirmasi Pengiriman Transfer'"
+      <app-dialog-confirm [title]="'Konfirmasi Pengiriman Transfer'"
         [message]="'Apakah Anda yakin data muatan transfer ini sudah sesuai dan siap disimpan ke pengiriman?'"
-        [confirmText]="'Ya, Simpan'"
-        [confirmBtnClass]="'btn-no-shadow-primary'"
-        [isLoading]="loading"
-        (cancel)="isDialogConfirmSubmit = false"
-        (confirm)="onSubmit()"
-      />
+        [confirmText]="'Ya, Simpan'" [confirmBtnClass]="'btn-no-shadow-primary'" [isLoading]="loading"
+        (cancel)="isDialogConfirmSubmit = false" (confirm)="onSubmit()" />
       }
 
       <!-- Loaded Items Section -->

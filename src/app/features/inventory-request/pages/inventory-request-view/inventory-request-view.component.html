@@ -32,7 +32,7 @@
   <!-- Body Container -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
     <!-- Scrollable List -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
@@ -40,7 +40,7 @@
         <app-loader [width]="'w-full'" [height]="'h-[140px]'"></app-loader>
       </div>
       } @else if (inventoryRequest && inventoryRequest.Details && inventoryRequest.Details.length > 0) {
-      <div class="flex flex-col gap-3">
+      <div class="flex flex-col gap-2">
         <p class="font-bold text-base sm:text-lg text-slate-800 px-1">
           Item yang diminta:
         </p>
@@ -109,7 +109,8 @@
   <div class="w-full max-w-sm sm:max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">
     <div class="flex justify-between items-center pb-3 border-b border-gray-100">
       <h2 class="text-xl font-bold text-[#202B6D]">Pilih Mobil / Armada</h2>
-      <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+      <button type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
         (click)="isSelectTransportUnit = false" aria-label="Tutup">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
@@ -131,14 +132,12 @@
       </select>
     </div>
 
-    <div class="grid grid-cols-2 gap-3 mt-6">
-      <button type="button" class="btn-no-shadow-secondary"
-        (click)="isSelectTransportUnit = false">
+    <div class="grid grid-cols-2 gap-2 mt-6">
+      <button type="button" class="btn-no-shadow-secondary" (click)="isSelectTransportUnit = false">
         Tutup
       </button>
       <button type="button" [disabled]="loadingSubmitted || !selectedVehicle"
-        class="btn-no-shadow-success disabled:bg-gray-300 disabled:cursor-not-allowed"
-        (click)="onSubmit()">
+        class="btn-no-shadow-success disabled:bg-gray-300 disabled:cursor-not-allowed" (click)="onSubmit()">
         @if (loadingSubmitted) {
         <span>Tunggu...</span>
         } @else {

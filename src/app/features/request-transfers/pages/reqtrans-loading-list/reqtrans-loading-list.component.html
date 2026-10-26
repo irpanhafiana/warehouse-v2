@@ -1,6 +1,6 @@
 <div class="w-full h-full flex flex-col bg-checkout overflow-hidden">
   <!-- Top Bar & Controls -->
-  <div class="w-full flex flex-col p-4 shrink-0 gap-3">
+  <div class="w-full flex flex-col p-4 shrink-0 gap-2">
     <div class="flex flex-row justify-between items-center gap-2">
       <div class="flex flex-col min-w-0">
         <p class="font-semibold text-xs uppercase tracking-wider text-white/70">
@@ -22,7 +22,7 @@
 
     <!-- Filters -->
     <div class="flex flex-col gap-2 mt-2">
-      <div class="grid grid-cols-2 gap-3 items-end">
+      <div class="grid grid-cols-2 gap-2 items-end">
         <div class="flex flex-col items-start gap-1">
           <label class="font-medium text-xs uppercase tracking-wider text-white/90 pl-1">Tanggal</label>
           <input type="date"
@@ -52,7 +52,7 @@
 
   <!-- Main Content Card List -->
   <div class="w-full flex-1 min-h-0 bg-[#F3F2F8] rounded-t-3xl sm:rounded-t-[40px] p-4 flex flex-col overflow-hidden">
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-3 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
