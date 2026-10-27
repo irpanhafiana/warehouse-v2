@@ -1,3 +1,5 @@
+import { environment } from '../../../environments/environment';
+
 /**
  * Utility functions for Date formatting and default date calculations.
  */
@@ -9,12 +11,16 @@ export interface DateFilterResult {
 
 /**
  * Menghasilkan tanggal default mundur N hari dari hari ini.
+ * Jika environment target adalah 'cabang', default adalah hari ini (daysBack = 0).
  * @param daysBack Jumlah hari mundur (default: 3)
  */
 export function getDefaultDateFilter(daysBack = 3): DateFilterResult {
+  const isCabang = environment.target === 'cabang';
+  const effectiveDaysBack = isCabang ? 0 : daysBack;
+
   const currentDate = new Date();
   const targetDate = new Date(currentDate);
-  targetDate.setDate(targetDate.getDate() - daysBack);
+  targetDate.setDate(targetDate.getDate() - effectiveDaysBack);
 
   const year = targetDate.getFullYear();
   const month = String(targetDate.getMonth() + 1).padStart(2, '0');

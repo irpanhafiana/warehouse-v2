@@ -10,6 +10,7 @@ import { LoadingService } from '../../../loading/services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { AuthService } from '../../../../core/services/auth.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
+import { getDefaultDateFilter } from '../../../../core/utils';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { DialogConfirmComponent } from '../../../../shared/components/dialog-confirm/dialog-confirm.component';
 
@@ -80,21 +81,15 @@ export class RouteGroupDetailComponent implements OnInit {
   isStatusDialog = '';
   isDisabledButton = false;
   isAllBonDone = false;
-  isFilterAlphabet = false;
 
   constructor() {
     this.alias = this.route.snapshot.params['alias'];
   }
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 3);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(3);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
 
     if (this.dateString && this.alias) {
       this.fetchRouteGroupDetail(this.alias);
@@ -103,6 +98,7 @@ export class RouteGroupDetailComponent implements OnInit {
   }
 
   getLoading(): void {
+    this.resetFilter();
     if (this.alias) {
       this.fetchRouteGroupDetail(this.alias);
       this.getLoadingList();
@@ -780,17 +776,6 @@ export class RouteGroupDetailComponent implements OnInit {
 
   onBack(): void {
     void this.router.navigate(['/main/route-group/list']);
-  }
-
-  openFilterAlphabet(): void {
-    this.isFilterAlphabet = true;
-    this.cdr.markForCheck();
-  }
-
-  closeFilterAlphabet(): void {
-    this.isFilterAlphabet = false;
-    this.selectedAplhabet = '';
-    this.cdr.markForCheck();
   }
 
   closeDialogRekap(): void {

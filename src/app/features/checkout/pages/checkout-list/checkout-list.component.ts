@@ -79,6 +79,7 @@ export class CheckoutListComponent implements OnInit {
   }
 
   getCheckoutList(): void {
+    this.selectedAplhabet = '';
     this.loading = true;
     this.cdr.markForCheck();
     this.service

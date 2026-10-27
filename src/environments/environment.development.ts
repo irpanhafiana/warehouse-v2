@@ -1,5 +1,6 @@
 export const environment = {
   production: false,
+  target: 'gudang',
   api: 'http://192.168.1.15:10100/pos-api/',
   signalRapi: 'http://192.168.1.15:10010',
 

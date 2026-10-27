@@ -17,19 +17,6 @@
           <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
         </button>
 
-        @if (!isFilterAlphabet) {
-        <button type="button" (click)="isFilterAlphabet = true"
-          class="w-13 h-13 flex items-center justify-center bg-red-600 hover:bg-red-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-          aria-label="Filter">
-          <img src="filter-w.png" alt="Filter" class="w-full h-full object-contain" />
-        </button>
-        } @else {
-        <button type="button" (click)="isFilterAlphabet = false; selectedAlphabet = ''; applyFilter()"
-          class="w-13 h-13 flex items-center justify-center bg-gray-600 hover:bg-gray-700 border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
-          aria-label="Close Filter">
-          <img src="close-w.png" alt="Close" class="w-full h-full object-contain" />
-        </button>
-        }
 
         <button type="button" (click)="isDialogConfirmKeluar = true"
           class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e67d00] border border-amber-600/30 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer"
@@ -40,7 +27,7 @@
     </div>
 
     <!-- Alphabet Filter Row -->
-    @if (isFilterAlphabet) {
+    @if (alphabet.length > 0) {
     <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
       @if (filteredData.length !== 0) {
       <button type="button"
@@ -131,7 +118,7 @@
     </div>
 
     <!-- Items Checklist Scrollable Area -->
-    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-28">
+    <div class="flex-1 min-h-0 scrollable-body flex flex-col gap-2 pr-1 pb-36">
       @if (loading) {
       <div class="flex flex-col gap-2">
         <app-loader [width]="'w-full'" [height]="'h-[120px]'"></app-loader>
@@ -209,13 +196,33 @@
   </div>
 
   <!-- Floating Action Button: Muat Ke Mobil -->
-  <div class="fixed bottom-6 right-4 z-40 flex items-center gap-2">
+  <div class="fixed bottom-20 right-4 z-40 flex items-center gap-2">
     <button type="button" (click)="toAddDelivery()"
       class="flex items-center gap-2 btn-no-shadow-success py-3 px-5 rounded-xl cursor-pointer text-sm font-semibold">
       <img src="delivery.png" class="w-5 h-5 object-contain" alt="Delivery" />
       <span>Muat Ke Mobil</span>
     </button>
   </div>
+
+  <!-- Bottom Sticky Bar: Status Item Belum Di Pick / Selesai -->
+  @if (salesInvoice) {
+  <div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 px-4 py-3 z-30 flex justify-between items-center shadow-md">
+    @if (salesInvoice.DocStatus === 'Close') {
+    <span class="text-sm font-semibold text-gray-700">BON sudah diloading</span>
+    <button type="button" class="btn-sm-no-shadow-primary cursor-pointer" (click)="toCheckout(salesInvoice.DocNum)">
+      Cek
+    </button>
+    } @else {
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-semibold text-gray-500">Item Belum Di Pick:</span>
+      <span class="font-bold text-base text-red-600">{{ notPickedItem }}</span>
+    </div>
+    <button type="button" class="btn-sm-no-shadow-primary cursor-pointer" (click)="toPickingDetail(salesInvoice.DocNum)">
+      Cek Disini
+    </button>
+    }
+  </div>
+  }
 </div>
 
 <!-- Dialog Confirm Keluar -->

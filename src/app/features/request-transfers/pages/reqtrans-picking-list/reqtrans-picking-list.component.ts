@@ -119,6 +119,7 @@ export class ReqtransPickingListComponent implements OnInit, OnDestroy {
   }
 
   fetchPickingData(silent = false): void {
+    this.selectedAlphabet = '';
     if (!silent) {
       this.loading = true;
       this.cdr.markForCheck();

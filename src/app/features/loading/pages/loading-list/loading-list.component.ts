@@ -68,6 +68,7 @@ export class LoadingListComponent implements OnInit {
   }
 
   getLoadingList(): void {
+    this.selectedAlphabet.set('');
     this.loading.set(true);
     this.cdr.markForCheck();
     this.service

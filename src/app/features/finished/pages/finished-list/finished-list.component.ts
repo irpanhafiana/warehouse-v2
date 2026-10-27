@@ -80,6 +80,7 @@ export class FinishedListComponent implements OnInit {
   }
 
   getFinishedList() {
+    this.selectedAlphabet = '';
     this.loading = true;
     this.cdr.markForCheck();
     this.service

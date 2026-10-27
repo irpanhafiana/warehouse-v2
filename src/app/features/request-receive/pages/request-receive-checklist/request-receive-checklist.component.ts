@@ -46,7 +46,6 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   selectedBON: string = '';
   inventoryRequest?: Inventory;
   loading: boolean = false;
-  isFilterAlphabet: boolean = false;
   filteredData: InventoryDetail[] = [];
   initialData: InventoryDetail[] = [];
   loadingStates: { [key: number]: boolean } = {};
@@ -120,6 +119,7 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
   }
 
   onRefresh(): void {
+    this.selectedAlphabet = '';
     this.fetchRequestReceiveChecklist();
   }
 
@@ -432,17 +432,6 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  openFilterAlphabet(): void {
-    this.isFilterAlphabet = true;
-    this.cdr.markForCheck();
-  }
-
-  closeFilterAlphabet(): void {
-    this.isFilterAlphabet = false;
-    this.selectedAlphabet = '';
-    this.filteredData = this.initialData;
-    this.cdr.markForCheck();
-  }
 
   openDialogAddPic(): void {
     this.isDialogAddPic = true;

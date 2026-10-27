@@ -52,7 +52,6 @@ export class CheckoutDetailComponent implements OnInit {
   salesInvoiceLength = 0;
   itemLoadedMapLength = 0;
   isShowAddDelivery = false;
-  isFilterAlphabet = false;
   initialData: Detail[] = [];
   filteredData: Detail[] = [];
   selectedAplhabet = '';
@@ -107,6 +106,7 @@ export class CheckoutDetailComponent implements OnInit {
   }
 
   getDetail(): void {
+    this.selectedAplhabet = '';
     this.loading = true;
     this.cdr.markForCheck();
     this.service
@@ -287,16 +287,5 @@ export class CheckoutDetailComponent implements OnInit {
     this.location.back();
   }
 
-  openFilterAlphabet(): void {
-    this.isFilterAlphabet = true;
-    this.cdr.markForCheck();
-  }
-
-  closeFilterAlphabet(): void {
-    this.isFilterAlphabet = false;
-    this.selectedAplhabet = '';
-    this.filteredData = this.initialData;
-    this.cdr.markForCheck();
-  }
 }
 

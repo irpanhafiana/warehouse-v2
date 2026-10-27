@@ -99,6 +99,7 @@ export class RouteGroupListComponent implements OnInit {
   }
 
   fetchRouteGroups(date: string, statusSelected: string): void {
+    this.selectedAplhabet = '';
     this.isLoading = true;
     this.cdr.markForCheck();
     const request$ =

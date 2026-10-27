@@ -76,7 +76,6 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   isStatusDialog = '';
   isDisabledButton = false;
   isAllBonDone = false;
-  isFilterAlphabet = false;
 
   constructor() {
     this.alias = this.route.snapshot.params['alias'];
@@ -94,6 +93,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   }
 
   getLoading(): void {
+    this.resetFilter();
     if (this.alias) {
       this.fetchRouteGroupDetail(this.alias);
       this.getLoadingList();
@@ -765,17 +765,6 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   onBack(): void {
     void this.router.navigate(['/main/route-group/list']);
-  }
-
-  openFilterAlphabet(): void {
-    this.isFilterAlphabet = true;
-    this.cdr.markForCheck();
-  }
-
-  closeFilterAlphabet(): void {
-    this.isFilterAlphabet = false;
-    this.selectedAplhabet = '';
-    this.cdr.markForCheck();
   }
 
   closeDialogRekap(): void {

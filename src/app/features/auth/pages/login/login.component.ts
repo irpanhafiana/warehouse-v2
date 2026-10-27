@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   defaultBranch = '';
 
   phoneName: string | null = null;
-  appVersion = 'v1.0.4';
+  appVersion = 'v1.0.6';
   pickingPic: string[] = [];
 
   isLoadingPic = false;

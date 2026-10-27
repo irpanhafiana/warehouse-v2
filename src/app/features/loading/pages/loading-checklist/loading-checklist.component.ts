@@ -69,7 +69,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   readonly isDialogAddPic = signal(false);
   readonly isDialogConfirmKeluar = signal(false);
   readonly isDialogOpenBarcode = signal(false);
-  readonly isFilterAlphabet = signal(false);
   readonly isErrorPicSebagian = signal(false);
   readonly isBonNotFinishPick = signal(false);
   readonly isRecehExist = signal(false);
@@ -210,7 +209,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           });
 
           this.salesInvoice.set(data);
-          this.initialData.set(data.Details || []);
+          this.initialData.set(this.restoreSebagianFromStorage(data.Details || []));
 
           const initials = Array.from(
             new Set(
@@ -320,13 +319,18 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   filteredProducts(detail: Detail[]): Detail[] {
-    const products = (detail || []).map((product) => ({
-      ...product,
-      ProductModel: {
-        ...product.ProductModel,
-        Name: product.ProductModel?.Name?.replace(/^~+/, '').trim() || '',
-      },
-    }));
+    const products = (detail || []).map((product) => {
+      const existingDetail = this.filteredData().find((d) => d.Id === product.Id);
+      return {
+        ...product,
+        sebagianValue: existingDetail?.sebagianValue ?? product.sebagianValue,
+        isSebagian: existingDetail?.isSebagian ?? product.isSebagian,
+        ProductModel: {
+          ...product.ProductModel,
+          Name: product.ProductModel?.Name?.replace(/^~+/, '').trim() || '',
+        },
+      };
+    });
 
     if (!this.selectedAlphabet()) {
       return this.sortDetails(products);
@@ -370,13 +374,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     if (this.isLoading(id)) return;
     this.setLoadingState(id, true);
 
-    if (detail.sebagianValue > 0 && detail.sebagianValue !== detail.OpenQuantity) {
-      this.isErrorPicSebagian.set(true);
-      this.msgError.set('Jumlah yang masuk baru sebagian, tolong periksa kembali!');
-      this.setLoadingState(id, false);
-      return;
-    }
-
     if (!this.picName()) {
       this.isErrorPicSebagian.set(true);
       this.msgError.set('PIC belum dipilih, silahkan pilih PIC terlebih dahulu sebelum melanjutkan loading!');
@@ -399,23 +396,33 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
               this.setLoadingState(id, false);
               return;
             }
-            this.executeSaveRemarkDone(id, detailId);
+            this.executeSaveRemarkDone(id, detail);
           },
           error: (e) => {
             console.error('Check receh error before loading:', e);
-            this.executeSaveRemarkDone(id, detailId);
+            this.executeSaveRemarkDone(id, detail);
           },
         });
       return;
     }
 
-    this.executeSaveRemarkDone(id, detailId);
+    this.executeSaveRemarkDone(id, detail);
   }
 
-  private executeSaveRemarkDone(id: number, detailId: string): void {
+  private executeSaveRemarkDone(id: number, detail: Detail): void {
+    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
+
     const savePayload = {
       PIC: [this.picName()],
-      DetailId: !detailId || detailId.trim() === '' ? [Number(id)] : detailId.split(',').map(Number),
+      DetailId: [Number(id)],
+      Details: [
+        {
+          ItemCode: detail.ProductModel.Code,
+          UoMCode: detail.UoMModel.Code,
+          Quantity: qty,
+          BaseQuantity: detail.BaseQuantity,
+        },
+      ],
       DocNum: this.selectedBON() || '',
     };
 
@@ -425,6 +432,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(id, false);
+          // Reset sebagianValue di localStorage setelah berhasil disimpan
+          this.clearSebagianFromStorage(id);
         },
         error: () => {
           this.isErrorPicSebagian.set(true);
@@ -488,6 +497,9 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.initialData.update((items) =>
       items.map((i) => (i.Id === id ? { ...i, sebagianValue: changed.sebagianValue } : i))
     );
+
+    // Simpan sebagianValue ke localStorage agar tidak hilang saat refresh/berpindah BON
+    this.saveSebagianToStorage(id, changed.sebagianValue);
     this.cdr.markForCheck();
   }
 
@@ -612,11 +624,64 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     return this.loadingStates()[itemId] || false;
   }
 
+  private saveSebagianToStorage(id: number, sebagianValue: number): void {
+    try {
+      const storedData: { id: number; sebagianValue: number }[] = JSON.parse(
+        localStorage.getItem(this.selectedBON()) || '[]'
+      );
+      const existingItem = storedData.find((item) => item.id === id);
+      if (existingItem) {
+        existingItem.sebagianValue = sebagianValue;
+      } else {
+        storedData.push({ id, sebagianValue });
+      }
+      localStorage.setItem(this.selectedBON(), JSON.stringify(storedData));
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+
+  private clearSebagianFromStorage(id: number): void {
+    try {
+      const storedData: { id: number; sebagianValue: number }[] = JSON.parse(
+        localStorage.getItem(this.selectedBON()) || '[]'
+      );
+      const filtered = storedData.filter((item) => item.id !== id);
+      if (filtered.length > 0) {
+        localStorage.setItem(this.selectedBON(), JSON.stringify(filtered));
+      } else {
+        localStorage.removeItem(this.selectedBON());
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+  }
+
+  private restoreSebagianFromStorage(details: Detail[]): Detail[] {
+    try {
+      const storedData: { id: number; sebagianValue: number }[] = JSON.parse(
+        localStorage.getItem(this.selectedBON()) || '[]'
+      );
+      if (storedData.length === 0) return details;
+
+      return details.map((item) => {
+        const stored = storedData.find((s) => s.id === item.Id);
+        if (stored) {
+          return { ...item, sebagianValue: stored.sebagianValue };
+        }
+        return item;
+      });
+    } catch {
+      return details;
+    }
+  }
+
   onBack(): void {
     this.location.back();
   }
 
   onRefresh(silent = false): void {
+    this.selectedAlphabet.set('');
     this.getDetailByCustomerCode(this.dateString(), this.docnum(), silent);
     this.getLoadingDetail(this.selectedBON(), undefined, silent);
   }

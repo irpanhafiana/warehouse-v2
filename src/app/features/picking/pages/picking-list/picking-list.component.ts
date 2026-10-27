@@ -11,6 +11,7 @@ import { SignalrService } from '../../../../core/services/signalr.service';
 import { StorageService } from '../../../../core/services/storage.service';
 
 import { HeaderRes, Area } from '../../../../core/models';
+import { getDefaultDateFilter } from '../../../../core/utils';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
@@ -161,6 +162,7 @@ export class PickingListComponent implements OnInit, OnDestroy {
   }
 
   fetchPickingData(silent = false): void {
+    this.selectedAlphabet = '';
     if (!silent) {
       this.loading = true;
       this.cdr.markForCheck();
@@ -351,14 +353,9 @@ export class PickingListComponent implements OnInit, OnDestroy {
   }
 
   private setDefaultDate(): void {
-    const currentDate = new Date();
-    const previousDate = new Date(currentDate);
-    previousDate.setDate(previousDate.getDate() - 8);
-    const year = previousDate.getFullYear();
-    const month = String(previousDate.getMonth() + 1).padStart(2, '0');
-    const day = String(previousDate.getDate()).padStart(2, '0');
-    this.date = `${year}-${month}-${day}`;
-    this.dateString = `${year}${month}${day}`;
+    const filter = getDefaultDateFilter(8);
+    this.date = filter.date;
+    this.dateString = filter.dateString;
   }
 
   private generateAreaList(data: HeaderRes[]): void {

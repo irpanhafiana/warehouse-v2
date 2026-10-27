@@ -54,7 +54,6 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   isDialogAddPic: boolean = false;
   isDialogConfirmKeluar: boolean = false;
   isDialogOpenBarcode: boolean = false;
-  isFilterAlphabet: boolean = false;
   isErrorPicSebagian: boolean = false;
   isBonNotFinishPick: boolean = false;
   isRecehExist: boolean = false;
@@ -334,12 +333,6 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
     if (detail.OpenQuantity === 0 || this.isLoading(id)) return;
 
-    if (detail.sebagianValue > 0 && detail.sebagianValue !== detail.OpenQuantity) {
-      this.isErrorPicSebagian = true;
-      this.msgError = 'Jumlah yang masuk baru sebagian, tolong periksa kembali!';
-      return;
-    }
-
     if (!this.picName) {
       this.isErrorPicSebagian = true;
       this.msgError = 'PIC belum dipilih, silahkan pilih PIC terlebih dahulu sebelum melanjutkan loading!';
@@ -402,6 +395,15 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(id, false);
+          try {
+            const storedData = JSON.parse(localStorage.getItem(this.selectedBON) || '[]');
+            const filtered = storedData.filter((item: any) => item.id !== id);
+            if (filtered.length > 0) {
+              localStorage.setItem(this.selectedBON, JSON.stringify(filtered));
+            } else {
+              localStorage.removeItem(this.selectedBON);
+            }
+          } catch {}
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -582,6 +584,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   onRefresh(silent = false): void {
+    this.selectedAlphabet = '';
     this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
     this.getLoadingDetail(this.selectedBON, undefined, silent);
   }
