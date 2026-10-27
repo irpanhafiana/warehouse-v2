@@ -315,7 +315,14 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
 
   updateDetails(detailIncoming: Detail): void {
     const updateInArr = (arr: Detail[]): void => {
-      const item = arr.find((d) => d.Id === detailIncoming.Id);
+      const item = arr.find(
+        (d) =>
+          (detailIncoming.Id > 0 && d.Id === detailIncoming.Id) ||
+          (detailIncoming.DetailId && d.DetailId === detailIncoming.DetailId) ||
+          (detailIncoming.Id === 0 && d.Id === 0) ||
+          ((d.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' &&
+            (detailIncoming.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH')
+      );
       if (item) {
         Object.assign(item, detailIncoming);
       }
@@ -341,33 +348,14 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
 
     this.setLoadingState(id, true);
 
-    const isRecehItem =
-      (detail.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
-      (detail.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH';
-
-    if (isRecehItem) {
-      this.loadingService
-        .getCheckReceh(this.selectedBON)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (data) => {
-            this.isRecehExist = Boolean(data);
-            this.cdr.markForCheck();
-
-            if (this.isRecehExist) {
-              this.setLoadingState(id, false);
-              return;
-            }
-
-            this.executeSaveRemarkDone(id, detail);
-          },
-          error: (e) => {
-            console.error('Check receh error before loading:', e);
-            this.executeSaveRemarkDone(id, detail);
-          },
-        });
-      return;
+    // Optimistic update: langsung tambahkan PIC ke remarks agar kartu langsung berubah hijau seketika
+    const currentRemarks = (detail.Remarks || '').trim();
+    if (!currentRemarks) {
+      detail.Remarks = `load by: ${this.picName}`;
+    } else if (!currentRemarks.includes(this.picName)) {
+      detail.Remarks = `${currentRemarks}, ${this.picName}`;
     }
+    this.cdr.markForCheck();
 
     this.executeSaveRemarkDone(id, detail);
   }
@@ -375,9 +363,16 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   private executeSaveRemarkDone(id: number, detail: Detail): void {
     const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
 
+    const detailIds =
+      detail.DetailId && detail.DetailId.trim() !== ''
+        ? detail.DetailId.split(',')
+            .map((x) => Number(x.trim()))
+            .filter((x) => !isNaN(x) && x > 0)
+        : [Number(id)];
+
     const payload = {
       PIC: [this.picName],
-      DetailId: [Number(id)],
+      DetailId: detailIds.length > 0 ? detailIds : [Number(id)],
       Details: [
         {
           ItemCode: detail.ProductModel.Code,
@@ -404,6 +399,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
               localStorage.removeItem(this.selectedBON);
             }
           } catch {}
+          this.getNotPickedItem();
+          this.getLoadingDetail(this.selectedBON, undefined, true);
           this.cdr.markForCheck();
         },
         error: (e) => {

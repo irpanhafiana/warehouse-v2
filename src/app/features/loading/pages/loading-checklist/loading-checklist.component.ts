@@ -381,6 +381,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Optimistic update: langsung tambahkan PIC ke remarks agar kartu langsung berubah hijau seketika
+    const currentRemarks = (detail.Remarks || '').trim();
+    if (!currentRemarks) {
+      detail.Remarks = `load by: ${this.picName()}`;
+    } else if (!currentRemarks.includes(this.picName())) {
+      detail.Remarks = `${currentRemarks}, ${this.picName()}`;
+    }
+    this.cdr.markForCheck();
+
     const isRecehItem =
       (detail.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
       (detail.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH';
@@ -412,9 +421,16 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   private executeSaveRemarkDone(id: number, detail: Detail): void {
     const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
 
+    const detailIds =
+      detail.DetailId && detail.DetailId.trim() !== ''
+        ? detail.DetailId.split(',')
+            .map((x) => Number(x.trim()))
+            .filter((x) => !isNaN(x) && x > 0)
+        : [Number(id)];
+
     const savePayload = {
       PIC: [this.picName()],
-      DetailId: [Number(id)],
+      DetailId: detailIds.length > 0 ? detailIds : [Number(id)],
       Details: [
         {
           ItemCode: detail.ProductModel.Code,
@@ -434,6 +450,9 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.setLoadingState(id, false);
           // Reset sebagianValue di localStorage setelah berhasil disimpan
           this.clearSebagianFromStorage(id);
+          this.getNotPickedItem();
+          this.getLoadingDetail(this.selectedBON(), undefined, true);
+          this.cdr.markForCheck();
         },
         error: () => {
           this.isErrorPicSebagian.set(true);
@@ -505,7 +524,12 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   updateDetails(detailsIncoming: Detail): void {
     const updateIn = (arr: Detail[]) => {
-      const idx = arr.findIndex((d) => (detailsIncoming.Id ? d.Id === detailsIncoming.Id : d.DetailId === detailsIncoming.DetailId));
+      const idx = arr.findIndex(
+        (d) =>
+          (detailsIncoming.Id ? d.Id === detailsIncoming.Id : d.DetailId === detailsIncoming.DetailId) ||
+          ((d.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' &&
+            (detailsIncoming.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH')
+      );
       if (idx !== -1) {
         const copy = [...arr];
         copy[idx] = { ...copy[idx], ...detailsIncoming };

@@ -7,14 +7,12 @@ import { ToastrService } from 'ngx-toastr';
 
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { SignalrService } from '../../../../core/services/signalr.service';
-import { StorageService } from '../../../../core/services/storage.service';
+import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 
 import { Detail, SalesInvoicesModel } from '../../../../core/models';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { CardPickingItemComponent } from '../../../../shared/components/card-picking-item/card-picking-item.component';
-import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-pic/dialog-set-pic.component';
-import { TruncatePipe } from '../../../../shared/pipes';
 
 @Component({
   selector: 'app-picking-checklist',
@@ -23,7 +21,6 @@ import { TruncatePipe } from '../../../../shared/pipes';
     FormsModule,
     LoaderComponent,
     CardPickingItemComponent,
-    DialogSetPicComponent,
   ],
   templateUrl: './picking-checklist.component.html',
   styleUrl: './picking-checklist.component.css',
@@ -46,9 +43,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
   loadingPickDone = false;
   loadingId?: number;
 
-  isDialogOpen = false;
-  detailId = 0;
-  pickingPic: string[] = [];
+  loginPic = '';
   selectedPic = '';
   selectedTab: 'receh' | 'non-receh' = 'receh';
 
@@ -84,6 +79,12 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       const parsed = typeof salesInvoiceModel === 'string' ? JSON.parse(salesInvoiceModel) : salesInvoiceModel;
       const target = Array.isArray(parsed) ? parsed[0] : parsed;
       if (target) {
+        if (target.DocNum === this.docnum && target.Remarks) {
+          if (this.salesInvoice) {
+            this.salesInvoice.Remarks = target.Remarks;
+          }
+          this.selectedPic = target.Remarks.trim().toUpperCase();
+        }
         this.updateDetails(target);
       }
     } catch (e) {
@@ -95,22 +96,27 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.docnum = this.route.snapshot.params['docnum'] || '';
     this.dateString = this.route.snapshot.params['date'] || '';
 
+    // Ambil login PIC secara sinkron langsung dari cache/localStorage
+    const syncPhoneName = this.storageService.getItemSync(STORAGE_KEYS.PHONE_NAME);
+    if (syncPhoneName) {
+      this.loginPic = syncPhoneName.trim().toUpperCase();
+    }
+
     const [savedTab, cachedPic] = await Promise.all([
       this.storageService.get('selectedTab'),
-      this.storageService.get('phoneName'),
+      this.storageService.get(STORAGE_KEYS.PHONE_NAME),
     ]);
 
     if (savedTab === 'non-receh' || savedTab === 'receh') {
       this.selectedTab = savedTab;
     }
-    if (cachedPic && !this.selectedPic) {
-      this.selectedPic = cachedPic.toUpperCase();
+    if (cachedPic) {
+      this.loginPic = cachedPic.trim().toUpperCase();
     }
     this.cdr.markForCheck();
 
     if (this.docnum) {
       this.getDetail();
-      this.getPickingPicList();
     }
 
     this.signalrService.on('NotifyNewPicking', this.notifyNewPickingHandler);
@@ -163,13 +169,13 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
 
   checkPIC(picName?: string, isBackgroundSync = false): void {
     if (picName && picName.trim() !== '') {
-      this.selectedPic = picName;
+      this.selectedPic = picName.trim().toUpperCase();
       this.cdr.markForCheck();
       return;
     }
 
-    // Jika pengguna sudah memiliki selectedPic (sedang aktif mengerjakan BON), pertahankan dan jangan kick out
-    if (this.selectedPic) {
+    // Jika pengguna sudah memiliki loginPic atau selectedPic, pertahankan dan jangan kick out
+    if (this.loginPic || this.selectedPic) {
       return;
     }
 
@@ -181,6 +187,27 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     // Hanya tendang keluar jika saat initial load memang tidak ada PIC sama sekali
     this.toastr.warning('BON ini belum memiliki PIC atau status telah dibatalkan.', 'Perhatian');
     void this.router.navigate(['/main/picking/list', this.docnum]);
+  }
+
+  /**
+   * Mengembalikan PIC efektif untuk item picking (Picked by):
+   * Prioritas utama: Nama PIC dari login di depan (phoneName).
+   * Walaupun pengambil BON berbeda, item yang diselesaikan dicatat mengikuti nama PIC yang login.
+   * Fallback: selectedPic / salesInvoice.Remarks jika loginPic belum terisi.
+   */
+  getEffectivePic(): string {
+    const login = this.loginPic?.trim() || this.storageService.getItemSync(STORAGE_KEYS.PHONE_NAME)?.trim();
+    if (login) {
+      return login.toUpperCase();
+    }
+    if (this.selectedPic && this.selectedPic.trim()) {
+      return this.selectedPic.trim().toUpperCase();
+    }
+    const bonPic = this.salesInvoice?.Remarks?.trim();
+    if (bonPic) {
+      return bonPic.toUpperCase();
+    }
+    return '';
   }
 
   private filterRecehDetails(details: Detail[]): Detail[] {
@@ -199,38 +226,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     );
   }
 
-  getPickingPicList(): void {
-    this.service
-      .getPickingPicList()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data) => {
-          this.pickingPic = data || [];
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.cdr.markForCheck();
-        },
-      });
-  }
-
-  openDialog(id: number): void {
-    this.detailId = id;
-    this.isDialogOpen = true;
-    this.cdr.markForCheck();
-  }
-
-  closeDialog(): void {
-    this.isDialogOpen = false;
-    this.cdr.markForCheck();
-  }
-
-  onPickerSelectedFromDialog(picName: string): void {
-    this.onSaveItem(this.detailId, picName);
-    this.closeDialog();
-  }
-
-  onSaveItem(detailId: number, customPic?: string): void {
+  onSaveItem(detailId: number): void {
     if (this.isLoading(detailId)) {
       return;
     }
@@ -238,7 +234,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.setLoadingState(detailId, true);
     this.cdr.markForCheck();
 
-    const pic = (customPic || this.selectedPic).toUpperCase();
+    const pic = this.getEffectivePic();
     const savePayload = {
       PIC: [pic],
       DetailId: [detailId],
@@ -251,7 +247,6 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(detailId, false);
-          this.closeDialog();
           // Realtime SignalR will update the state, but we also immediately reflect:
           this.updateItemLocally(detailId, pic);
           this.cdr.markForCheck();
@@ -284,9 +279,10 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.loadingId = id;
     this.cdr.markForCheck();
 
+    const pic = this.getEffectivePic();
     const payload = {
       DetailId: id,
-      PIC: this.selectedPic,
+      PIC: pic,
     };
 
     this.service
@@ -336,8 +332,9 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     }
 
     const currentPicLoading = await this.storageService.get('picLoading');
-    if (!currentPicLoading && this.selectedPic) {
-      await this.storageService.set('picLoading', this.selectedPic);
+    const effectivePic = this.getEffectivePic();
+    if (!currentPicLoading && effectivePic) {
+      await this.storageService.set('picLoading', effectivePic);
     }
 
     void this.router.navigate([
@@ -388,4 +385,3 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     return this.loadingStates[itemId] || false;
   }
 }
-
