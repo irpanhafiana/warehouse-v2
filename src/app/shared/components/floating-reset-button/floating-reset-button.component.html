@@ -1,0 +1,92 @@
+<!-- Floating Draggable Button -->
+<button
+  type="button"
+  (mousedown)="onMouseDown($event)"
+  (touchstart)="onTouchStart($event)"
+  (touchmove)="onTouchMove($event)"
+  (touchend)="onTouchEnd()"
+  (click)="onClick($event)"
+  [style.left.px]="posX()"
+  [style.top.px]="posY()"
+  class="fixed z-40 w-13 h-13 sm:w-14 sm:h-14 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white rounded-2xl shadow-xl border-2 border-white/80 flex items-center justify-center p-2.5 transition-shadow cursor-grab active:cursor-grabbing select-none touch-none"
+  [class.scale-95]="isDragging()"
+  aria-label="Reset HP / Ganti Pengguna"
+  title="Geser untuk memindahkan, klik untuk Reset HP"
+>
+  <img
+    src="new-assets/force-close-w.png"
+    alt="Reset HP"
+    class="w-full h-full object-contain pointer-events-none select-none"
+  />
+</button>
+
+<!-- Modal Konfirmasi Reset HP / Ganti Pengguna -->
+@if (isDialogOpen()) {
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop"
+>
+  <div
+    class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4"
+  >
+    <div class="flex justify-between items-center pb-2 border-b border-gray-100">
+      <div class="flex items-center gap-2">
+        <div
+          class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-red-600 font-bold text-base"
+        >
+          !
+        </div>
+        <h2 class="text-lg font-bold text-[#202B6D] tracking-tight">
+          Reset HP / Ganti Pengguna
+        </h2>
+      </div>
+      <button
+        type="button"
+        class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+        (click)="closeDialog()"
+        aria-label="Tutup"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    <div class="text-gray-600 text-sm leading-relaxed">
+      <p>
+        Nama PIC yang tersimpan di HP ini akan
+        <span class="font-bold text-red-600">dihapus</span> dan aplikasi akan
+        kembali ke halaman login agar HP dapat digunakan oleh personil lain.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 mt-2">
+      <button
+        type="button"
+        class="w-full btn-no-shadow-secondary text-center cursor-pointer py-2.5"
+        [disabled]="isResetting()"
+        (click)="closeDialog()"
+      >
+        Batal
+      </button>
+      <button
+        type="button"
+        class="w-full btn-no-shadow-danger text-center cursor-pointer py-2.5"
+        [disabled]="isResetting()"
+        (click)="onConfirmReset()"
+      >
+        @if (isResetting()) {
+        Memproses...
+        } @else {
+        Reset HP
+        }
+      </button>
+    </div>
+  </div>
+</div>
+}
+
