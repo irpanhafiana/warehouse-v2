@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   defaultBranch = '';
 
   phoneName: string | null = null;
-  appVersion = 'v1.0.9';
+  appVersion = 'v1.0.1';
   pickingPic: string[] = [];
 
   isLoadingPic = false;
@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   async ngOnInit(): Promise<void> {
     this.setGreeting();
-    try { const info = await CapApp.getInfo(); this.appVersion = 'v' + info.version + ' (Build ' + info.build + ')'; } catch {}
+    try { const info = await CapApp.getInfo(); this.appVersion = 'v' + info.version + ' (Build ' + info.build + ')'; } catch { }
 
     this.phoneName = await this.storage.getItem(STORAGE_KEYS.PHONE_NAME);
 
