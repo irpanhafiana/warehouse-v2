@@ -356,7 +356,7 @@
 }
 
 <!-- Modal Pengingat: Receh belum selesai -->
-@if (isRecehExist()) {
+@if (isRecehExist() && !isBonNotFinishPick()) {
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
   <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card">

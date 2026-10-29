@@ -103,10 +103,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       this.picName = cachedPic.toUpperCase();
     }
 
-    this.getNotPickedItem();
-    this.getRecehExist();
     this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
-    this.getLoadingDetail(this.selectedBON || this.customerCodeParam);
+    this.getLoadingDetail(this.selectedBON || this.customerCodeParam, undefined, false, true);
 
     this.signalRService.on('NotifyNewDeliveryLoading', this.notifyNewLoadingHandler);
     this.signalRService.on('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
@@ -143,7 +141,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getLoadingDetail(docnum: string, index?: number, silent = false): void {
+  getLoadingDetail(docnum: string, index?: number, silent = false, showDialog = false): void {
+    const isSwitchBon = !!this.selectedBON && this.selectedBON !== docnum;
     this.selectedBON = docnum;
     if (!silent) {
       this.loading = true;
@@ -151,8 +150,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     }
 
     this.getPickingPicList();
-    this.getNotPickedItem();
-    this.getRecehExist();
+    this.getNotPickedItem(showDialog || isSwitchBon);
+    this.getRecehExist(showDialog || isSwitchBon);
 
     this.loadingService
       .getLoadingDetail(docnum)
@@ -232,7 +231,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getNotPickedItem(): void {
+  getNotPickedItem(showDialog = false): void {
     if (!this.selectedBON) return;
     this.loadingService
       .getCheckItemNotPicked(this.selectedBON)
@@ -240,7 +239,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data) => {
           this.notPickedItem = Number(data) || 0;
-          if (this.notPickedItem > 0) {
+          if (showDialog && this.notPickedItem > 0) {
             this.isBonNotFinishPick = true;
           }
           this.cdr.markForCheck();
@@ -252,14 +251,19 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getRecehExist(): void {
+  getRecehExist(showDialog = false): void {
     if (!this.selectedBON) return;
     this.loadingService
       .getCheckReceh(this.selectedBON)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          this.isRecehExist = Boolean(data);
+          const exists = Boolean(data);
+          if (showDialog && exists) {
+            this.isRecehExist = true;
+          } else if (!exists) {
+            this.isRecehExist = false;
+          }
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -366,8 +370,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
     const detailIds =
       detail.DetailId && detail.DetailId.trim() !== ''
         ? detail.DetailId.split(',')
-            .map((x) => Number(x.trim()))
-            .filter((x) => !isNaN(x) && x > 0)
+          .map((x) => Number(x.trim()))
+          .filter((x) => !isNaN(x) && x > 0)
         : [Number(id)];
 
     const payload = {
@@ -398,9 +402,8 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
             } else {
               localStorage.removeItem(this.selectedBON);
             }
-          } catch {}
-          this.getNotPickedItem();
-          this.getLoadingDetail(this.selectedBON, undefined, true);
+          } catch { }
+          this.getLoadingDetail(this.selectedBON, undefined, true, false);
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -583,7 +586,7 @@ export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
   onRefresh(silent = false): void {
     this.selectedAlphabet = '';
     this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
-    this.getLoadingDetail(this.selectedBON, undefined, silent);
+    this.getLoadingDetail(this.selectedBON, undefined, silent, false);
   }
 }
 

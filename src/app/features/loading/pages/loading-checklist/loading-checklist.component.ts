@@ -136,9 +136,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       this.picName.set(savedPhoneName);
     }
 
-    this.getNotPickedItem();
     this.getDetailByCustomerCode(dateVal, docnumVal);
-    this.getLoadingDetail(bonVal ? bonVal : docnumVal);
+    this.getLoadingDetail(bonVal ? bonVal : docnumVal, undefined, false, true);
     this.getPickingPicList();
 
     this.signalrService.on('NotifyNewLoading', this.notifyNewLoadingHandler);
@@ -185,7 +184,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getLoadingDetail(docnum: string, index?: number, silent = false): void {
+  getLoadingDetail(docnum: string, index?: number, silent = false, showDialog = false): void {
+    const isSwitchBon = !!this.selectedBON() && this.selectedBON() !== docnum;
     this.selectedBON.set(docnum);
     if (index !== undefined) {
       this.toggleText(index);
@@ -236,8 +236,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
         },
         complete: () => {
           this.getPickingPicList();
-          this.getNotPickedItem();
-          this.getRecehExist();
+          this.getNotPickedItem(showDialog || isSwitchBon);
+          this.getRecehExist(showDialog || isSwitchBon);
           this.getCheckBON(this.selectedBON());
         },
       });
@@ -282,28 +282,34 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getNotPickedItem(): void {
+  getNotPickedItem(showDialog = false): void {
     this.loadingService
       .getCheckItemNotPicked(this.selectedBON())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (count: number) => {
           this.notPickedItem.set(count);
-          if (count > 0) {
+          if (showDialog && count > 0) {
             this.isBonNotFinishPick.set(true);
+          } else if (count === 0) {
+            this.isBonNotFinishPick.set(false);
           }
           this.cdr.markForCheck();
         },
       });
   }
 
-  getRecehExist(): void {
+  getRecehExist(showDialog = false): void {
     this.loadingService
       .getCheckReceh(this.selectedBON())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (exists: boolean) => {
-          this.isRecehExist.set(exists);
+          if (showDialog && exists) {
+            this.isRecehExist.set(true);
+          } else if (!exists) {
+            this.isRecehExist.set(false);
+          }
           this.cdr.markForCheck();
         },
       });
@@ -450,8 +456,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.setLoadingState(id, false);
           // Reset sebagianValue di localStorage setelah berhasil disimpan
           this.clearSebagianFromStorage(id);
-          this.getNotPickedItem();
-          this.getLoadingDetail(this.selectedBON(), undefined, true);
+          this.getLoadingDetail(this.selectedBON(), undefined, true, false);
           this.cdr.markForCheck();
         },
         error: () => {
@@ -707,7 +712,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   onRefresh(silent = false): void {
     this.selectedAlphabet.set('');
     this.getDetailByCustomerCode(this.dateString(), this.docnum(), silent);
-    this.getLoadingDetail(this.selectedBON(), undefined, silent);
+    this.getLoadingDetail(this.selectedBON(), undefined, silent, false);
   }
 
   toCheckout(docnum: string): void {
