@@ -11,7 +11,7 @@ import {
   LoaderComponent,
   NavbarReqtransComponent,
 } from '../../../../shared/components';
-import { ReqTransLoadingService } from '../../services/reqtrans-loading.service';
+import { TransferLoadingService } from '../../services/transfer-loading.service';
 
 export interface GroupedCustomerLoading {
   customerName: string;
@@ -22,7 +22,7 @@ export interface GroupedCustomerLoading {
 }
 
 @Component({
-  selector: 'app-reqtrans-loading-list',
+  selector: 'app-transfer-loading-list',
   imports: [
     CommonModule,
     FormsModule,
@@ -31,11 +31,11 @@ export interface GroupedCustomerLoading {
     NavbarReqtransComponent,
     ButtonHomeComponent,
   ],
-  templateUrl: './reqtrans-loading-list.component.html',
+  templateUrl: './transfer-loading-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransLoadingListComponent implements OnInit {
-  private loadingService = inject(ReqTransLoadingService);
+export class TransferLoadingListComponent implements OnInit {
+  private loadingService = inject(TransferLoadingService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);

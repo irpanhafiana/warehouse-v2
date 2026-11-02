@@ -11,7 +11,7 @@ import {
 } from '../../../../shared/components';
 
 @Component({
-  selector: 'app-reqtrans-goods-delivery-list',
+  selector: 'app-transfer-goods-delivery-list',
   imports: [
     CommonModule,
     FormsModule,
@@ -19,10 +19,10 @@ import {
     NavbarReqtransComponent,
     ButtonHomeComponent,
   ],
-  templateUrl: './reqtrans-goods-delivery-list.component.html',
+  templateUrl: './transfer-goods-delivery-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransGoodsDeliveryListComponent implements OnInit {
+export class TransferGoodsDeliveryListComponent implements OnInit {
   private service = inject(GoodsDeliveryService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);

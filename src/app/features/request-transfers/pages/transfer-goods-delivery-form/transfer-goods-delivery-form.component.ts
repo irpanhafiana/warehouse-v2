@@ -7,21 +7,21 @@ import { ToastrService } from 'ngx-toastr';
 import { Detail, Driver, Vehicle } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
 import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
-import { ReqTransLoadingService } from '../../services/reqtrans-loading.service';
+import { TransferLoadingService } from '../../services/transfer-loading.service';
 
 @Component({
-  selector: 'app-reqtrans-goods-delivery-form',
+  selector: 'app-transfer-goods-delivery-form',
   imports: [CommonModule, FormsModule, ReactiveFormsModule, LoaderComponent, DialogConfirmComponent],
-  templateUrl: './reqtrans-goods-delivery-form.component.html',
+  templateUrl: './transfer-goods-delivery-form.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransGoodsDeliveryFormComponent implements OnInit {
+export class TransferGoodsDeliveryFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private location = inject(Location);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
-  private loadingService = inject(ReqTransLoadingService);
+  private loadingService = inject(TransferLoadingService);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);

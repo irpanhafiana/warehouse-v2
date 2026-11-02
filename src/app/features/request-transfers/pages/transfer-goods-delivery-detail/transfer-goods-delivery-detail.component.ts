@@ -7,12 +7,12 @@ import { GoodsDeliveryService } from '../../../../core/services/goods-delivery.s
 import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
 
 @Component({
-  selector: 'app-reqtrans-goods-delivery-detail',
+  selector: 'app-transfer-goods-delivery-detail',
   imports: [CommonModule, LoaderComponent, DialogConfirmComponent],
-  templateUrl: './reqtrans-goods-delivery-detail.component.html',
+  templateUrl: './transfer-goods-delivery-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransGoodsDeliveryDetailComponent implements OnInit {
+export class TransferGoodsDeliveryDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private service = inject(GoodsDeliveryService);

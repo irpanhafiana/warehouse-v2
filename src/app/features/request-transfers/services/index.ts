@@ -1,3 +1,6 @@
-export * from './reqtrans-picking.service';
-export * from './reqtrans-loading.service';
+export * from './transfer-picking.service';
+export * from './transfer-loading.service';
 
+// Backward compatibility alias
+export { TransferPickingService as ReqtransPickingService } from './transfer-picking.service';
+export { TransferLoadingService as ReqtransLoadingService } from './transfer-loading.service';

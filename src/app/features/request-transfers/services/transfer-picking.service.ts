@@ -6,7 +6,7 @@ import { environment } from '../../../../environments/environment';
 @Injectable({
   providedIn: 'root',
 })
-export class ReqtransPickingService {
+export class TransferPickingService {
   private http = inject(HttpClient);
   private apiUrl: string = environment.api;
 

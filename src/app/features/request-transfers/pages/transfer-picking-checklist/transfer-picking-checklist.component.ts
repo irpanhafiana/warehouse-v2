@@ -8,19 +8,19 @@ import { Detail, SalesInvoicesModel } from '../../../../core/models';
 import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { DialogSetPicComponent, LoaderComponent } from '../../../../shared/components';
-import { ReqtransPickingService } from '../../services/reqtrans-picking.service';
+import { TransferPickingService } from '../../services/transfer-picking.service';
 
 @Component({
-  selector: 'app-reqtrans-picking-checklist',
+  selector: 'app-transfer-picking-checklist',
   imports: [CommonModule, FormsModule, LoaderComponent, DialogSetPicComponent],
-  templateUrl: './reqtrans-picking-checklist.component.html',
+  templateUrl: './transfer-picking-checklist.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransPickingChecklistComponent implements OnInit, OnDestroy {
+export class TransferPickingChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private toastr = inject(ToastrService);
-  private pickingService = inject(ReqtransPickingService);
+  private pickingService = inject(TransferPickingService);
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);

@@ -3,16 +3,15 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-navbar-reqrec',
+  selector: 'app-request-transfer-navbar, app-navbar-reqtrans',
   imports: [RouterModule, CommonModule],
-  templateUrl: './navbar-reqrec.component.html',
+  templateUrl: './request-transfer-navbar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavbarReqrecComponent {
+export class RequestTransferNavbarComponent {
   private router = inject(Router);
 
   isActive(url: string): boolean {
     return this.router.url.includes(url);
   }
 }
-

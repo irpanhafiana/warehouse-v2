@@ -16,10 +16,10 @@ import {
   LoaderComponent,
   NavbarReqtransComponent,
 } from '../../../../shared/components';
-import { ReqtransPickingService } from '../../services/reqtrans-picking.service';
+import { TransferPickingService } from '../../services/transfer-picking.service';
 
 @Component({
-  selector: 'app-reqtrans-picking-list',
+  selector: 'app-transfer-picking-list',
   imports: [
     CommonModule,
     FormsModule,
@@ -28,12 +28,12 @@ import { ReqtransPickingService } from '../../services/reqtrans-picking.service'
     ButtonHomeComponent,
     DialogSetPicComponent,
   ],
-  templateUrl: './reqtrans-picking-list.component.html',
+  templateUrl: './transfer-picking-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransPickingListComponent implements OnInit, OnDestroy {
+export class TransferPickingListComponent implements OnInit, OnDestroy {
   private service = inject(SalesInvoiceService);
-  private pickingService = inject(ReqtransPickingService);
+  private pickingService = inject(TransferPickingService);
   private sharedDataService = inject(SharedDataService);
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);

@@ -10,10 +10,10 @@ import { SalesInvoiceService } from '../../../../core/services/sales-invoice.ser
 import { SignalrService, parseSignalRPayload } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { DialogSetPicComponent, LoaderComponent } from '../../../../shared/components';
-import { ReqTransLoadingService } from '../../services/reqtrans-loading.service';
+import { TransferLoadingService } from '../../services/transfer-loading.service';
 
 @Component({
-  selector: 'app-reqtrans-loading-checklist',
+  selector: 'app-transfer-loading-checklist',
   imports: [
     CommonModule,
     FormsModule,
@@ -21,15 +21,15 @@ import { ReqTransLoadingService } from '../../services/reqtrans-loading.service'
     QRCodeComponent,
     DialogSetPicComponent,
   ],
-  templateUrl: './reqtrans-loading-checklist.component.html',
+  templateUrl: './transfer-loading-checklist.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ReqtransLoadingChecklistComponent implements OnInit, OnDestroy {
+export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private location = inject(Location);
   private toastr = inject(ToastrService);
-  private loadingService = inject(ReqTransLoadingService);
+  private loadingService = inject(TransferLoadingService);
   private salesInvoiceService = inject(SalesInvoiceService);
   private signalRService = inject(SignalrService);
   private storage = inject(StorageService);

@@ -70,7 +70,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (
 
       if (error.status === 0) {
         // Status 0: Masalah jaringan, Wi-Fi terputus, atau blokir CORS/Cleartext
-        const detail = `[Status 0: Network Error]\nGagal koneksi ke:\n${targetUrl}\nPastikan HP terhubung ke Wi-Fi yang sama dengan server.`;
+        const detail = `[Status 0: Network Error]\nGagal koneksi ke:\n${targetUrl}\n${(!!environment.is4urlCloud && targetUrl.startsWith(environment.is4urlCloud)) || (!!environment.is4urlTOKEN && targetUrl.startsWith(environment.is4urlTOKEN)) ? 'Pastikan HP terhubung ke Internet untuk server Cloud.' : 'Pastikan HP terhubung ke Wi-Fi yang sama dengan server lokal.'}`;
         console.error('Network Error:', detail, error);
         toastr.error(detail, 'Koneksi Gagal', {
           timeOut: 12000,

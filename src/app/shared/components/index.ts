@@ -9,5 +9,9 @@ export * from './floating-reset-button/floating-reset-button.component';
 export * from './loader/loader.component';
 export * from './loader-force-close/loader-force-close.component';
 export * from './navbar/navbar.component';
-export * from './navbar-reqrec/navbar-reqrec.component';
-export * from './navbar-reqtrans/navbar-reqtrans.component';
+export * from './request-receive-navbar/request-receive-navbar.component';
+export * from './request-transfer-navbar/request-transfer-navbar.component';
+
+// Backward compatibility aliases
+export { RequestReceiveNavbarComponent as NavbarReqrecComponent } from './request-receive-navbar/request-receive-navbar.component';
+export { RequestTransferNavbarComponent as NavbarReqtransComponent } from './request-transfer-navbar/request-transfer-navbar.component';
