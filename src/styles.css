@@ -96,15 +96,15 @@ router-outlet + * {
 }
 
 .card {
-  @apply w-full bg-white p-4 rounded-xl border border-gray-200 shadow-xs;
+  @apply w-full bg-white p-4 rounded-xl border border-gray-200;
 }
 
 .bottomsheet {
-  @apply w-full bg-white p-4 border border-gray-200 rounded-t-2xl shadow-xl;
+  @apply w-full bg-white p-4 border border-gray-200 rounded-t-2xl;
 }
 
 .card-no-click {
-  @apply w-full bg-white p-4 border border-gray-200 rounded-xl cursor-pointer shadow-xs transition-all;
+  @apply w-full bg-white p-4 border border-gray-200 rounded-xl cursor-pointer transition-all;
 }
 
 .btn-success {
@@ -132,27 +132,27 @@ router-outlet + * {
 }
 
 .nav-primary {
-  @apply bg-primary py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
+  @apply bg-primary py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all;
 }
 
 .nav-danger {
-  @apply bg-red-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
+  @apply bg-red-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all;
 }
 
 .nav-success {
-  @apply bg-green-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
+  @apply bg-green-700 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all;
 }
 
 .nav-accent {
-  @apply bg-accent py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
+  @apply bg-accent py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all;
 }
 
 .nav-secondary {
-  @apply bg-gray-500 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all shadow-xs;
+  @apply bg-gray-500 py-3 text-white rounded-xl font-bold text-lg text-center active:scale-95 transition-all;
 }
 
 .input-name {
-  @apply w-full border border-gray-300 focus:border-checkout rounded-xl p-3 focus:outline-none text-gray-800 shadow-xs;
+  @apply w-full border border-gray-300 focus:border-checkout rounded-xl p-3 focus:outline-none text-gray-800;
   transition: border-color 0.2s ease;
 }
 
@@ -180,12 +180,12 @@ router-outlet + * {
 }
 
 .label-pic {
-  @apply inline-flex m-1 text-base font-semibold border border-gray-200 rounded-xl px-4 py-2 bg-white text-gray-800 shadow-xs;
+  @apply inline-flex m-1 text-base font-semibold border border-gray-200 rounded-xl px-4 py-2 bg-white text-gray-800;
   transition: all 0.2s ease;
 }
 
 .fix-top {
-  @apply fixed top-0 w-full z-10 shadow-lg bg-white;
+  @apply fixed top-0 w-full z-10 border-b border-gray-200 bg-white;
 }
 
 .btn-sm-success {

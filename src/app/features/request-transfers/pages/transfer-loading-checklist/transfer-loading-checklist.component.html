@@ -206,7 +206,7 @@
 
   <!-- Bottom Sticky Bar: Status Item Belum Di Pick / Selesai -->
   @if (salesInvoice) {
-  <div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 px-4 py-3 z-30 flex justify-between items-center shadow-md">
+  <div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 px-4 py-3 z-30 flex justify-between items-center ">
     @if (salesInvoice.DocStatus === 'Close') {
     <span class="text-sm font-semibold text-gray-700">BON sudah diloading</span>
     <button type="button" class="btn-sm-no-shadow-primary cursor-pointer" (click)="toCheckout(salesInvoice.DocNum)">

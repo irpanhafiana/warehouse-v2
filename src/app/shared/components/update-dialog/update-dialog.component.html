@@ -2,7 +2,7 @@
 <div
   class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
   <div
-    class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 shadow-2xl animate-modal-card flex flex-col gap-4">
+    class="w-full max-w-md bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
 
     <!-- Header Icon & Title -->
     <div class="flex items-center gap-2">
@@ -63,7 +63,7 @@
     <div class="flex flex-col gap-2 pt-2">
       @if (!isDownloading()) {
       <button type="button" (click)="onDownload()"
-        class="btn-no-shadow-primary w-full py-3 flex items-center justify-center gap-2 text-sm sm:text-base font-bold shadow-xs">
+        class="btn-no-shadow-primary w-full py-3 flex items-center justify-center gap-2 text-sm sm:text-base font-bold">
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

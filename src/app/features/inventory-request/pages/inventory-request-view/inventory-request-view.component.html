@@ -121,7 +121,7 @@
     <div class="my-4 flex flex-col gap-1.5">
       <label class="text-xs font-semibold text-gray-600 uppercase tracking-wider">Pilih Kendaraan:</label>
       <select
-        class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl text-base font-semibold text-gray-800 focus:outline-none shadow-xs"
+        class="w-full p-2.5 sm:p-3 bg-white border border-gray-300 focus:border-checkout rounded-xl text-base font-semibold text-gray-800 focus:outline-none"
         [(ngModel)]="selectedVehicle" (change)="onSelectedVehicle()">
         <option [ngValue]="null">Pilih Kendaraan</option>
         @for (item of vehicles; track item.vehicleNo) {
