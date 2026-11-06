@@ -9,6 +9,7 @@ import { RouteGroupService } from '../../services';
 import { LoadingService } from '../../../loading/services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
 import { getDefaultDateFilter } from '../../../../core/utils';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
@@ -36,6 +37,7 @@ export class RouteGroupDetailComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private storageService = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -426,6 +428,7 @@ export class RouteGroupDetailComponent implements OnInit {
       TransportDescription: this.selectedVehicleName,
       Driver: this.selectedDriverName,
       Details: this.dataBONSelesai,
+      Remarks: this.data?.RouteName || '',
     };
 
     if (this.selectedVehicleNo && this.selectedVehicleName) {
@@ -467,6 +470,7 @@ export class RouteGroupDetailComponent implements OnInit {
       TransportDescription: this.selectedVehicleName,
       Driver: this.selectedDriverName,
       Details: this.dataBONSelesai,
+      Remarks: this.data?.RouteName || '',
     };
 
     if (this.selectedVehicleNo && this.selectedVehicleName) {
@@ -508,6 +512,7 @@ export class RouteGroupDetailComponent implements OnInit {
       TransportDescription: this.selectedVehicleName,
       Driver: this.selectedDriverName,
       Details: this.dataBONSelesai,
+      Remarks: this.data?.RouteName || '',
     };
 
     this.routeGroupService
@@ -529,7 +534,7 @@ export class RouteGroupDetailComponent implements OnInit {
           this.isDisabledButton = false;
           this.cdr.markForCheck();
           this.onBack();
-          this.onMobilSiapJalan();
+          this.toastr.success('Jalur muat telah selesai dimuat ke dalam mobil', 'Success');
         },
       });
   }
@@ -656,10 +661,14 @@ export class RouteGroupDetailComponent implements OnInit {
       .generateIS4Token()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => {
+        next: async (data) => {
           this.isLoading = false;
-          localStorage.setItem('is4_token', data.access_token);
-          localStorage.setItem('is4_refresh_token', data.refresh_token);
+          if (data?.access_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
+          }
+          if (data?.refresh_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
+          }
           this.cdr.markForCheck();
         },
         error: () => {
@@ -786,4 +795,3 @@ export class RouteGroupDetailComponent implements OnInit {
     this.cdr.markForCheck();
   }
 }
-

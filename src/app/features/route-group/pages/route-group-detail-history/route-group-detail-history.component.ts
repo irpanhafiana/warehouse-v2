@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr';
 import { RouteGroupService } from '../../services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
@@ -32,6 +33,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private storageService = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -523,7 +525,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
           this.isDisabledButton = false;
           this.cdr.markForCheck();
           this.onBack();
-          this.onMobilSiapJalan();
+          this.toastr.success('Jalur muat telah selesai dimuat ke dalam mobil', 'Success');
         },
       });
   }
@@ -645,10 +647,14 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
       .generateIS4Token()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => {
+        next: async (data) => {
           this.isLoading = false;
-          localStorage.setItem('is4_token', data.access_token);
-          localStorage.setItem('is4_refresh_token', data.refresh_token);
+          if (data?.access_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
+          }
+          if (data?.refresh_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
+          }
           this.cdr.markForCheck();
         },
         error: () => {
@@ -775,4 +781,3 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
     this.cdr.markForCheck();
   }
 }
-

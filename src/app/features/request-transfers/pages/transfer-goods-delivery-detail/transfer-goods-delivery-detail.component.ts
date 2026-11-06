@@ -172,13 +172,18 @@ export class TransferGoodsDeliveryDetailComponent implements OnInit {
       });
   }
 
-  private parseDeliveryData(data: string): any {
+  private parseDeliveryData(data: string | any): any {
+    if (!data) {
+      return { ProductModel: { Name: '-' }, Quantity: 0, BaseQuantity: 0, UoMModel: { Code: '' } };
+    }
+    if (typeof data === 'object') {
+      return data;
+    }
     try {
       return JSON.parse(data);
     } catch (error) {
       console.warn('Error parsing delivery data:', error);
-      return { productCode: null, quantity: 0, baseQuantity: 0, uomCode: '' };
+      return { ProductModel: { Name: '-' }, Quantity: 0, BaseQuantity: 0, UoMModel: { Code: '' } };
     }
   }
 }
-

@@ -51,14 +51,21 @@ export const requestTransfersRoutes: Routes = [
           ).then((m) => m.TransferGoodsDeliveryListComponent),
       },
       {
-        path: 'goods-delivery/form/:cardcode/:driver/:date',
+        path: 'goods-delivery/add-to-delivery/:docnum/:customerName',
         loadComponent: () =>
           import(
             './pages/transfer-goods-delivery-form/transfer-goods-delivery-form.component'
           ).then((m) => m.TransferGoodsDeliveryFormComponent),
       },
       {
-        path: 'goods-delivery/detail/:cardcode/:driver/:date',
+        path: 'goods-delivery/form/:docnum/:customerName',
+        loadComponent: () =>
+          import(
+            './pages/transfer-goods-delivery-form/transfer-goods-delivery-form.component'
+          ).then((m) => m.TransferGoodsDeliveryFormComponent),
+      },
+      {
+        path: 'goods-delivery/detail/:date/:transportUnit/:status',
         loadComponent: () =>
           import(
             './pages/transfer-goods-delivery-detail/transfer-goods-delivery-detail.component'

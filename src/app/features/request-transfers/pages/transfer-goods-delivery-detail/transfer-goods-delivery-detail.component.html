@@ -35,7 +35,7 @@
         <app-loader [width]="'w-full'" [height]="'h-[180px]'"></app-loader>
       </div>
       } @else {
-      @for (item of goodsDeliveryDetail; track item.BasedSalesInvoiceDocNum) {
+      @for (item of goodsDeliveryDetail; track item.BasedSalesInvoiceDocNum || $index) {
       <div class="w-full bg-white border border-gray-200 rounded-xl p-4 transition-all flex flex-col gap-2">
         <div class="grid grid-cols-2 justify-between">
           <div class="flex flex-col items-start">
@@ -70,13 +70,13 @@
         <!-- Detail List Accordion -->
         @if (item.isExpanded) {
         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200 flex flex-col gap-2">
-          @for (subItem of item.Details; track subItem.DetailId || subItem.Id) {
+          @for (subItem of item.Details; track subItem.DetailId || subItem.Id || $index) {
           <div class="w-full flex flex-col justify-between border-b border-gray-200 last:border-b-0 py-2">
             <p class="text-base font-bold text-slate-800">
-              {{ subItem.Data.ProductModel.Name }}
+              {{ subItem.Data?.ProductModel?.Name }}
             </p>
             <p class="text-sm font-semibold text-gray-600 mt-0.5">
-              {{ subItem.Data.Quantity }} {{ subItem.Data.UoMModel.Code }} ({{ subItem.Data.BaseQuantity }})
+              {{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }} ({{ subItem.Data?.BaseQuantity }})
             </p>
           </div>
           }
