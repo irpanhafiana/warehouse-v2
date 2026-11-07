@@ -5,7 +5,7 @@
       <div class="flex flex-row items-center gap-2">
         <button type="button" (click)="onBack()"
           class="w-13 h-13 flex items-center justify-center bg-[#FF8B00] hover:bg-[#e07b00] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
-          <img src="/arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
+          <img src="arrow_back-w.png" alt="Back" class="w-full h-full object-contain" />
         </button>
         <div class="flex flex-col">
           <p class="font-medium text-xs uppercase tracking-wider text-white/80">Detail Selesai</p>
@@ -16,7 +16,7 @@
       </div>
       <button type="button" (click)="getDetail()"
         class="w-13 h-13 flex items-center justify-center bg-[#202B6D] hover:bg-[#1a235b] border border-white/20 active:scale-95 rounded-xl p-2.5 transition-all cursor-pointer">
-        <img src="/refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
+        <img src="refresh-w.png" alt="Refresh" class="w-full h-full object-contain" />
       </button>
     </div>
   </div>
@@ -67,9 +67,9 @@
             'bg-green-50 border-green-200': item.Remarks === 'load'
           }">
           @if (item.Remarks === 'load') {
-          <img src="/done.png" alt="Done" class="absolute top-2 right-2 w-10 z-10" />
+          <img src="done.png" alt="Done" class="absolute top-2 right-2 w-10 z-10" />
           } @else if (item.Remarks === 'pick') {
-          <img src="/pick.png" alt="Pick" class="absolute top-2 right-2 w-10 z-10" />
+          <img src="pick.png" alt="Pick" class="absolute top-2 right-2 w-10 z-10" />
           }
 
           <div class="flex flex-col gap-1 pr-10">

@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Detail, Driver, Vehicle } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
+import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
 import { TransferLoadingService } from '../../services/transfer-loading.service';
 
@@ -21,6 +22,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private storageService = inject(StorageService);
   private loadingService = inject(TransferLoadingService);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
@@ -87,9 +89,13 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
       .generateIS4Token()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (data) => {
-          localStorage.setItem('is4_token', data.access_token);
-          localStorage.setItem('is4_refresh_token', data.refresh_token);
+        next: async (data) => {
+          if (data?.access_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
+          }
+          if (data?.refresh_token) {
+            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
+          }
           this.getVehicles();
           this.getDrivers();
         },
@@ -108,7 +114,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.vehicles = res?.data || [];
+          this.vehicles = res?.data || res || [];
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -128,7 +134,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (res) => {
-          this.drivers = res?.data || [];
+          this.drivers = res?.data || res || [];
           this.cdr.markForCheck();
         },
         error: (e) => {

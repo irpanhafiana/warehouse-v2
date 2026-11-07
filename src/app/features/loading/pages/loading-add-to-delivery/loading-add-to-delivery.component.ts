@@ -13,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { LoadingService } from '../../services/loading.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { StorageService } from '../../../../core/services/storage.service';
+import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 
 import { Vehicle, Driver, Detail } from '../../../../core/models';
 
@@ -103,10 +103,10 @@ export class LoadingAddToDeliveryComponent implements OnInit {
         next: async (data) => {
           this.loading = false;
           if (data?.access_token) {
-            await this.storageService.set('is4_token', data.access_token);
+            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
           }
           if (data?.refresh_token) {
-            await this.storageService.set('is4_refresh_token', data.refresh_token);
+            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
           }
           this.getVehicles();
           this.getDrivers();
