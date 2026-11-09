@@ -43,6 +43,7 @@ export class SignalrService {
   private hasConnectedBefore = false;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private retryDelayTimer: ReturnType<typeof setTimeout> | null = null;
+  private jitterTimer: ReturnType<typeof setTimeout> | null = null;
   private appStateListenerHandle: PluginListenerHandle | null = null;
 
   // Registry handler: eventName -> Map<originalCallback, wrappedCallback>
@@ -123,6 +124,10 @@ export class SignalrService {
     if (this.reconnectTimer !== null) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
+    }
+    if (this.jitterTimer !== null) {
+      clearTimeout(this.jitterTimer);
+      this.jitterTimer = null;
     }
     if (this.retryDelayTimer !== null) {
       clearTimeout(this.retryDelayTimer);
@@ -274,6 +279,15 @@ export class SignalrService {
   }
 
   private emitReconnected(): void {
-    this.ngZone.run(() => this.reconnectedSubject.next());
+    if (this.jitterTimer !== null) {
+      clearTimeout(this.jitterTimer);
+      this.jitterTimer = null;
+    }
+
+    const jitterMs = Math.floor(Math.random() * 3000);
+    this.jitterTimer = setTimeout(() => {
+      this.jitterTimer = null;
+      this.ngZone.run(() => this.reconnectedSubject.next());
+    }, jitterMs);
   }
 }

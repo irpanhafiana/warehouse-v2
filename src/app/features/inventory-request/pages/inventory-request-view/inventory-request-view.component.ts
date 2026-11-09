@@ -9,6 +9,7 @@ import { Inventory, Vehicle } from '../../../../core/models';
 import { LoaderComponent } from '../../../../shared/components';
 import { InventoryRequestService } from '../../services/inventory-request.service';
 import { AuthService, SalesInvoiceService, StorageService, STORAGE_KEYS } from '../../../../core/services';
+import { Is4TokenService } from '../../../../core/services/is4-token.service';
 
 @Component({
   selector: 'app-inventory-request-view',
@@ -22,6 +23,7 @@ export class InventoryRequestViewComponent implements OnInit {
   private service = inject(InventoryRequestService);
   private salesInvoiceService = inject(SalesInvoiceService);
   private authService = inject(AuthService);
+  private is4TokenService = inject(Is4TokenService);
   private storage = inject(StorageService);
   private toastr = inject(ToastrService);
   private cdr = inject(ChangeDetectorRef);
@@ -52,13 +54,11 @@ export class InventoryRequestViewComponent implements OnInit {
   }
 
   onIs4Login(): void {
-    this.authService
-      .generateIS4Token()
+    this.is4TokenService
+      .ensureToken()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: async (data) => {
-          await this.storage.setItem(STORAGE_KEYS.IS4_TOKEN, data.access_token);
-          await this.storage.setItem(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
+        next: () => {
           this.getVehicles();
         },
         error: (e) => {
@@ -68,7 +68,7 @@ export class InventoryRequestViewComponent implements OnInit {
       });
   }
 
-  getVehicles(): void {
+  getVehicles(isRetry = false): void {
     this.salesInvoiceService
       .getVehicles()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -77,8 +77,18 @@ export class InventoryRequestViewComponent implements OnInit {
           this.vehicles = res?.data || res || [];
           this.cdr.markForCheck();
         },
-        error: (e) => {
+        error: (e: any) => {
           console.warn('Get vehicles warning:', e);
+          if (e?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getVehicles(true),
+                error: () => this.cdr.markForCheck(),
+              });
+            return;
+          }
           this.cdr.markForCheck();
         },
       });

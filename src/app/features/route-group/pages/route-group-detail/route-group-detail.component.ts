@@ -9,6 +9,7 @@ import { RouteGroupService } from '../../services';
 import { LoadingService } from '../../../loading/services';
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Is4TokenService } from '../../../../core/services/is4-token.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { RouteGroup, HeaderRes, Area, Driver, Vehicle } from '../../../../core/models';
 import { getDefaultDateFilter } from '../../../../core/utils';
@@ -37,6 +38,7 @@ export class RouteGroupDetailComponent implements OnInit {
   private service = inject(SalesInvoiceService);
   private toastr = inject(ToastrService);
   private authService = inject(AuthService);
+  private is4TokenService = inject(Is4TokenService);
   private storageService = inject(StorageService);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
@@ -657,32 +659,24 @@ export class RouteGroupDetailComponent implements OnInit {
   onIs4Login(): void {
     this.isLoading = true;
     this.cdr.markForCheck();
-    this.authService
-      .generateIS4Token()
+    this.is4TokenService
+      .ensureToken()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: async (data) => {
+        next: () => {
           this.isLoading = false;
-          if (data?.access_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
-          }
-          if (data?.refresh_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
-          }
+          this.getVehicles();
+          this.getDrivers();
           this.cdr.markForCheck();
         },
         error: () => {
           this.isLoading = false;
           this.cdr.markForCheck();
         },
-        complete: () => {
-          this.getVehicles();
-          this.getDrivers();
-        },
       });
   }
 
-  getVehicles(): void {
+  getVehicles(isRetry = false): void {
     this.isLoading = true;
     this.cdr.markForCheck();
     this.service
@@ -694,14 +688,27 @@ export class RouteGroupDetailComponent implements OnInit {
           this.vehicles = data?.data || data || [];
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: any) => {
+          if (err?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getVehicles(true),
+                error: () => {
+                  this.isLoading = false;
+                  this.cdr.markForCheck();
+                },
+              });
+            return;
+          }
           this.isLoading = false;
           this.cdr.markForCheck();
         },
       });
   }
 
-  getDrivers(): void {
+  getDrivers(isRetry = false): void {
     this.isLoading = true;
     this.cdr.markForCheck();
     this.service
@@ -713,7 +720,20 @@ export class RouteGroupDetailComponent implements OnInit {
           this.drivers = data?.data || data || [];
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: any) => {
+          if (err?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getDrivers(true),
+                error: () => {
+                  this.isLoading = false;
+                  this.cdr.markForCheck();
+                },
+              });
+            return;
+          }
           this.isLoading = false;
           this.cdr.markForCheck();
         },

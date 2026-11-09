@@ -2,6 +2,7 @@ import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeD
 import { CommonModule, DatePipe } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SalesInvoiceService } from '../../../../core/services';
 import { HeaderRes, Area, SalesInvoicesModel } from '../../../../core/models';
@@ -35,6 +36,9 @@ export class FinishedListComponent implements OnInit {
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
   private readonly cdr = inject(ChangeDetectorRef);
+  private countCache: { date: string; data: { Code: string; Count: number }[] } | null = null;
+  private listSub?: Subscription;
+  private countSub?: Subscription;
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -80,11 +84,13 @@ export class FinishedListComponent implements OnInit {
   }
 
   getFinishedList() {
+    this.countCache = null;
+    this.countSub?.unsubscribe();
+    this.listSub?.unsubscribe();
     this.selectedAlphabet = '';
     this.loading = true;
     this.cdr.markForCheck();
-    this.service
-      .getFinishedList(this.dateString)
+    this.listSub = this.service.getFinishedList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -109,6 +115,7 @@ export class FinishedListComponent implements OnInit {
     if (input.value) {
       this.date = input.value;
       this.dateString = formatToApiDateString(input.value);
+      this.countCache = null;
       this.getFinishedList();
     }
   }
@@ -123,23 +130,29 @@ export class FinishedListComponent implements OnInit {
     this.applyFilter();
   }
 
+  private applyCount(data: { Code: string; Count: number }[]): void {
+    if (!data || !Array.isArray(data)) return;
+    data.forEach((response) => {
+      const matchingGroup = this.groupResult.find(
+        (element: any) => element.customerCode === response.Code
+      );
+
+      if (matchingGroup) {
+        matchingGroup.total = response.Count;
+      }
+    });
+    this.cdr.markForCheck();
+  }
+
   getCountCustomer(dateString: string) {
-    this.service
+    this.countSub?.unsubscribe();
+    this.countSub = this.service
       .getCountCustomer(dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: { Code: string; Count: number }[]) => {
-          if (!data || !Array.isArray(data)) return;
-          data.forEach((response) => {
-            const matchingGroup = this.groupResult.find(
-              (element: any) => element.customerCode === response.Code
-            );
-
-            if (matchingGroup) {
-              matchingGroup.total = response.Count;
-            }
-          });
-          this.cdr.markForCheck();
+          this.countCache = { date: dateString, data: data || [] };
+          this.applyCount(this.countCache.data);
         },
         error: (e) => {
           this.cdr.markForCheck();
@@ -172,7 +185,11 @@ export class FinishedListComponent implements OnInit {
     this.groupResult = result;
 
     if (this.groupResult.length > 0) {
-      this.getCountCustomer(this.dateString);
+      if (this.countCache?.date === this.dateString) {
+        this.applyCount(this.countCache.data);
+      } else {
+        this.getCountCustomer(this.dateString);
+      }
     }
   }
 

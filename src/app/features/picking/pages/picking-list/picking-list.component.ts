@@ -416,10 +416,15 @@ export class PickingListComponent implements OnInit, OnDestroy {
       });
   }
 
+  private audioNotification: HTMLAudioElement | null = null;
+
   private playAudioNotification(): void {
     try {
-      const audio = new Audio('sounds/wow.mp3');
-      audio.play().catch(() => {
+      if (!this.audioNotification) {
+        this.audioNotification = new Audio('sounds/wow.mp3');
+      }
+      this.audioNotification.currentTime = 0;
+      this.audioNotification.play().catch(() => {
         // Ignored if browser blocks autoplay before user gesture
       });
     } catch {

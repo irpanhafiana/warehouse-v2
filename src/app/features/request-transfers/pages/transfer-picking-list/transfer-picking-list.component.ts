@@ -3,6 +3,8 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 import { Area, HeaderRes } from '../../../../core/models';
 import { getDefaultDateFilter, formatToApiDateString } from '../../../../core/utils/date.util';
@@ -65,10 +67,13 @@ export class TransferPickingListComponent implements OnInit, OnDestroy {
   isDialogGantiPIC: boolean = false;
   isDialogAmbilBON: boolean = false;
 
+  private readonly cancelDelivery$ = new Subject<void>();
+  private pickingDataSub: Subscription | null = null;
+
   private notifyCancelDeliveryHandler = (data: string): void => {
     try {
       console.log('SignalR NotifyCancelDelivery:', data);
-      this.fetchPickingData();
+      this.cancelDelivery$.next();
     } catch (e) {
       console.warn('SignalR NotifyCancelDelivery parse warning:', e);
     }
@@ -92,6 +97,12 @@ export class TransferPickingListComponent implements OnInit, OnDestroy {
     }
     this.signalRService.on('NotifyCancelDelivery', this.notifyCancelDeliveryHandler);
 
+    this.cancelDelivery$
+      .pipe(debounceTime(1000), takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.fetchPickingData(true);
+      });
+
     this.signalRService.reconnected$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
@@ -102,6 +113,10 @@ export class TransferPickingListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.pickingDataSub) {
+      this.pickingDataSub.unsubscribe();
+      this.pickingDataSub = null;
+    }
     this.signalRService.off('NotifyCancelDelivery', this.notifyCancelDeliveryHandler);
   }
 
@@ -119,13 +134,18 @@ export class TransferPickingListComponent implements OnInit, OnDestroy {
   }
 
   fetchPickingData(silent = false): void {
+    if (this.pickingDataSub) {
+      this.pickingDataSub.unsubscribe();
+      this.pickingDataSub = null;
+    }
+
     this.selectedAlphabet = '';
     if (!silent) {
       this.loading = true;
       this.cdr.markForCheck();
     }
 
-    this.pickingService
+    this.pickingDataSub = this.pickingService
       .getPickingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({

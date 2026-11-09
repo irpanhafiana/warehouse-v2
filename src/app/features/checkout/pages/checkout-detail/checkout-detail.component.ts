@@ -228,7 +228,6 @@ export class CheckoutDetailComponent implements OnInit {
       this.filteredData = this.initialData;
     } else {
       this.selectedAplhabet = i;
-      this.applyFilter();
     }
     this.applyFilter();
   }

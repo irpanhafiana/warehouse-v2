@@ -1,8 +1,9 @@
-import { Component, ElementRef, viewChild, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, ElementRef, viewChild, OnInit, OnDestroy, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subscription, finalize } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
 
@@ -80,14 +81,19 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   readonly listBON = signal<HeaderRes[]>([]);
   readonly loadingStates = signal<{ [key: number]: boolean }>({});
   readonly itemLoaded = signal<any[]>([]);
+  readonly loadedIdSet = computed(() => new Set((this.itemLoaded() || []).map((item) => item?.Id)));
   readonly expandedIndex = signal<number | null>(null);
+
+  private loadingDetailSub?: Subscription;
+  private detailCustomerSub?: Subscription;
 
   private notifyNewLoadingHandler = (salesInvoiceModel: string): void => {
     try {
       const parsed = typeof salesInvoiceModel === 'string' ? JSON.parse(salesInvoiceModel) : salesInvoiceModel;
-      const target = Array.isArray(parsed) ? parsed[0] : parsed;
-      if (target) {
-        this.updateDetails(target);
+      if (Array.isArray(parsed)) {
+        this.updateDetailsArray(parsed);
+      } else if (parsed) {
+        this.updateDetails(parsed);
       }
     } catch (e) {
       console.error('SignalR notifyNewLoading parse error:', e);
@@ -97,6 +103,10 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   private notifyAdditionalInvoiceHandler = (salesInvoiceModel: string): void => {
     try {
       const parsed = typeof salesInvoiceModel === 'string' ? JSON.parse(salesInvoiceModel) : salesInvoiceModel;
+      const incomingCode = parsed?.Code || parsed?.CustomerModel?.Code;
+      if (incomingCode && incomingCode !== this.docnum()) {
+        return;
+      }
       this.newBon.set(parsed);
       this.getDetailByCustomerCode(this.dateString(), this.docnum());
       if (this.newBon()?.Name) {
@@ -143,30 +153,33 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.on('NotifyNewLoading', this.notifyNewLoadingHandler);
     this.signalrService.on('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
     this.signalrService.on('NotifyNewReturn', this.notifyNewReturnHandler);
-
-    this.signalrService.reconnected$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.onRefresh(true));
   }
 
   ngOnDestroy(): void {
+    this.loadingDetailSub?.unsubscribe();
+    this.detailCustomerSub?.unsubscribe();
     this.signalrService.off('NotifyNewLoading', this.notifyNewLoadingHandler);
     this.signalrService.off('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
     this.signalrService.off('NotifyNewReturn', this.notifyNewReturnHandler);
   }
 
   getDetailByCustomerCode(dateString: string, customerCode: string, silent = false): void {
+    this.detailCustomerSub?.unsubscribe();
     if (!silent) {
       this.loadingBonBaru.set(true);
     }
-    this.loadingService
+    this.detailCustomerSub = this.loadingService
       .getLoadingDetailByCustomerCode(dateString, customerCode)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data: HeaderRes[]) => {
+      .pipe(
+        finalize(() => {
           if (!silent) {
             this.loadingBonBaru.set(false);
           }
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data: HeaderRes[]) => {
           const sorted = [...(data || [])].sort((a, b) => {
             const dateCompare = (b.DocDate || '').localeCompare(a.DocDate || '');
             if (dateCompare !== 0) return dateCompare;
@@ -176,9 +189,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: () => {
-          if (!silent) {
-            this.loadingBonBaru.set(false);
-          }
           this.cdr.markForCheck();
         },
       });
@@ -191,17 +201,22 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       this.toggleText(index);
     }
 
+    this.loadingDetailSub?.unsubscribe();
     if (!silent) {
       this.loading.set(true);
     }
-    this.loadingService
+    this.loadingDetailSub = this.loadingService
       .getLoadingDetail(docnum)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data: SalesInvoicesModel) => {
+      .pipe(
+        finalize(() => {
           if (!silent) {
             this.loading.set(false);
           }
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (data: SalesInvoicesModel) => {
           (data.Details || []).forEach((element) => {
             element.isDone = false;
             element.isSebagian = false;
@@ -209,7 +224,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           });
 
           this.salesInvoice.set(data);
-          this.initialData.set(this.restoreSebagianFromStorage(data.Details || []));
+          const restored = this.restoreSebagianFromStorage(data.Details || []);
+          this.initialData.set(this.sortDetails(restored));
 
           const initials = Array.from(
             new Set(
@@ -228,14 +244,12 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
         },
         error: () => {
           if (!silent) {
-            this.loading.set(false);
             this.isErrorUnknown.set(true);
             this.toastr.error('Silahkan cek item yang belum di pick', 'Peringatan');
           }
           this.cdr.markForCheck();
         },
         complete: () => {
-          this.getPickingPicList();
           this.getNotPickedItem(showDialog || isSwitchBon);
           this.getRecehExist(showDialog || isSwitchBon);
           this.getCheckBON(this.selectedBON());
@@ -260,6 +274,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
             });
           });
           this.itemLoaded.set(loaded);
+          this.initialData.set(this.sortDetails(this.initialData()));
           this.applyFilter();
           this.cdr.markForCheck();
         },
@@ -316,10 +331,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   applyFilter(): void {
-    let result = this.filteredProducts(this.initialData());
-    if (result.length === 0 && !this.selectedAlphabet()) {
-      result = this.sortDetails(this.initialData());
-    }
+    const result = this.filteredProducts(this.initialData());
     this.filteredData.set(result);
     this.cdr.markForCheck();
   }
@@ -339,14 +351,12 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     });
 
     if (!this.selectedAlphabet()) {
-      return this.sortDetails(products);
+      return products;
     }
 
-    const filtered = products.filter((product) =>
+    return products.filter((product) =>
       product.ProductModel?.Name?.toLowerCase().startsWith(this.selectedAlphabet().toLowerCase())
     );
-
-    return this.sortDetails(filtered);
   }
 
   sortDetails(details: Detail[]): Detail[] {
@@ -373,7 +383,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isItemLoaded(item: Detail): boolean {
-    return this.itemLoaded().some((loadedItem) => loadedItem.Id === item.Id);
+    return this.loadedIdSet().has(item.Id);
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
@@ -456,7 +466,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           this.setLoadingState(id, false);
           // Reset sebagianValue di localStorage setelah berhasil disimpan
           this.clearSebagianFromStorage(id);
-          this.getLoadingDetail(this.selectedBON(), undefined, true, false);
           this.cdr.markForCheck();
         },
         error: () => {
@@ -711,6 +720,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   onRefresh(silent = false): void {
     this.selectedAlphabet.set('');
+    this.getPickingPicList();
     this.getDetailByCustomerCode(this.dateString(), this.docnum(), silent);
     this.getLoadingDetail(this.selectedBON(), undefined, silent, false);
   }

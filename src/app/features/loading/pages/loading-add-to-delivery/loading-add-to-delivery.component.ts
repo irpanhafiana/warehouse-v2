@@ -13,6 +13,7 @@ import { ToastrService } from 'ngx-toastr';
 
 import { LoadingService } from '../../services/loading.service';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Is4TokenService } from '../../../../core/services/is4-token.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 
 import { Vehicle, Driver, Detail } from '../../../../core/models';
@@ -33,6 +34,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private service = inject(LoadingService);
   private authService = inject(AuthService);
+  private is4TokenService = inject(Is4TokenService);
   private storageService = inject(StorageService);
   private toastr = inject(ToastrService);
   private destroyRef = inject(DestroyRef);
@@ -96,18 +98,12 @@ export class LoadingAddToDeliveryComponent implements OnInit {
   onIs4Login(): void {
     this.loading = true;
     this.cdr.markForCheck();
-    this.authService
-      .generateIS4Token()
+    this.is4TokenService
+      .ensureToken()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: async (data) => {
+        next: () => {
           this.loading = false;
-          if (data?.access_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
-          }
-          if (data?.refresh_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
-          }
           this.getVehicles();
           this.getDrivers();
           this.cdr.markForCheck();
@@ -119,7 +115,7 @@ export class LoadingAddToDeliveryComponent implements OnInit {
       });
   }
 
-  getVehicles(): void {
+  getVehicles(isRetry = false): void {
     this.service
       .getVehicles()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -128,13 +124,23 @@ export class LoadingAddToDeliveryComponent implements OnInit {
           this.vehicles = data?.data || data || [];
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: any) => {
+          if (err?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getVehicles(true),
+                error: () => this.cdr.markForCheck(),
+              });
+            return;
+          }
           this.cdr.markForCheck();
         },
       });
   }
 
-  getDrivers(): void {
+  getDrivers(isRetry = false): void {
     this.service
       .getDrivers()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -143,7 +149,17 @@ export class LoadingAddToDeliveryComponent implements OnInit {
           this.drivers = data?.data || data || [];
           this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err: any) => {
+          if (err?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getDrivers(true),
+                error: () => this.cdr.markForCheck(),
+              });
+            return;
+          }
           this.cdr.markForCheck();
         },
       });

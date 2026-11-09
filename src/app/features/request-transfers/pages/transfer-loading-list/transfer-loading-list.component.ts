@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -39,6 +40,9 @@ export class TransferLoadingListComponent implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private countCache: { date: string; data: { Code: string; Count: number }[] } | null = null;
+  private listSub?: Subscription;
+  private countSub?: Subscription;
 
   headerRes: HeaderRes[] = [];
   filteredSalesInvoices: HeaderRes[] = [];
@@ -68,11 +72,13 @@ export class TransferLoadingListComponent implements OnInit {
   }
 
   getLoadingList(): void {
+    this.countCache = null;
+    this.countSub?.unsubscribe();
+    this.listSub?.unsubscribe();
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.loadingService
-      .getLoadingList(this.dateString)
+    this.listSub = this.loadingService.getLoadingList(this.dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
@@ -108,6 +114,7 @@ export class TransferLoadingListComponent implements OnInit {
     if (input.value) {
       this.date = input.value;
       this.dateString = input.value.replace(/-/g, '');
+      this.countCache = null;
       this.getLoadingList();
     }
   }
@@ -158,25 +165,35 @@ export class TransferLoadingListComponent implements OnInit {
     this.groupResult = result;
 
     if (this.groupResult.length > 0) {
-      this.getCountCustomer(this.dateString);
+      if (this.countCache?.date === this.dateString) {
+        this.applyCount(this.countCache.data);
+      } else {
+        this.getCountCustomer(this.dateString);
+      }
     }
   }
 
+  private applyCount(data: { Code: string; Count: number }[]): void {
+    data?.forEach((response: { Code: string; Count: number }) => {
+      const matchingGroup = this.groupResult.find(
+        (elem) => elem.customerCode === response.Code
+      );
+      if (matchingGroup) {
+        matchingGroup.total = response.Count;
+      }
+    });
+    this.cdr.markForCheck();
+  }
+
   getCountCustomer(dateString: string): void {
-    this.loadingService
+    this.countSub?.unsubscribe();
+    this.countSub = this.loadingService
       .getCountCustomer(dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          data?.forEach((response: { Code: string; Count: number }) => {
-            const matchingGroup = this.groupResult.find(
-              (elem) => elem.customerCode === response.Code
-            );
-            if (matchingGroup) {
-              matchingGroup.total = response.Count;
-            }
-          });
-          this.cdr.markForCheck();
+          this.countCache = { date: dateString, data: data || [] };
+          this.applyCount(this.countCache.data);
         },
         error: (e) => {
           console.warn('Get count customer warning:', e);

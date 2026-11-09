@@ -2,6 +2,7 @@ import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeD
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { SalesInvoiceService } from '../../../../core/services/sales-invoice.service';
@@ -42,6 +43,9 @@ export class LoadingListComponent implements OnInit {
   private router = inject(Router);
   private destroyRef = inject(DestroyRef);
   readonly cdr = inject(ChangeDetectorRef);
+  private countCache: { date: string; data: { Code: string; Count: number }[] } | null = null;
+  private listSub?: Subscription;
+  private countSub?: Subscription;
 
   readonly headerRes = signal<HeaderRes[]>([]);
   readonly filteredSalesInvoices = signal<HeaderRes[]>([]);
@@ -68,11 +72,13 @@ export class LoadingListComponent implements OnInit {
   }
 
   getLoadingList(): void {
+    this.countCache = null;
+    this.countSub?.unsubscribe();
+    this.listSub?.unsubscribe();
     this.selectedAlphabet.set('');
     this.loading.set(true);
     this.cdr.markForCheck();
-    this.service
-      .getLoadingList(this.dateString())
+    this.listSub = this.service.getLoadingList(this.dateString())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: HeaderRes[]) => {
@@ -96,6 +102,7 @@ export class LoadingListComponent implements OnInit {
     const input = e.target as HTMLInputElement;
     this.date.set(input.value);
     this.dateString.set(formatToApiDateString(input.value));
+    this.countCache = null;
     if (this.dateString()) {
       this.getLoadingList();
     }
@@ -163,30 +170,40 @@ export class LoadingListComponent implements OnInit {
     this.groupResult.set(result);
 
     if (result.length > 0) {
-      this.getCountCustomer(this.dateString());
+      if (this.countCache?.date === this.dateString()) {
+        this.applyCount(this.countCache.data);
+      } else {
+        this.getCountCustomer(this.dateString());
+      }
     }
     this.cdr.markForCheck();
   }
 
+  private applyCount(data: { Code: string; Count: number }[]): void {
+    this.groupResult.update((current) => {
+      const updated = current.map((item) => ({ ...item }));
+      (data || []).forEach((response) => {
+        const matchingGroup = updated.find(
+          (element) => element.customerCode === response.Code
+        );
+        if (matchingGroup) {
+          matchingGroup.total = response.Count;
+        }
+      });
+      return updated;
+    });
+    this.cdr.markForCheck();
+  }
+
   getCountCustomer(dateString: string): void {
-    this.service
+    this.countSub?.unsubscribe();
+    this.countSub = this.service
       .getCountCustomer(dateString)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data: { Code: string; Count: number }[]) => {
-          this.groupResult.update((current) => {
-            const updated = current.map((item) => ({ ...item }));
-            (data || []).forEach((response) => {
-              const matchingGroup = updated.find(
-                (element) => element.customerCode === response.Code
-              );
-              if (matchingGroup) {
-                matchingGroup.total = response.Count;
-              }
-            });
-            return updated;
-          });
-          this.cdr.markForCheck();
+          this.countCache = { date: dateString, data: data || [] };
+          this.applyCount(this.countCache.data);
         },
         error: () => {
           this.cdr.markForCheck();

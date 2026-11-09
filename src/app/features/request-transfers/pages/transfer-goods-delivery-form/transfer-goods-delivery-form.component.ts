@@ -6,6 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { Detail, Driver, Vehicle } from '../../../../core/models';
 import { AuthService } from '../../../../core/services/auth.service';
+import { Is4TokenService } from '../../../../core/services/is4-token.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 import { LoaderComponent, DialogConfirmComponent } from '../../../../shared/components';
 import { TransferLoadingService } from '../../services/transfer-loading.service';
@@ -22,6 +23,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private is4TokenService = inject(Is4TokenService);
   private storageService = inject(StorageService);
   private loadingService = inject(TransferLoadingService);
   private toastr = inject(ToastrService);
@@ -85,17 +87,11 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
     this.loading = true;
     this.cdr.markForCheck();
 
-    this.authService
-      .generateIS4Token()
+    this.is4TokenService
+      .ensureToken()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: async (data) => {
-          if (data?.access_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_TOKEN, data.access_token);
-          }
-          if (data?.refresh_token) {
-            await this.storageService.set(STORAGE_KEYS.IS4_REFRESH_TOKEN, data.refresh_token);
-          }
+        next: () => {
           this.getVehicles();
           this.getDrivers();
         },
@@ -108,7 +104,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
       });
   }
 
-  getVehicles(): void {
+  getVehicles(isRetry = false): void {
     this.loadingService
       .getVehicles()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -119,6 +115,20 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get vehicles warning:', e);
+          if (e?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getVehicles(true),
+                error: () => {
+                  this.loading = false;
+                  this.cdr.markForCheck();
+                },
+              });
+            return;
+          }
+          this.loading = false;
           this.cdr.markForCheck();
         },
         complete: () => {
@@ -128,7 +138,7 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
       });
   }
 
-  getDrivers(): void {
+  getDrivers(isRetry = false): void {
     this.loadingService
       .getDrivers()
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -139,6 +149,16 @@ export class TransferGoodsDeliveryFormComponent implements OnInit {
         },
         error: (e) => {
           console.warn('Get drivers warning:', e);
+          if (e?.status === 401 && !isRetry) {
+            this.is4TokenService
+              .ensureToken(true)
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
+                next: () => this.getDrivers(true),
+                error: () => this.cdr.markForCheck(),
+              });
+            return;
+          }
           this.cdr.markForCheck();
         },
       });
