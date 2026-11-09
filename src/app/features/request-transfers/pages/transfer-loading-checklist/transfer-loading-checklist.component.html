@@ -133,32 +133,88 @@
           <div class="flex flex-col">
             <div class="flex flex-row justify-between items-center mb-1">
               <span class="text-xs font-bold text-gray-500">{{ item.Alias || '' }}</span>
-              <div class="flex items-center gap-1">
+              <div class="flex items-center gap-1.5 flex-wrap justify-end">
                 @if (item.Remarks) {
-                <span class="text-xs font-semibold text-gray-600">{{ item.Remarks }}</span>
+                <span class="text-xs font-semibold text-gray-600 truncate max-w-36">{{ item.Remarks }}</span>
                 }
-                @if (isItemLoaded(item)) {
-                <span class="bg-[#257180] text-white text-xs font-bold px-2 py-0.5 rounded-md">
+                @if (isFullyDelivered(item)) {
+                <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Sudah Dikirim Semua
+                </span>
+                } @else if (getDeliveredQty(item) > 0) {
+                <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Sudah dikirim: {{ getDeliveredQty(item) }}
+                </span>
+                } @else if (isItemLoaded(item)) {
+                <span class="bg-[#257180] text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
                   Sudah dimuat
                 </span>
+                }
+
+                @if (!isFullyDelivered(item)) {
+                  @if (item.sebagianValue > 0) {
+                  <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    Akan dikirim: {{ item.sebagianValue }}
+                  </span>
+                  } @else if (item.Remarks && item.Remarks.includes(picName) && getRemainingQty(item) > 0) {
+                  <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                    Akan dikirim: {{ getRemainingQty(item) }}
+                  </span>
+                  }
                 }
               </div>
             </div>
 
+            @if (isFullyDelivered(item)) {
+            <h2 class="font-bold text-slate-400 text-base sm:text-lg text-left leading-snug">
+              {{ item.ProductModel.Name }}
+            </h2>
+            } @else if (item.Remarks && item.Remarks.includes(picName)) {
+            <h2 class="font-bold text-slate-800 text-base sm:text-lg text-left leading-snug">
+              {{ item.ProductModel.Name }}
+            </h2>
+            } @else {
             <button type="button"
               class="font-bold text-slate-800 text-base sm:text-lg text-left leading-snug cursor-pointer transition-opacity"
               [class.opacity-50]="isLoading(item.Id)"
               (click)="!isLoading(item.Id) && onRemarkDone(item.Id, item.Remarks, item.DetailId, item)">
               {{ isLoading(item.Id) ? 'Menyimpan...' : item.ProductModel.Name }}
             </button>
+            }
           </div>
 
           <div class="flex flex-row justify-between items-center mt-3 pt-2 border-t border-gray-100">
-            <span class="font-semibold text-gray-600 text-sm">
-              {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
-            </span>
+            <div class="font-semibold text-gray-600 text-sm">
+              @if (hasDelivered(item) && !isFullyDelivered(item)) {
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="line-through text-gray-400 text-xs sm:text-sm">
+                  Total: {{ getTotalQty(item) }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                </span>
+                <span class="text-gray-400 font-bold">➔</span>
+                <span class="bg-red-50 text-red-700 border border-red-200 px-2 py-0.5 rounded-md text-xs font-bold">
+                  Sisa: {{ getRemainingQty(item) }} {{ item.UoMModel.Code }}
+                </span>
+              </div>
+              } @else if (isFullyDelivered(item)) {
+              <div class="flex items-center gap-1.5">
+                <span class="text-emerald-700 font-bold text-xs sm:text-sm">
+                  Tuntas: {{ getTotalQty(item) }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                </span>
+              </div>
+              } @else {
+              <span>
+                {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+              </span>
+              }
+            </div>
 
-            @if (!item.Remarks?.includes(picName)) {
+            @if (isFullyDelivered(item)) {
+            <!-- Selesai dikirim semua -->
+            } @else if (item.Remarks?.includes(picName)) {
+            <button type="button" class="btn-sm-no-shadow-danger cursor-pointer" (click)="onCancel(item.Id)">
+              Batalkan
+            </button>
+            } @else if (getRemainingQty(item) > 1) {
             <div class="flex flex-row gap-1.5 items-center">
               <button type="button"
                 class="w-7 h-7 flex items-center justify-center bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-lg cursor-pointer"
@@ -166,7 +222,7 @@
                 -
               </button>
               <span class="font-bold text-sm text-center px-1">
-                {{ item.sebagianValue }} / {{ item.OpenQuantity > 0 ? item.OpenQuantity : item.Quantity }}
+                {{ item.sebagianValue || 0 }} / {{ getRemainingQty(item) }}
               </span>
               <button type="button"
                 class="w-7 h-7 flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg cursor-pointer"
@@ -174,10 +230,6 @@
                 +
               </button>
             </div>
-            } @else {
-            <button type="button" class="btn-sm-no-shadow-danger cursor-pointer" (click)="onCancel(item.Id)">
-              Batalkan
-            </button>
             }
           </div>
         </div>

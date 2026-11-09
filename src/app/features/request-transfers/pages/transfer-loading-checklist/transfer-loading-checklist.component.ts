@@ -367,8 +367,72 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
     updates.forEach((item) => this.updateDetails(item));
   }
 
+  calculateApprovalQty(openQuantity: number, quantity: number): number {
+    if (openQuantity > 0) {
+      return Number(openQuantity + quantity);
+    }
+    return Number(quantity);
+  }
+
+  getDeliveredQty(item: Detail): number {
+    if (item.SAPDocEntry && !isNaN(Number(item.SAPDocEntry)) && Number(item.SAPDocEntry) > 0) {
+      return Number(item.SAPDocEntry);
+    }
+
+    const qty = Number(item.Quantity || 0);
+    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : qty;
+
+    if (qty > openQty && openQty >= 0) {
+      return qty - openQty;
+    }
+
+    if (openQty === 0 && this.isItemLoaded(item)) {
+      return qty || Number(item.SAPDocEntry) || 0;
+    }
+
+    const loadedMatches = (this.itemLoaded || []).filter(
+      (l) => l?.id === item.Id || l?.Id === item.Id
+    );
+    if (loadedMatches.length > 0) {
+      const sum = loadedMatches.reduce(
+        (total, curr) => total + Number(curr?.data?.sebagianValue || curr?.data?.Quantity || curr?.sebagianValue || curr?.Quantity || 0),
+        0
+      );
+      if (sum > 0) return sum;
+    }
+
+    return 0;
+  }
+
+  getRemainingQty(item: Detail): number {
+    if (item.OpenQuantity !== undefined && item.OpenQuantity !== null) {
+      return Number(item.OpenQuantity);
+    }
+    return Number(item.Quantity || 0);
+  }
+
+  getTotalQty(item: Detail): number {
+    if (item.SAPDocEntry && Number(item.SAPDocEntry) > 0 && item.OpenQuantity > 0) {
+      return this.calculateApprovalQty(item.OpenQuantity, Number(item.SAPDocEntry));
+    }
+    return Number(item.Quantity || 0);
+  }
+
+  hasDelivered(item: Detail): boolean {
+    return (
+      this.isItemLoaded(item) ||
+      this.getDeliveredQty(item) > 0 ||
+      (item.OpenQuantity !== undefined && item.OpenQuantity !== null && Number(item.OpenQuantity) < Number(item.Quantity || 0))
+    );
+  }
+
+  isFullyDelivered(item: Detail): boolean {
+    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : Number(item.Quantity || 0);
+    return openQty === 0 && this.hasDelivered(item);
+  }
+
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (detail.OpenQuantity === 0 || this.isLoading(id)) return;
+    if (detail.OpenQuantity === 0 || this.isFullyDelivered(detail) || this.isLoading(id)) return;
 
     if (!this.picName) {
       this.isErrorPicSebagian = true;
@@ -391,7 +455,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   private executeSaveRemarkDone(id: number, detail: Detail): void {
-    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
+    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : this.getRemainingQty(detail);
 
     const detailIds =
       detail.DetailId && detail.DetailId.trim() !== ''
@@ -484,7 +548,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       itemInInitial.sebagianValue = 0;
     }
 
-    const maxQty = Number((itemInFiltered.OpenQuantity || 0) + (itemInFiltered.Quantity || 0));
+    const maxQty = this.getRemainingQty(itemInFiltered);
 
     if (indicator === '-') {
       if (itemInFiltered.sebagianValue > 0) {
@@ -531,6 +595,10 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: any): string {
+    if (this.isFullyDelivered(item)) {
+      return 'bg-emerald-50 border-emerald-300 opacity-90';
+    }
+
     const remarkNames = item.Remarks
       ? item.Remarks.replace('load by: ', '')
         .split(',')
@@ -538,7 +606,8 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
         .filter(Boolean)
       : [];
 
-    if (item.sebagianValue > 0 && item.sebagianValue !== item.Quantity) {
+    const remaining = this.getRemainingQty(item);
+    if (item.sebagianValue > 0 && item.sebagianValue !== remaining) {
       return 'bg-gray-200 border-gray-400';
     }
     if (remarkNames.includes(this.picName)) {

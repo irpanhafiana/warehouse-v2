@@ -369,7 +369,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isItemComplete(item: Detail): boolean {
-    if (this.isItemLoaded(item)) return true;
+    if (this.isFullyDelivered(item)) return true;
     if (!item.Remarks) return false;
     const match = item.Remarks.match(/load by:\s*([\w\s,]+)/i);
     if (match) {
@@ -386,8 +386,65 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     return this.loadedIdSet().has(item.Id);
   }
 
+  calculateApprovalQty(openQuantity: number, quantity: number): number {
+    if (openQuantity > 0) {
+      return Number(openQuantity + quantity);
+    }
+    return Number(quantity);
+  }
+
+  getDeliveredQty(item: Detail): number {
+    const qty = Number(item.Quantity || 0);
+    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : qty;
+
+    if (qty > openQty && openQty >= 0) {
+      return qty - openQty;
+    }
+
+    if (openQty === 0 && this.isItemLoaded(item)) {
+      return qty;
+    }
+
+    const loadedMatches = (this.itemLoaded() || []).filter(
+      (l) => l?.Id === item.Id || l?.id === item.Id
+    );
+    if (loadedMatches.length > 0) {
+      const sum = loadedMatches.reduce(
+        (total, curr) => total + Number(curr.sebagianValue || curr.Quantity || 0),
+        0
+      );
+      if (sum > 0) return sum;
+    }
+
+    return 0;
+  }
+
+  getRemainingQty(item: Detail): number {
+    if (item.OpenQuantity !== undefined && item.OpenQuantity !== null) {
+      return Number(item.OpenQuantity);
+    }
+    return Number(item.Quantity || 0);
+  }
+
+  getTotalQty(item: Detail): number {
+    return Number(item.Quantity || 0);
+  }
+
+  hasDelivered(item: Detail): boolean {
+    return (
+      this.isItemLoaded(item) ||
+      this.getDeliveredQty(item) > 0 ||
+      (item.OpenQuantity !== undefined && item.OpenQuantity !== null && Number(item.OpenQuantity) < Number(item.Quantity || 0))
+    );
+  }
+
+  isFullyDelivered(item: Detail): boolean {
+    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : Number(item.Quantity || 0);
+    return openQty === 0 && this.hasDelivered(item);
+  }
+
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (this.isLoading(id)) return;
+    if (this.isLoading(id) || this.isFullyDelivered(detail)) return;
     this.setLoadingState(id, true);
 
     if (!this.picName()) {
@@ -435,7 +492,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   private executeSaveRemarkDone(id: number, detail: Detail): void {
-    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
+    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : this.getRemainingQty(detail);
 
     const detailIds =
       detail.DetailId && detail.DetailId.trim() !== ''
@@ -516,7 +573,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       if (indicator === '-') {
         if (copy.sebagianValue > 0) copy.sebagianValue--;
       } else if (indicator === '+') {
-        if (copy.sebagianValue < copy.OpenQuantity) copy.sebagianValue++;
+        const maxLimit = this.getRemainingQty(copy);
+        if (copy.sebagianValue < maxLimit) copy.sebagianValue++;
       }
       return copy;
     });
@@ -562,6 +620,10 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: Detail): string {
+    if (this.isFullyDelivered(item)) {
+      return 'bg-emerald-50 border-emerald-300 opacity-90';
+    }
+
     const remarkNames = item.Remarks
       ? item.Remarks.replace('load by: ', '')
         .split(',')
@@ -569,7 +631,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
         .filter(Boolean)
       : [];
 
-    if (item.sebagianValue > 0 && item.sebagianValue !== item.OpenQuantity) {
+    const remaining = this.getRemainingQty(item);
+    if (item.sebagianValue > 0 && item.sebagianValue !== remaining) {
       return 'bg-gray-100 border-gray-300';
     }
     if (remarkNames.includes(this.picName())) {
@@ -597,7 +660,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   filterValidRemarks(data: Detail[]): Detail[] {
     return data.filter((item) => {
-      if (this.isItemLoaded(item)) return false;
+      if (this.isFullyDelivered(item) || item.OpenQuantity === 0) return false;
       const match = (item.Remarks || '').match(/load by:\s*([\w\s,]+)/i);
       if (match) {
         const names = match[1]
