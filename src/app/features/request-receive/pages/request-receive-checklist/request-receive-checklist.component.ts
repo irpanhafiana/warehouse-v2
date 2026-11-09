@@ -82,9 +82,6 @@ export class RequestReceiveChecklistComponent implements OnInit, OnDestroy {
     this.fetchRequestReceiveChecklist();
     this.signalRService.on('NotifyNewReceiveLoading', this.notifyNewReceiveLoadingHandler);
 
-    this.signalRService.reconnected$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.fetchRequestReceiveChecklist(true));
   }
 
   ngOnDestroy(): void {

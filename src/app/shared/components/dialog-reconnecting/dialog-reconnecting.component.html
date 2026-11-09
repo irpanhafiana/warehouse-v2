@@ -1,0 +1,56 @@
+@if (reconnectingService.isVisible()) {
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop select-none">
+  <div
+    class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4 text-center items-center shadow-2xl">
+    
+    <!-- Icon Container -->
+    <div
+      class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#202B6D] shrink-0">
+      @if (reconnectingService.isFailed()) {
+      <svg class="w-7 h-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+      } @else {
+      <svg class="w-7 h-7 text-[#202B6D] animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      }
+    </div>
+
+    <!-- Title & Description -->
+    <div class="flex flex-col gap-1 w-full">
+      <h2 class="text-xl font-bold text-[#202B6D] tracking-tight">
+        {{ reconnectingService.isFailed() ? 'Gagal Menghubungkan' : 'Menghubungkan Kembali' }}
+      </h2>
+      <p class="text-gray-600 text-sm leading-relaxed">
+        {{ reconnectingService.message() }}
+      </p>
+    </div>
+
+    <!-- Status Box -->
+    @if (!reconnectingService.isFailed()) {
+    <div class="w-full bg-blue-50 border border-blue-200 rounded-xl p-3 flex items-center justify-center gap-2.5">
+      <div class="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <span class="text-xs font-semibold text-blue-900">Memperbarui sesi & mengulang request...</span>
+    </div>
+    <p class="text-[11px] text-gray-400 font-medium">Mohon tunggu, jangan tutup aplikasi atau pindah halaman.</p>
+    } @else {
+    <!-- Failed Action Buttons -->
+    <div class="w-full flex flex-col gap-2 mt-2">
+      <button type="button" class="w-full btn-no-shadow-primary text-center py-2.5 font-bold cursor-pointer"
+        (click)="reconnectingService.retry()">
+        Coba Hubungkan Ulang
+      </button>
+      <button type="button" class="w-full btn-no-shadow-secondary text-center py-2.5 text-xs font-semibold cursor-pointer"
+        (click)="reconnectingService.forceCloseToLogin()">
+        Kembali ke Login
+      </button>
+    </div>
+    }
+
+  </div>
+</div>
+}

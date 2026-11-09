@@ -93,13 +93,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     const hour = new Date().getHours();
 
     if (hour >= 4 && hour < 11) {
-      this.greeting = 'Selamat Pagi ðŸ‘‹';
+      this.greeting = 'Selamat Pagi';
     } else if (hour >= 11 && hour < 15) {
-      this.greeting = 'Selamat Siang ðŸ‘‹';
+      this.greeting = 'Selamat Siang';
     } else if (hour >= 15 && hour < 18) {
-      this.greeting = 'Selamat Sore ðŸ‘‹';
+      this.greeting = 'Selamat Sore';
     } else {
-      this.greeting = 'Selamat Malam ðŸ‘‹';
+      this.greeting = 'Selamat Malam';
     }
   }
 

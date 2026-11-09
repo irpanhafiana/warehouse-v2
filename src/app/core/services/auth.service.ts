@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { StorageService, STORAGE_KEYS } from './storage.service';
 
@@ -10,6 +11,57 @@ import { StorageService, STORAGE_KEYS } from './storage.service';
 export class AuthService {
   private http = inject(HttpClient);
   private storage = inject(StorageService);
+
+  private localRefreshInFlight$: Observable<string> | null = null;
+  private cloudRefreshInFlight$: Observable<string> | null = null;
+
+  refreshLocalToken(): Observable<string> {
+    if (this.localRefreshInFlight$) {
+      return this.localRefreshInFlight$;
+    }
+
+    const username = environment.posUsername;
+    const password = environment.posPassword;
+
+    this.localRefreshInFlight$ = this.postLogin(username, password).pipe(
+      tap(async (res) => {
+        if (res?.access_token) {
+          await this.storage.setItem(STORAGE_KEYS.TOKEN, res.access_token);
+        }
+      }),
+      map((res) => res.access_token),
+      shareReplay({ bufferSize: 1, refCount: false }),
+      finalize(() => {
+        this.localRefreshInFlight$ = null;
+      })
+    );
+
+    return this.localRefreshInFlight$;
+  }
+
+  refreshCloudToken(): Observable<string> {
+    if (this.cloudRefreshInFlight$) {
+      return this.cloudRefreshInFlight$;
+    }
+
+    const username = environment.posUsername;
+    const password = environment.posPassword;
+
+    this.cloudRefreshInFlight$ = this.postLoginCloud(username, password).pipe(
+      tap(async (res) => {
+        if (res?.access_token) {
+          await this.storage.setItem(STORAGE_KEYS.CLOUD_TOKEN, res.access_token);
+        }
+      }),
+      map((res) => res.access_token),
+      shareReplay({ bufferSize: 1, refCount: false }),
+      finalize(() => {
+        this.cloudRefreshInFlight$ = null;
+      })
+    );
+
+    return this.cloudRefreshInFlight$;
+  }
 
   generateIS4Token(): Observable<{ access_token: string; refresh_token: string }> {
     const body =

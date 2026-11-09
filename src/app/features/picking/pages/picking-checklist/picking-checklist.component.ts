@@ -122,14 +122,6 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.signalrService.on('NotifyNewPicking', this.notifyNewPickingHandler);
     this.signalrService.on('NotifyNewReturn', this.notifyNewReturnHandler);
     this.signalrService.on('NotifyPickingLockedUnlocked', this.notifyPickingLockedUnlockedHandler);
-
-    this.signalrService.reconnected$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.docnum) {
-          this.getDetail(true);
-        }
-      });
   }
 
   ngOnDestroy(): void {

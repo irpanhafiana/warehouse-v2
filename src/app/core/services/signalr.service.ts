@@ -32,6 +32,7 @@ export function parseSignalRPayload<T = any>(data: unknown): T | null {
 export class SignalrService {
   private static readonly MESSAGE_HUB_SUFFIX = 'MessageHub';
   private static readonly MAX_RETRY_DELAY_MS = 20000;
+  private static readonly RECONNECT_COOLDOWN_MS = 15000;
 
   private hubConnection?: signalR.HubConnection;
   private readonly hubUrl: string = `${environment.signalRapi}/${SignalrService.MESSAGE_HUB_SUFFIX}`;
@@ -41,6 +42,7 @@ export class SignalrService {
   private isRetryLoopActive = false;
   private isManuallyStopped = false;
   private hasConnectedBefore = false;
+  private lastEmitReconnectedTime = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private retryDelayTimer: ReturnType<typeof setTimeout> | null = null;
   private jitterTimer: ReturnType<typeof setTimeout> | null = null;
@@ -279,6 +281,11 @@ export class SignalrService {
   }
 
   private emitReconnected(): void {
+    const now = Date.now();
+    if (now - this.lastEmitReconnectedTime < SignalrService.RECONNECT_COOLDOWN_MS) {
+      return;
+    }
+
     if (this.jitterTimer !== null) {
       clearTimeout(this.jitterTimer);
       this.jitterTimer = null;
@@ -287,6 +294,7 @@ export class SignalrService {
     const jitterMs = Math.floor(Math.random() * 3000);
     this.jitterTimer = setTimeout(() => {
       this.jitterTimer = null;
+      this.lastEmitReconnectedTime = Date.now();
       this.ngZone.run(() => this.reconnectedSubject.next());
     }, jitterMs);
   }

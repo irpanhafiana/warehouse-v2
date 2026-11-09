@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject, Subscription, debounceTime, finalize } from 'rxjs';
+import { Subscription, finalize } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { Detail, HeaderRes, SalesInvoicesModel } from '../../../../core/models';
@@ -67,7 +67,6 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   loadingStates: { [key: number]: boolean } = {};
   itemLoaded: any[] = [];
   loadedItemIds = new Set<number>();
-  private readonly remarkRefresh$ = new Subject<void>();
   private loadingDetailSub?: Subscription;
   private customerDetailSub?: Subscription;
 
@@ -112,15 +111,6 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       this.picName = cachedPic.toUpperCase();
     }
 
-    this.remarkRefresh$
-      .pipe(
-        debounceTime(1500),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.getLoadingDetail(this.selectedBON, undefined, true, false, true);
-      });
-
     this.getPickingPicList();
     this.getDetailByCustomerCode(this.dateString, this.customerCodeParam);
     this.getLoadingDetail(this.selectedBON || this.customerCodeParam, undefined, false, true);
@@ -128,10 +118,6 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
     this.signalRService.on('NotifyNewDeliveryLoading', this.notifyNewLoadingHandler);
     this.signalRService.on('NotifyAdditionalInvoice', this.notifyAdditionalInvoiceHandler);
     this.signalRService.on('NotifyNewReturn', this.notifyNewReturnHandler);
-
-    this.signalRService.reconnected$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.onRefresh(true));
   }
 
   ngOnDestroy(): void {
@@ -163,7 +149,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       });
   }
 
-  getLoadingDetail(docnum: string, index?: number, silent = false, showDialog = false, lightweight = false): void {
+  getLoadingDetail(docnum: string, index?: number, silent = false, showDialog = false): void {
     const isSwitchBon = !!this.selectedBON && this.selectedBON !== docnum;
     this.selectedBON = docnum;
     if (!silent) {
@@ -171,10 +157,8 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
     }
 
-    if (!lightweight) {
-      this.getNotPickedItem(showDialog || isSwitchBon);
-      this.getRecehExist(showDialog || isSwitchBon);
-    }
+    this.getNotPickedItem(showDialog || isSwitchBon);
+    this.getRecehExist(showDialog || isSwitchBon);
 
     this.loadingDetailSub?.unsubscribe();
     this.loadingDetailSub = this.loadingService
@@ -200,9 +184,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
           this.initialData = data?.Details || [];
           this.createAlphabetList(this.initialData);
           this.applyFilter();
-          if (!lightweight) {
-            this.getCheckBON(this.selectedBON);
-          }
+          this.getCheckBON(this.selectedBON);
           this.cdr.markForCheck();
         },
         error: (e) => {
@@ -447,7 +429,6 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
               localStorage.removeItem(this.selectedBON);
             }
           } catch { }
-          this.remarkRefresh$.next();
           this.cdr.markForCheck();
         },
         error: (e) => {

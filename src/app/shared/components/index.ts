@@ -4,6 +4,7 @@ export * from './card-detail-docnum/card-detail-docnum.component';
 export * from './card-picking-item/card-picking-item.component';
 export * from './dialog-confirm/dialog-confirm.component';
 export * from './dialog-force-close/dialog-force-close.component';
+export * from './dialog-reconnecting/dialog-reconnecting.component';
 export * from './dialog-set-pic/dialog-set-pic.component';
 export * from './floating-reset-button/floating-reset-button.component';
 export * from './loader/loader.component';

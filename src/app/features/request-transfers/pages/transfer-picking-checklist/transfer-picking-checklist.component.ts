@@ -99,13 +99,6 @@ export class TransferPickingChecklistComponent implements OnInit, OnDestroy {
     this.signalRService.on('NotifyNewDeliveryReturn', this.notifyNewDeliveryReturnHandler);
     this.signalRService.on('NotifyDeliveryPickingLockedUnlocked', this.notifyDeliveryPickingLockedUnlockedHandler);
 
-    this.signalRService.reconnected$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        if (this.docnum) {
-          this.getDetail(true);
-        }
-      });
   }
 
   ngOnDestroy(): void {

@@ -4,10 +4,11 @@ import { App as CapApp } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
 import { AppUpdateService } from './core/services/app-update.service';
 import { UpdateDialogComponent } from './shared/components/update-dialog/update-dialog.component';
+import { DialogReconnectingComponent } from './shared/components/dialog-reconnecting/dialog-reconnecting.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, UpdateDialogComponent],
+  imports: [RouterOutlet, UpdateDialogComponent, DialogReconnectingComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
