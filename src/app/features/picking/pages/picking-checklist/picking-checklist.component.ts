@@ -10,9 +10,11 @@ import { SignalrService } from '../../../../core/services/signalr.service';
 import { StorageService, STORAGE_KEYS } from '../../../../core/services/storage.service';
 
 import { Detail, SalesInvoicesModel } from '../../../../core/models';
+import { environment } from '../../../../../environments/environment';
 
 import { LoaderComponent } from '../../../../shared/components/loader/loader.component';
 import { CardPickingItemComponent } from '../../../../shared/components/card-picking-item/card-picking-item.component';
+import { DialogSetPicComponent } from '../../../../shared/components/dialog-set-pic/dialog-set-pic.component';
 
 @Component({
   selector: 'app-picking-checklist',
@@ -21,6 +23,7 @@ import { CardPickingItemComponent } from '../../../../shared/components/card-pic
     FormsModule,
     LoaderComponent,
     CardPickingItemComponent,
+    DialogSetPicComponent,
   ],
   templateUrl: './picking-checklist.component.html',
   styleUrl: './picking-checklist.component.css',
@@ -46,6 +49,12 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
   loginPic = '';
   selectedPic = '';
   selectedTab: 'receh' | 'non-receh' = 'receh';
+
+  readonly isCabang = environment.target === 'cabang';
+
+  isDialogOpen = false;
+  detailId = 0;
+  pickingPic: string[] = [];
 
   arrReceh: Detail[] = [];
   arrNonReceh: Detail[] = [];
@@ -117,6 +126,9 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
 
     if (this.docnum) {
       this.getDetail();
+      if (this.isCabang) {
+        this.getPickingPicList();
+      }
     }
 
     this.signalrService.on('NotifyNewPicking', this.notifyNewPickingHandler);
@@ -218,7 +230,38 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     );
   }
 
-  onSaveItem(detailId: number): void {
+  getPickingPicList(): void {
+    this.service
+      .getPickingPicList()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pickingPic = data || [];
+          this.cdr.markForCheck();
+        },
+        error: () => {
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  openDialog(id: number): void {
+    this.detailId = id;
+    this.isDialogOpen = true;
+    this.cdr.markForCheck();
+  }
+
+  closeDialog(): void {
+    this.isDialogOpen = false;
+    this.cdr.markForCheck();
+  }
+
+  onPickerSelectedFromDialog(picName: string): void {
+    this.onSaveItem(this.detailId, picName);
+    this.closeDialog();
+  }
+
+  onSaveItem(detailId: number, customPic?: string): void {
     if (this.isLoading(detailId)) {
       return;
     }
@@ -226,7 +269,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
     this.setLoadingState(detailId, true);
     this.cdr.markForCheck();
 
-    const pic = this.getEffectivePic();
+    const pic = (customPic || this.getEffectivePic()).toUpperCase();
     const savePayload = {
       PIC: [pic],
       DetailId: [detailId],
@@ -239,6 +282,7 @@ export class PickingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(detailId, false);
+          this.closeDialog();
           // Realtime SignalR will update the state, but we also immediately reflect:
           this.updateItemLocally(detailId, pic);
           this.cdr.markForCheck();

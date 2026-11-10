@@ -79,6 +79,25 @@
         @for (item of arrReceh; track item.Id) {
         <app-card-picking-item [salesInvoiceDetail]="item" [loadingId]="loadingId ?? 0">
           @if (!item.Remarks) {
+          @if (isCabang) {
+          <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
+            <button type="button" class="btn-sm-no-shadow-success cursor-pointer text-center"
+              (click)="openDialog(item.Id)">
+              Picker
+            </button>
+            <button type="button" class="cursor-pointer text-center" (click)="onSaveItem(item.Id)"
+              [disabled]="isLoading(item.Id)" [ngClass]="{
+                'btn-sm-no-shadow-primary': !isLoading(item.Id),
+                'btn-sm-no-shadow-secondary': isLoading(item.Id)
+              }">
+              @if (!isLoading(item.Id)) {
+              Selesai
+              } @else {
+              Proses...
+              }
+            </button>
+          </div>
+          } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-gray-100">
             <button type="button" class="w-full cursor-pointer text-center" (click)="onSaveItem(item.Id)"
               [disabled]="isLoading(item.Id)" [ngClass]="{
@@ -92,6 +111,7 @@
               }
             </button>
           </div>
+          }
           } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
             <button type="button" class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
@@ -120,6 +140,25 @@
         @for (item of arrNonReceh; track item.Id) {
         <app-card-picking-item [salesInvoiceDetail]="item" [loadingId]="loadingId ?? 0">
           @if (!item.Remarks) {
+          @if (isCabang) {
+          <div class="grid grid-cols-2 gap-2 items-center mt-3 pt-2 border-t border-gray-100">
+            <button type="button" class="btn-sm-no-shadow-success cursor-pointer text-center"
+              (click)="openDialog(item.Id)">
+              Picker
+            </button>
+            <button type="button" class="cursor-pointer text-center" (click)="onSaveItem(item.Id)"
+              [disabled]="isLoading(item.Id)" [ngClass]="{
+                'btn-sm-no-shadow-primary': !isLoading(item.Id),
+                'btn-sm-no-shadow-secondary': isLoading(item.Id)
+              }">
+              @if (!isLoading(item.Id)) {
+              Selesai
+              } @else {
+              Proses...
+              }
+            </button>
+          </div>
+          } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-gray-100">
             <button type="button" class="w-full cursor-pointer text-center" (click)="onSaveItem(item.Id)"
               [disabled]="isLoading(item.Id)" [ngClass]="{
@@ -133,6 +172,7 @@
               }
             </button>
           </div>
+          }
           } @else {
           <div class="grid grid-cols-1 mt-3 pt-2 border-t border-emerald-200">
             <button type="button" class="btn-sm-no-shadow-danger w-full text-center cursor-pointer"
@@ -166,4 +206,11 @@
     BON Siap Dimuat
   </button>
 </div>
+}
+
+<!-- Reusable Dialog Picker (Khusus Cabang) -->
+@if (isCabang) {
+<app-dialog-set-pic [isOpen]="isDialogOpen" [title]="'Pilih Picker'" [confirmText]="'Selesai'"
+  [currentPic]="loginPic || selectedPic" [picList]="pickingPic"
+  (saved)="onPickerSelectedFromDialog($event)" (closed)="closeDialog()"></app-dialog-set-pic>
 }

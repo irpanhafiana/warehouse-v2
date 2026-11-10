@@ -375,6 +375,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getDeliveredQty(item: Detail): number {
+    if (this.isReceh(item)) return 0;
     if (item.SAPDocEntry && !isNaN(Number(item.SAPDocEntry)) && Number(item.SAPDocEntry) > 0) {
       return Number(item.SAPDocEntry);
     }
@@ -419,6 +420,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   hasDelivered(item: Detail): boolean {
+    if (this.isReceh(item)) return false;
     return (
       this.isItemLoaded(item) ||
       this.getDeliveredQty(item) > 0 ||
@@ -427,12 +429,14 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isFullyDelivered(item: Detail): boolean {
+    if (this.isReceh(item)) return false;
     const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : Number(item.Quantity || 0);
     return openQty === 0 && this.hasDelivered(item);
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (detail.OpenQuantity === 0 || this.isFullyDelivered(detail) || this.isLoading(id)) return;
+    if (this.isLoading(id)) return;
+    if (!this.isReceh(detail) && (detail.OpenQuantity === 0 || this.isFullyDelivered(detail))) return;
 
     if (!this.picName) {
       this.isErrorPicSebagian = true;
@@ -440,9 +444,38 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.setLoadingState(id, true);
+    if (this.isReceh(detail)) {
+      this.setLoadingState(id, true);
+      this.loadingService
+        .getCheckReceh(this.selectedBON)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => {
+            const exists = Boolean(data);
+            this.isRecehExist = exists;
+            if (exists) {
+              this.setLoadingState(id, false);
+              this.cdr.markForCheck();
+              return;
+            }
+            this.applyOptimisticRemark(detail);
+            this.executeSaveRecehDone(id, detail);
+          },
+          error: (e) => {
+            console.error('Check receh error before loading:', e);
+            this.setLoadingState(id, false);
+            this.cdr.markForCheck();
+          },
+        });
+      return;
+    }
 
-    // Optimistic update: langsung tambahkan PIC ke remarks agar kartu langsung berubah hijau seketika
+    this.setLoadingState(id, true);
+    this.applyOptimisticRemark(detail);
+    this.executeSaveRemarkDone(id, detail);
+  }
+
+  private applyOptimisticRemark(detail: Detail): void {
     const currentRemarks = (detail.Remarks || '').trim();
     if (!currentRemarks) {
       detail.Remarks = `load by: ${this.picName}`;
@@ -450,8 +483,38 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
       detail.Remarks = `${currentRemarks}, ${this.picName}`;
     }
     this.cdr.markForCheck();
+  }
 
-    this.executeSaveRemarkDone(id, detail);
+  private executeSaveRecehDone(id: number, detail: Detail): void {
+    const detailIds =
+      detail.DetailId && detail.DetailId.trim() !== ''
+        ? detail.DetailId.split(',')
+            .map((x) => Number(x.trim()))
+            .filter((x) => !isNaN(x) && x > 0)
+        : [Number(id)];
+
+    const payload = {
+      PIC: [this.picName],
+      DetailId: detailIds.length > 0 ? detailIds : [Number(id)],
+      DocNum: this.selectedBON || '',
+    };
+
+    this.loadingService
+      .putLoadingListDetails(payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+        error: (e) => {
+          console.error('Save RECEH error:', e);
+          this.isErrorPicSebagian = true;
+          this.msgError = 'Gagal menyimpan data loading RECEH.';
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   private executeSaveRemarkDone(id: number, detail: Detail): void {
@@ -595,7 +658,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: any): string {
-    if (this.isFullyDelivered(item)) {
+    if (!this.isReceh(item) && this.isFullyDelivered(item)) {
       return 'bg-emerald-50 border-emerald-300 opacity-90';
     }
 
@@ -619,7 +682,15 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
     return 'bg-white border-gray-300';
   }
 
+  isReceh(item: Detail): boolean {
+    return (
+      (item.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
+      (item.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH'
+    );
+  }
+
   isItemLoaded(item: any): boolean {
+    if (this.isReceh(item)) return false;
     return this.loadedItemIds.has(item.Id);
   }
 

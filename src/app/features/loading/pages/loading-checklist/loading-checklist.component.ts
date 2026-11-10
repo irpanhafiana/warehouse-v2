@@ -368,8 +368,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     });
   }
 
+  isReceh(item: Detail): boolean {
+    return (
+      (item.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
+      (item.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH'
+    );
+  }
+
   isItemComplete(item: Detail): boolean {
-    if (this.isFullyDelivered(item)) return true;
+    if (!this.isReceh(item) && this.isFullyDelivered(item)) return true;
     if (!item.Remarks) return false;
     const match = item.Remarks.match(/load by:\s*([\w\s,]+)/i);
     if (match) {
@@ -383,6 +390,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isItemLoaded(item: Detail): boolean {
+    if (this.isReceh(item)) return false;
     return this.loadedIdSet().has(item.Id);
   }
 
@@ -394,6 +402,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getDeliveredQty(item: Detail): number {
+    if (this.isReceh(item)) return 0;
     const qty = Number(item.Quantity || 0);
     const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : qty;
 
@@ -431,6 +440,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   hasDelivered(item: Detail): boolean {
+    if (this.isReceh(item)) return false;
     return (
       this.isItemLoaded(item) ||
       this.getDeliveredQty(item) > 0 ||
@@ -439,22 +449,52 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isFullyDelivered(item: Detail): boolean {
+    if (this.isReceh(item)) return false;
     const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : Number(item.Quantity || 0);
     return openQty === 0 && this.hasDelivered(item);
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (this.isLoading(id) || this.isFullyDelivered(detail)) return;
-    this.setLoadingState(id, true);
+    if (this.isLoading(id)) return;
+    if (!this.isReceh(detail) && this.isFullyDelivered(detail)) return;
 
     if (!this.picName()) {
       this.isErrorPicSebagian.set(true);
       this.msgError.set('PIC belum dipilih, silahkan pilih PIC terlebih dahulu sebelum melanjutkan loading!');
-      this.setLoadingState(id, false);
       return;
     }
 
-    // Optimistic update: langsung tambahkan PIC ke remarks agar kartu langsung berubah hijau seketika
+    if (this.isReceh(detail)) {
+      this.setLoadingState(id, true);
+      this.loadingService
+        .getCheckReceh(this.selectedBON())
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (exists: boolean) => {
+            this.isRecehExist.set(exists);
+            if (exists) {
+              this.setLoadingState(id, false);
+              this.cdr.markForCheck();
+              return;
+            }
+            this.applyOptimisticRemark(detail);
+            this.executeSaveRecehDone(id, detail);
+          },
+          error: (e) => {
+            console.error('Check receh error before loading:', e);
+            this.applyOptimisticRemark(detail);
+            this.executeSaveRecehDone(id, detail);
+          },
+        });
+      return;
+    }
+
+    this.setLoadingState(id, true);
+    this.applyOptimisticRemark(detail);
+    this.executeSaveRemarkDone(id, detail);
+  }
+
+  private applyOptimisticRemark(detail: Detail): void {
     const currentRemarks = (detail.Remarks || '').trim();
     if (!currentRemarks) {
       detail.Remarks = `load by: ${this.picName()}`;
@@ -462,33 +502,38 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       detail.Remarks = `${currentRemarks}, ${this.picName()}`;
     }
     this.cdr.markForCheck();
+  }
 
-    const isRecehItem =
-      (detail.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
-      (detail.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH';
+  private executeSaveRecehDone(id: number, detail: Detail): void {
+    const detailIds =
+      detail.DetailId && detail.DetailId.trim() !== ''
+        ? detail.DetailId.split(',')
+            .map((x) => Number(x.trim()))
+            .filter((x) => !isNaN(x) && x > 0)
+        : [Number(id)];
 
-    if (isRecehItem) {
-      this.loadingService
-        .getCheckReceh(this.selectedBON())
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: (exists: boolean) => {
-            this.isRecehExist.set(exists);
-            if (this.isRecehExist()) {
-              this.setLoadingState(id, false);
-              return;
-            }
-            this.executeSaveRemarkDone(id, detail);
-          },
-          error: (e) => {
-            console.error('Check receh error before loading:', e);
-            this.executeSaveRemarkDone(id, detail);
-          },
-        });
-      return;
-    }
+    const savePayload = {
+      PIC: [this.picName()],
+      DetailId: detailIds.length > 0 ? detailIds : [Number(id)],
+      DocNum: this.selectedBON() || '',
+    };
 
-    this.executeSaveRemarkDone(id, detail);
+    this.service
+      .putLoadingListDetails(savePayload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Save RECEH error:', err);
+          this.isErrorPicSebagian.set(true);
+          this.msgError.set('Terjadi kesalahan saat menyimpan checklist loading RECEH.');
+          this.setLoadingState(id, false);
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   private executeSaveRemarkDone(id: number, detail: Detail): void {
@@ -620,7 +665,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: Detail): string {
-    if (this.isFullyDelivered(item)) {
+    if (!this.isReceh(item) && this.isFullyDelivered(item)) {
       return 'bg-emerald-50 border-emerald-300 opacity-90';
     }
 
@@ -631,9 +676,11 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
         .filter(Boolean)
       : [];
 
-    const remaining = this.getRemainingQty(item);
-    if (item.sebagianValue > 0 && item.sebagianValue !== remaining) {
-      return 'bg-gray-100 border-gray-300';
+    if (!this.isReceh(item)) {
+      const remaining = this.getRemainingQty(item);
+      if (item.sebagianValue > 0 && item.sebagianValue !== remaining) {
+        return 'bg-gray-100 border-gray-300';
+      }
     }
     if (remarkNames.includes(this.picName())) {
       return 'bg-emerald-300 border-emerald-400';
@@ -660,7 +707,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   filterValidRemarks(data: Detail[]): Detail[] {
     return data.filter((item) => {
-      if (this.isFullyDelivered(item) || item.OpenQuantity === 0) return false;
+      if (!this.isReceh(item) && (this.isFullyDelivered(item) || item.OpenQuantity === 0)) return false;
       const match = (item.Remarks || '').match(/load by:\s*([\w\s,]+)/i);
       if (match) {
         const names = match[1]
