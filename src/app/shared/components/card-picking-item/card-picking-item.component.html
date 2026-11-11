@@ -3,10 +3,24 @@
     'bg-white border border-gray-200': !isCompleted()
   }">
   <div class="flex flex-col">
-    @if (salesInvoiceDetail().Remarks) {
-    <span class="inline-block text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md w-fit mb-1">
-      {{ salesInvoiceDetail().Remarks }}
-    </span>
+    @if (salesInvoiceDetail().Remarks || aliasColor()) {
+    <div class="flex items-center justify-between gap-2 mb-1.5">
+      <div>
+        @if (salesInvoiceDetail().Remarks) {
+        <span class="inline-block text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-md w-fit">
+          {{ salesInvoiceDetail().Remarks }}
+        </span>
+        }
+      </div>
+
+      @if (aliasColor()) {
+      <span
+        class="w-5 h-5 rounded-full shrink-0 shadow-xs ring-1 ring-black/15 border border-white"
+        [style.backgroundColor]="aliasColor()"
+        [title]="aliasColor()">
+      </span>
+      }
+    </div>
     }
     <h2 class="font-bold text-slate-800 text-lg sm:text-xl leading-snug">
       {{ salesInvoiceDetail().ProductModel.Name }}

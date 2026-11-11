@@ -30,9 +30,7 @@
     @if (alphabet.length > 0) {
     <div class="flex flex-row items-center gap-2 text-white pt-2 pb-1 min-w-0">
       @if (filteredData.length !== 0) {
-      <button type="button"
-        class="btn-sm-no-shadow-danger shrink-0 cursor-pointer"
-        (click)="onSelectedAlphabet('~')">
+      <button type="button" class="btn-sm-no-shadow-danger shrink-0 cursor-pointer" (click)="onSelectedAlphabet('~')">
         Reset
       </button>
       }
@@ -85,11 +83,6 @@
             (click)="isDialogAddPic = true" aria-label="Tambah PIC">
             <img src="add-w.png" alt="Add" class="w-full h-full object-contain" />
           </button>
-          <button type="button"
-            class="w-10.5 h-10.5 flex items-center justify-center bg-gray-700 hover:bg-gray-800 text-white rounded-xl active:scale-95 cursor-pointer p-2"
-            (click)="isDialogOpenBarcode = true" aria-label="Share QR">
-            <img src="shared-w.png" alt="Share" class="w-full h-full object-contain" />
-          </button>
         </div>
       </div>
 
@@ -138,31 +131,31 @@
                 <span class="text-xs font-semibold text-gray-600 truncate max-w-36">{{ item.Remarks }}</span>
                 }
                 @if (!isReceh(item)) {
-                  @if (isFullyDelivered(item)) {
-                  <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
-                    Sudah Dikirim Semua
-                  </span>
-                  } @else if (getDeliveredQty(item) > 0) {
-                  <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
-                    Sudah dikirim: {{ getDeliveredQty(item) }}
-                  </span>
-                  } @else if (isItemLoaded(item)) {
-                  <span class="bg-[#257180] text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
-                    Sudah dimuat
-                  </span>
-                  }
+                @if (isFullyDelivered(item)) {
+                <span class="bg-emerald-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Sudah Dikirim Semua
+                </span>
+                } @else if (getDeliveredQty(item) > 0) {
+                <span class="bg-amber-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Sudah dikirim: {{ getDeliveredQty(item) }}
+                </span>
+                } @else if (isItemLoaded(item)) {
+                <span class="bg-[#257180] text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Sudah dimuat
+                </span>
+                }
 
-                  @if (!isFullyDelivered(item)) {
-                    @if (item.sebagianValue > 0) {
-                    <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
-                      Akan dikirim: {{ item.sebagianValue }}
-                    </span>
-                    } @else if (item.Remarks && item.Remarks.includes(picName) && getRemainingQty(item) > 0) {
-                    <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
-                      Akan dikirim: {{ getRemainingQty(item) }}
-                    </span>
-                    }
-                  }
+                @if (!isFullyDelivered(item)) {
+                @if (item.sebagianValue > 0) {
+                <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Akan dikirim: {{ item.sebagianValue }}
+                </span>
+                } @else if (item.Remarks && item.Remarks.includes(picName) && getRemainingQty(item) > 0) {
+                <span class="bg-cyan-600 text-white text-xs font-bold px-2 py-0.5 rounded-md shadow-xs">
+                  Akan dikirim: {{ getRemainingQty(item) }}
+                </span>
+                }
+                }
                 }
               </div>
             </div>
@@ -251,18 +244,46 @@
     </div>
   </div>
 
-  <!-- Floating Action Button: Muat Ke Mobil -->
-  <div class="fixed bottom-20 right-4 z-40 flex items-center gap-2">
-    <button type="button" (click)="toAddDelivery()"
-      class="flex items-center gap-2 btn-no-shadow-success py-3 px-5 rounded-xl cursor-pointer text-sm font-semibold">
-      <img src="delivery.png" class="w-5 h-5 object-contain" alt="Delivery" />
-      <span>Muat Ke Mobil</span>
+  <!-- Floating trigger button -->
+  <div class="fixed bottom-20 right-4 z-40">
+    <button type="button"
+      class="w-13 h-13 bg-[#FF8B00] hover:bg-[#e07b00] active:scale-95 border border-amber-600/30 rounded-xl flex items-center justify-center p-3 cursor-pointer transition-all shadow-md"
+      (click)="isShowMenu = true" aria-label="Menu Aksi">
+      <img src="menu-w.png" alt="Menu" class="w-full h-full object-contain" />
     </button>
   </div>
 
+  <!-- Modal Dialog Menu Aksi Loading -->
+  @if (isShowMenu) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-modal-backdrop">
+    <div class="w-full max-w-sm bg-white rounded-2xl p-6 border border-gray-200 animate-modal-card flex flex-col gap-4">
+      <div class="flex justify-between items-center pb-3 border-b border-gray-100">
+        <h2 class="text-xl font-bold text-[#202B6D]">Menu</h2>
+        <button type="button"
+          class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all cursor-pointer"
+          (click)="isShowMenu = false" aria-label="Tutup">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-2.5 my-1">
+        <button type="button"
+          class="btn-no-shadow-success w-full py-3 text-sm sm:text-base font-bold rounded-xl cursor-pointer text-center flex items-center justify-center gap-2"
+          (click)="isShowMenu = false; toAddDelivery()">
+          <span>Muat Ke Mobil</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Bottom Sticky Bar: Status Item Belum Di Pick / Selesai -->
   @if (salesInvoice) {
-  <div class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 px-4 py-3 z-30 flex justify-between items-center ">
+  <div
+    class="fixed left-0 right-0 bottom-0 bg-white border-t border-gray-200 px-4 py-3 z-30 flex justify-between items-center ">
     @if (salesInvoice.DocStatus === 'Close') {
     <span class="text-sm font-semibold text-gray-700">BON sudah diloading</span>
     <button type="button" class="btn-sm-no-shadow-primary cursor-pointer" (click)="toCheckout(salesInvoice.DocNum)">
@@ -273,7 +294,8 @@
       <span class="text-xs font-semibold text-gray-500">Item Belum Di Pick:</span>
       <span class="font-bold text-base text-red-600">{{ notPickedItem }}</span>
     </div>
-    <button type="button" class="btn-sm-no-shadow-primary cursor-pointer" (click)="toPickingDetail(salesInvoice.DocNum)">
+    <button type="button" class="btn-sm-no-shadow-primary cursor-pointer"
+      (click)="toPickingDetail(salesInvoice.DocNum)">
       Cek Disini
     </button>
     }

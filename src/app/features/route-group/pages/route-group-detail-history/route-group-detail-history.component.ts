@@ -41,6 +41,7 @@ export class RouteGroupDetailHistoryComponent implements OnInit {
 
   alias = '';
   data!: RouteGroup;
+  isShowMenu = false;
   isDialogOpenBarcode = false;
   filteredSalesInvoices: HeaderRes[] = [];
   headerRes: HeaderRes[] = [];

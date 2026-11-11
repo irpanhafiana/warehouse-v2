@@ -17,5 +17,17 @@ export class CardPickingItemComponent {
     const r = this.salesInvoiceDetail()?.Remarks;
     return r !== null && r !== '' && r !== undefined;
   });
+
+  readonly aliasColor = computed(() => {
+    const raw = this.salesInvoiceDetail()?.Alias?.trim();
+    if (!raw) return null;
+    if (/^#?([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(raw)) {
+      return raw.startsWith('#') ? raw : `#${raw}`;
+    }
+    if (/^(rgb|hsl)/i.test(raw)) {
+      return raw;
+    }
+    return null;
+  });
 }
 
