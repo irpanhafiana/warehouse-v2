@@ -67,14 +67,28 @@
           <p class="text-base sm:text-lg font-bold text-slate-800">{{ item.CustomerName }}</p>
         </div>
 
+        @if (statusSelected === 'HISTORY' || getLoadBy(item) !== '-') {
+        <div class="flex flex-col items-start">
+          <small class="text-gray-500 text-xs font-semibold">Load By</small>
+          <p class="text-base sm:text-lg font-bold text-slate-800">{{ getLoadBy(item) }}</p>
+        </div>
+        }
+
         <!-- Detail List Accordion -->
         @if (item.isExpanded) {
         <div class="bg-gray-50 rounded-xl p-3 border border-gray-200 flex flex-col gap-2">
           @for (subItem of item.Details; track subItem.DetailId || subItem.Id || $index) {
           <div class="w-full flex flex-col justify-between border-b border-gray-200 last:border-b-0 py-2">
-            <p class="text-base font-bold text-slate-800">
-              {{ subItem.Data?.ProductModel?.Name }}
-            </p>
+            <div class="flex flex-row justify-between items-start gap-2">
+              <p class="text-base font-bold text-slate-800">
+                {{ subItem.Data?.ProductModel?.Name }}
+              </p>
+              @if (subItem.Remarks || subItem.Data?.Remarks) {
+              <span class="text-xs font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md shrink-0">
+                {{ (subItem.Remarks || subItem.Data?.Remarks).replace('load by: ', '') }}
+              </span>
+              }
+            </div>
             <p class="text-sm font-semibold text-gray-600 mt-0.5">
               {{ subItem.Data?.Quantity }} {{ subItem.Data?.UoMModel?.Code }} ({{ subItem.Data?.BaseQuantity }})
             </p>

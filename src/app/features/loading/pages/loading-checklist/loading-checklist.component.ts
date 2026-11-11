@@ -332,7 +332,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   applyFilter(): void {
     const result = this.filteredProducts(this.initialData());
-    this.filteredData.set(result);
+    this.filteredData.set(this.sortDetails(result));
     this.cdr.markForCheck();
   }
 
@@ -361,22 +361,31 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   sortDetails(details: Detail[]): Detail[] {
     return [...details].sort((a, b) => {
+      const aReceh = this.isReceh(a);
+      const bReceh = this.isReceh(b);
+
+      if (aReceh !== bReceh) {
+        return aReceh ? 1 : -1;
+      }
+
       const aDone = this.isItemComplete(a);
       const bDone = this.isItemComplete(b);
-      if (aDone === bDone) return 0;
-      return aDone ? 1 : -1;
+      if (aDone !== bDone) {
+        return aDone ? 1 : -1;
+      }
+
+      return 0;
     });
   }
 
   isReceh(item: Detail): boolean {
-    return (
-      (item.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
-      (item.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH'
-    );
+    const name = (item?.ProductModel?.Name || '').replace(/^~+/, '').trim().toUpperCase();
+    const desc = (item?.ProductModel?.Description || '').replace(/^~+/, '').trim().toUpperCase();
+    return name === 'RECEH' || desc === 'RECEH' || name.startsWith('RECEH');
   }
 
   isItemComplete(item: Detail): boolean {
-    if (!this.isReceh(item) && this.isFullyDelivered(item)) return true;
+    if (this.isItemLoaded(item)) return true;
     if (!item.Remarks) return false;
     const match = item.Remarks.match(/load by:\s*([\w\s,]+)/i);
     if (match) {
@@ -401,62 +410,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     return Number(quantity);
   }
 
-  getDeliveredQty(item: Detail): number {
-    if (this.isReceh(item)) return 0;
-    const qty = Number(item.Quantity || 0);
-    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : qty;
-
-    if (qty > openQty && openQty >= 0) {
-      return qty - openQty;
-    }
-
-    if (openQty === 0 && this.isItemLoaded(item)) {
-      return qty;
-    }
-
-    const loadedMatches = (this.itemLoaded() || []).filter(
-      (l) => l?.Id === item.Id || l?.id === item.Id
-    );
-    if (loadedMatches.length > 0) {
-      const sum = loadedMatches.reduce(
-        (total, curr) => total + Number(curr.sebagianValue || curr.Quantity || 0),
-        0
-      );
-      if (sum > 0) return sum;
-    }
-
-    return 0;
-  }
-
-  getRemainingQty(item: Detail): number {
-    if (item.OpenQuantity !== undefined && item.OpenQuantity !== null) {
-      return Number(item.OpenQuantity);
-    }
-    return Number(item.Quantity || 0);
-  }
-
-  getTotalQty(item: Detail): number {
-    return Number(item.Quantity || 0);
-  }
-
-  hasDelivered(item: Detail): boolean {
-    if (this.isReceh(item)) return false;
-    return (
-      this.isItemLoaded(item) ||
-      this.getDeliveredQty(item) > 0 ||
-      (item.OpenQuantity !== undefined && item.OpenQuantity !== null && Number(item.OpenQuantity) < Number(item.Quantity || 0))
-    );
-  }
-
-  isFullyDelivered(item: Detail): boolean {
-    if (this.isReceh(item)) return false;
-    const openQty = item.OpenQuantity !== undefined && item.OpenQuantity !== null ? Number(item.OpenQuantity) : Number(item.Quantity || 0);
-    return openQty === 0 && this.hasDelivered(item);
-  }
-
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (this.isLoading(id)) return;
-    if (!this.isReceh(detail) && this.isFullyDelivered(detail)) return;
+    if (this.isLoading(id) || this.isItemLoaded(detail)) return;
 
     if (!this.picName()) {
       this.isErrorPicSebagian.set(true);
@@ -537,7 +492,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   private executeSaveRemarkDone(id: number, detail: Detail): void {
-    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : this.getRemainingQty(detail);
+    const qty = detail.sebagianValue > 0 ? detail.sebagianValue : detail.OpenQuantity;
 
     const detailIds =
       detail.DetailId && detail.DetailId.trim() !== ''
@@ -618,7 +573,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       if (indicator === '-') {
         if (copy.sebagianValue > 0) copy.sebagianValue--;
       } else if (indicator === '+') {
-        const maxLimit = this.getRemainingQty(copy);
+        const maxLimit = copy.OpenQuantity;
         if (copy.sebagianValue < maxLimit) copy.sebagianValue++;
       }
       return copy;
@@ -644,8 +599,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       const idx = arr.findIndex(
         (d) =>
           (detailsIncoming.Id ? d.Id === detailsIncoming.Id : d.DetailId === detailsIncoming.DetailId) ||
-          ((d.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' &&
-            (detailsIncoming.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH')
+          (this.isReceh(d) && this.isReceh(detailsIncoming))
       );
       if (idx !== -1) {
         const copy = [...arr];
@@ -654,7 +608,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       }
       return arr;
     };
-    this.initialData.set(updateIn(this.initialData()));
+    this.initialData.set(this.sortDetails(updateIn(this.initialData())));
     this.filteredData.set(updateIn(this.filteredData()));
     this.setLoadingState(detailsIncoming.Id, false);
     this.applyFilter();
@@ -665,10 +619,6 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: Detail): string {
-    if (!this.isReceh(item) && this.isFullyDelivered(item)) {
-      return 'bg-emerald-50 border-emerald-300 opacity-90';
-    }
-
     const remarkNames = item.Remarks
       ? item.Remarks.replace('load by: ', '')
         .split(',')
@@ -677,8 +627,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       : [];
 
     if (!this.isReceh(item)) {
-      const remaining = this.getRemainingQty(item);
-      if (item.sebagianValue > 0 && item.sebagianValue !== remaining) {
+      if (item.sebagianValue > 0 && item.sebagianValue !== item.OpenQuantity) {
         return 'bg-gray-100 border-gray-300';
       }
     }
@@ -707,7 +656,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   filterValidRemarks(data: Detail[]): Detail[] {
     return data.filter((item) => {
-      if (!this.isReceh(item) && (this.isFullyDelivered(item) || item.OpenQuantity === 0)) return false;
+      if (!this.isReceh(item) && this.isItemLoaded(item)) return false;
       const match = (item.Remarks || '').match(/load by:\s*([\w\s,]+)/i);
       if (match) {
         const names = match[1]

@@ -40,7 +40,7 @@ export class RequestReceiveListComponent implements OnInit {
   async initDefaultBranch(): Promise<void> {
     const cachedBranch = await this.storage.getItem(STORAGE_KEYS.DEFAULT_BRANCH);
     if (cachedBranch) {
-      this.defaultBranch = cachedBranch;
+      this.defaultBranch = String(cachedBranch).replace(/(%22|["'\\])/gi, '').trim();
       this.fetchDeliveryList(this.defaultBranch);
     } else {
       this.fetchDefaultBranch();
@@ -56,8 +56,8 @@ export class RequestReceiveListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: async (branch) => {
-          this.defaultBranch = branch;
-          await this.storage.setItem(STORAGE_KEYS.DEFAULT_BRANCH, branch);
+          this.defaultBranch = String(branch).replace(/(%22|["'\\])/gi, '').trim();
+          await this.storage.setItem(STORAGE_KEYS.DEFAULT_BRANCH, this.defaultBranch);
           this.fetchDeliveryList(this.defaultBranch);
         },
         error: (e) => {

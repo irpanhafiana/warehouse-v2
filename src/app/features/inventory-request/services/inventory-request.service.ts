@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { Inventory } from '../../../core/models';
 
@@ -20,14 +20,17 @@ export class InventoryRequestService {
   });
 
   getDefaultBranch(): Observable<string> {
-    return this.http.get(`${this.apiUrl}api/v1/Branches/Default`, {
-      responseType: 'text',
-    });
+    return this.http
+      .get(`${this.apiUrl}api/v1/Branches/Default`, {
+        responseType: 'text',
+      })
+      .pipe(map((res) => String(res).replace(/(%22|["'\\])/gi, '').trim()));
   }
 
-  getDeliveryList(branch: string): Observable<Inventory[]> {
+  getDeliveryList(branch: string | number): Observable<Inventory[]> {
+    const cleanBranch = String(branch).replace(/(%22|["'\\])/gi, '').trim();
     return this.http.get<Inventory[]>(
-      `${this.apiCloud}api/v1/InventoryRequests/Delivery/${branch}/list`
+      `${this.apiCloud}api/v1/InventoryRequests/Delivery/${cleanBranch}/list`
     );
   }
 

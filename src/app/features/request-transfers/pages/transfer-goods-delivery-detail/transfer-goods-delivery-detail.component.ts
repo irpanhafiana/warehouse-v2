@@ -172,6 +172,16 @@ export class TransferGoodsDeliveryDetailComponent implements OnInit {
       });
   }
 
+  getLoadBy(item: any): string {
+    const raw =
+      item?.Remarks?.trim() ||
+      (item?.Details || []).find((d: any) => d.Remarks?.trim())?.Remarks?.trim() ||
+      (item?.Details || []).find((d: any) => d.Data?.Remarks?.trim())?.Data?.Remarks?.trim() ||
+      '';
+    if (!raw) return '-';
+    return raw.replace(/^load by:\s*/i, '');
+  }
+
   private parseDeliveryData(data: string | any): any {
     if (!data) {
       return { ProductModel: { Name: '-' }, Quantity: 0, BaseQuantity: 0, UoMModel: { Code: '' } };

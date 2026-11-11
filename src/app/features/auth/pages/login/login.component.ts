@@ -142,8 +142,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   fetchDataInParallel(): void {
     this.salesInvoiceService.getDefaultBranch().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: async (branch) => {
-        await this.storage.setItem(STORAGE_KEYS.DEFAULT_BRANCH, branch);
-        this.defaultBranch = branch;
+        const cleanBranch = String(branch).replace(/(%22|["'\\])/gi, '').trim();
+        await this.storage.setItem(STORAGE_KEYS.DEFAULT_BRANCH, cleanBranch);
+        this.defaultBranch = cleanBranch;
         this.cdr.markForCheck();
       },
       error: (e) => {

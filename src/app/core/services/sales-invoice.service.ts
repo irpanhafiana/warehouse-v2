@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { HeaderRes } from '../models/header-response.model';
 import { SalesInvoicesModel } from '../models/sales-invoice.model';
@@ -15,7 +15,9 @@ export class SalesInvoiceService {
   private apiUrl = environment.api;
 
   getDefaultBranch(): Observable<string> {
-    return this.http.get<string>(`${this.apiUrl}api/v1/Branches/Default`);
+    return this.http
+      .get(`${this.apiUrl}api/v1/Branches/Default`, { responseType: 'text' })
+      .pipe(map((res) => String(res).replace(/(%22|["'\\])/gi, '').trim()));
   }
 
   getPickingList(date: string): Observable<HeaderRes[]> {
@@ -139,9 +141,10 @@ export class SalesInvoiceService {
     );
   }
 
-  getBranchList(branch: string): Observable<any> {
+  getBranchList(branch: string | number): Observable<any> {
+    const cleanBranch = String(branch).replace(/(%22|["'\\])/gi, '').trim();
     return this.http.get(
-      `${this.apiUrl}api/v1/InventoryRequests/Delivery/${branch}/list`
+      `${this.apiUrl}api/v1/InventoryRequests/Delivery/${cleanBranch}/list`
     );
   }
 
