@@ -169,9 +169,21 @@
 
           <div class="flex flex-row justify-between items-center mt-3 pt-2 border-t border-gray-100">
             <div class="font-semibold text-gray-600 text-sm">
+              @if (!isReceh(item) && item.Quantity !== item.OpenQuantity) {
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="line-through text-gray-400">
+                  {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
+                </span>
+                <span class="text-gray-400 font-bold">➜</span>
+                <span class="bg-red-600 text-white px-2 py-0.5 rounded text-xs font-bold shadow-xs">
+                  {{ item.SAPDocEntry }} {{ item.SAPDocNum }}
+                </span>
+              </div>
+              } @else {
               <span>
                 {{ item.Quantity }} {{ item.UoMModel.Code }} ({{ item.BaseQuantity }})
               </span>
+              }
             </div>
 
             @if (item.Remarks && item.Remarks.includes(picName())) {
