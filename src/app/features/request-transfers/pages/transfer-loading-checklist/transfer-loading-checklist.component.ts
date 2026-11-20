@@ -345,14 +345,33 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
 
   updateDetails(detailIncoming: Detail): void {
     const updateInArr = (arr: Detail[]): void => {
-      const item = arr.find(
-        (d) =>
-          (detailIncoming.Id > 0 && d.Id === detailIncoming.Id) ||
-          (detailIncoming.DetailId && d.DetailId === detailIncoming.DetailId) ||
-          (detailIncoming.Id === 0 && d.Id === 0) ||
-          ((d.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' &&
-            (detailIncoming.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH')
-      );
+      const item = arr.find((d) => {
+        if (detailIncoming.Id && detailIncoming.Id > 0 && d.Id === detailIncoming.Id) {
+          return true;
+        }
+        if (detailIncoming.DetailId && d.DetailId && d.DetailId === detailIncoming.DetailId) {
+          return true;
+        }
+        if (this.isReceh(d) && d.DetailId) {
+          const detailIdList = d.DetailId.split(',').map((x) => x.trim());
+          if (detailIncoming.Id && detailIdList.includes(String(detailIncoming.Id))) {
+            return true;
+          }
+          if (detailIncoming.DetailId && detailIdList.includes(String(detailIncoming.DetailId))) {
+            return true;
+          }
+        }
+        const incomingDoc = (detailIncoming as any).DocNum;
+        if (
+          incomingDoc &&
+          (incomingDoc === this.selectedBON || incomingDoc === this.docnum) &&
+          this.isReceh(d) &&
+          this.isReceh(detailIncoming)
+        ) {
+          return true;
+        }
+        return false;
+      });
       if (item) {
         Object.assign(item, detailIncoming);
       }
@@ -435,7 +454,7 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (this.isLoading(id)) return;
+    if (this.isLoading(id) || this.isRecehWithoutAlias(detail)) return;
     if (!this.isReceh(detail) && (detail.OpenQuantity === 0 || this.isFullyDelivered(detail))) return;
 
     if (!this.picName) {
@@ -658,6 +677,9 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: any): string {
+    if (this.isRecehWithoutAlias(item)) {
+      return 'bg-gray-100 border-gray-300';
+    }
     if (!this.isReceh(item) && this.isFullyDelivered(item)) {
       return 'bg-emerald-50 border-emerald-300 opacity-90';
     }
@@ -683,10 +705,13 @@ export class TransferLoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   isReceh(item: Detail): boolean {
-    return (
-      (item.ProductModel?.Name || '').trim().toUpperCase() === 'RECEH' ||
-      (item.ProductModel?.Description || '').trim().toUpperCase() === 'RECEH'
-    );
+    const name = (item?.ProductModel?.Name || '').replace(/^~+/, '').trim().toUpperCase();
+    const desc = (item?.ProductModel?.Description || '').replace(/^~+/, '').trim().toUpperCase();
+    return name === 'RECEH' || desc === 'RECEH' || name.startsWith('RECEH');
+  }
+
+  isRecehWithoutAlias(item: Detail): boolean {
+    return this.isReceh(item) && (!item?.Alias || !item.Alias.trim());
   }
 
   isItemLoaded(item: any): boolean {

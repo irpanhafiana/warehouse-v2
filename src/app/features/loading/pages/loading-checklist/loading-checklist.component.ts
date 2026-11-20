@@ -93,7 +93,11 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       if (Array.isArray(parsed)) {
         this.updateDetailsArray(parsed);
       } else if (parsed) {
-        this.updateDetails(parsed);
+        if (Array.isArray((parsed as any).Details)) {
+          this.updateDetailsArray((parsed as any).Details);
+        } else {
+          this.updateDetails(parsed);
+        }
       }
     } catch (e) {
       console.error('SignalR notifyNewLoading parse error:', e);
@@ -122,6 +126,8 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       const parsedData = typeof salesInvoiceModel === 'string' ? JSON.parse(salesInvoiceModel) : salesInvoiceModel;
       if (Array.isArray(parsedData)) {
         this.updateDetailsArray(parsedData);
+      } else if (parsedData && Array.isArray((parsedData as any).Details)) {
+        this.updateDetailsArray((parsedData as any).Details);
       }
     } catch (error) {
       console.error('SignalR notifyNewReturn error:', error);
@@ -384,18 +390,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     return name === 'RECEH' || desc === 'RECEH' || name.startsWith('RECEH');
   }
 
+  isRecehWithoutAlias(item: Detail): boolean {
+    return this.isReceh(item) && (!item?.Alias || !item.Alias.trim());
+  }
+
   isItemComplete(item: Detail): boolean {
     if (this.isItemLoaded(item)) return true;
     if (!item.Remarks) return false;
-    const match = item.Remarks.match(/load by:\s*([\w\s,]+)/i);
-    if (match) {
-      const names = match[1]
-        .split(',')
-        .map((name: string) => name.trim())
-        .filter(Boolean);
-      return names.length > 1;
-    }
-    return false;
+    const names = this.extractPicsFromRemarks(item.Remarks);
+    return names.length > 1;
   }
 
   isItemLoaded(item: Detail): boolean {
@@ -411,7 +414,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   onRemarkDone(id: number, remarks: string, detailId: string, detail: Detail): void {
-    if (this.isLoading(id) || this.isItemLoaded(detail)) return;
+    if (this.isLoading(id) || this.isItemLoaded(detail) || this.isRecehWithoutAlias(detail)) return;
 
     if (!this.picName()) {
       this.isErrorPicSebagian.set(true);
@@ -421,6 +424,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
     if (this.isReceh(detail)) {
       this.setLoadingState(id, true);
+      this.applyOptimisticRemark(detail);
       this.loadingService
         .getCheckReceh(this.selectedBON())
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -428,16 +432,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           next: (exists: boolean) => {
             this.isRecehExist.set(exists);
             if (exists) {
+              this.revertOptimisticRemark(detail);
               this.setLoadingState(id, false);
               this.cdr.markForCheck();
               return;
             }
-            this.applyOptimisticRemark(detail);
             this.executeSaveRecehDone(id, detail);
           },
           error: (e) => {
             console.error('Check receh error before loading:', e);
-            this.applyOptimisticRemark(detail);
             this.executeSaveRecehDone(id, detail);
           },
         });
@@ -449,13 +452,75 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
     this.executeSaveRemarkDone(id, detail);
   }
 
+  extractPicsFromRemarks(remarks?: string | null): string[] {
+    if (!remarks) return [];
+    return remarks
+      .replace(/load by:\s*/i, '')
+      .split(',')
+      .map((name) => name.trim().toUpperCase())
+      .filter(Boolean);
+  }
+
+  mergeRemarks(existingRemarks?: string | null, incomingRemarks?: string | null): string | null {
+    const existing = this.extractPicsFromRemarks(existingRemarks);
+    const incoming = this.extractPicsFromRemarks(incomingRemarks);
+    const merged = Array.from(new Set([...existing, ...incoming]));
+    return merged.length > 0 ? `load by: ${merged.join(', ')}` : (incomingRemarks || existingRemarks || null);
+  }
+
+  isCurrentPicInRemarks(remarks: string | null | undefined): boolean {
+    if (!remarks) return false;
+    const currentPic = (this.picName() || '').trim().toUpperCase();
+    if (!currentPic) return false;
+    return this.extractPicsFromRemarks(remarks).includes(currentPic);
+  }
+
   private applyOptimisticRemark(detail: Detail): void {
     const currentRemarks = (detail.Remarks || '').trim();
+    const pic = this.picName().trim().toUpperCase();
+    let newRemarks = currentRemarks;
     if (!currentRemarks) {
-      detail.Remarks = `load by: ${this.picName()}`;
-    } else if (!currentRemarks.includes(this.picName())) {
-      detail.Remarks = `${currentRemarks}, ${this.picName()}`;
+      newRemarks = `load by: ${pic}`;
+    } else if (!this.isCurrentPicInRemarks(currentRemarks)) {
+      newRemarks = `${currentRemarks}, ${pic}`;
     }
+    detail.Remarks = newRemarks;
+
+    const matcher = (d: Detail) =>
+      (detail.Id && detail.Id > 0 && d.Id === detail.Id) ||
+      (detail.DetailId && d.DetailId && d.DetailId === detail.DetailId) ||
+      (this.isReceh(d) && this.isReceh(detail));
+
+    this.initialData.update((list) =>
+      list.map((d) => (matcher(d) ? { ...d, Remarks: newRemarks } : d))
+    );
+    this.filteredData.update((list) =>
+      list.map((d) => (matcher(d) ? { ...d, Remarks: newRemarks } : d))
+    );
+    this.cdr.markForCheck();
+  }
+
+  private revertOptimisticRemark(detail: Detail): void {
+    const currentRemarks = (detail.Remarks || '').trim();
+    let newRemarks: string | null = null;
+    if (currentRemarks) {
+      const currentPic = (this.picName() || '').trim().toUpperCase();
+      const names = this.extractPicsFromRemarks(currentRemarks).filter((n) => n !== currentPic);
+      newRemarks = names.length > 0 ? `load by: ${names.join(', ')}` : null;
+    }
+    detail.Remarks = newRemarks;
+
+    const matcher = (d: Detail) =>
+      (detail.Id && detail.Id > 0 && d.Id === detail.Id) ||
+      (detail.DetailId && d.DetailId && d.DetailId === detail.DetailId) ||
+      (this.isReceh(d) && this.isReceh(detail));
+
+    this.initialData.update((list) =>
+      list.map((d) => (matcher(d) ? { ...d, Remarks: newRemarks } : d))
+    );
+    this.filteredData.update((list) =>
+      list.map((d) => (matcher(d) ? { ...d, Remarks: newRemarks } : d))
+    );
     this.cdr.markForCheck();
   }
 
@@ -485,6 +550,7 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
           console.error('Save RECEH error:', err);
           this.isErrorPicSebagian.set(true);
           this.msgError.set('Terjadi kesalahan saat menyimpan checklist loading RECEH.');
+          this.revertOptimisticRemark(detail);
           this.setLoadingState(id, false);
           this.cdr.markForCheck();
         },
@@ -528,7 +594,9 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
         error: () => {
           this.isErrorPicSebagian.set(true);
           this.msgError.set('Terjadi kesalahan saat menyimpan checklist loading.');
+          this.revertOptimisticRemark(detail);
           this.setLoadingState(id, false);
+          this.cdr.markForCheck();
         },
       });
   }
@@ -542,11 +610,16 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const currentDetail = this.initialData().find((d) => d.Id === id);
+    const prevRemarks = currentDetail?.Remarks ?? null;
+
+    // LANGSUNG jadikan putih / batalkan secara optimistik tanpa nunggu server!
+    this.revertRemarkForPic(id, this.picName());
     this.setLoadingState(id, true);
 
     const payload = {
       DetailId: id,
-      PIC: this.picName(),
+      PIC: this.picName().trim().toUpperCase(),
       DocNum: this.selectedBON(),
     };
 
@@ -556,11 +629,49 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.setLoadingState(id, false);
+          this.clearSebagianFromStorage(id);
+          this.cdr.markForCheck();
         },
-        error: () => {
+        error: (err) => {
+          console.error('Cancel loading error:', err);
+          this.isErrorPicSebagian.set(true);
+          this.msgError.set('Gagal membatalkan checklist loading.');
+          // Revert jika gagal cancel
+          this.setRemarkLocally(id, prevRemarks);
           this.setLoadingState(id, false);
+          this.cdr.markForCheck();
         },
       });
+  }
+
+  private revertRemarkForPic(id: number, picToCancel: string): void {
+    const formattedPic = picToCancel.trim().toUpperCase();
+
+    const updateList = (list: Detail[]) =>
+      list.map((item) => {
+        if (item.Id !== id) return item;
+        const currentRemarks = item.Remarks || '';
+        const names = this.extractPicsFromRemarks(currentRemarks).filter(
+          (name) => name !== formattedPic
+        );
+        const newRemarks = names.length > 0 ? `load by: ${names.join(', ')}` : null;
+        return { ...item, Remarks: newRemarks };
+      });
+
+    this.initialData.update((list) => this.sortDetails(updateList(list)));
+    this.filteredData.update((list) => this.sortDetails(updateList(list)));
+    this.applyFilter();
+    this.cdr.markForCheck();
+  }
+
+  private setRemarkLocally(id: number, remarks: string | null): void {
+    const updateList = (list: Detail[]) =>
+      list.map((item) => (item.Id === id ? { ...item, Remarks: remarks } : item));
+
+    this.initialData.update((list) => this.sortDetails(updateList(list)));
+    this.filteredData.update((list) => this.sortDetails(updateList(list)));
+    this.applyFilter();
+    this.cdr.markForCheck();
   }
 
   onSebagianValueChange(indicator: string, id: number): void {
@@ -596,14 +707,63 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
 
   updateDetails(detailsIncoming: Detail): void {
     const updateIn = (arr: Detail[]) => {
-      const idx = arr.findIndex(
-        (d) =>
-          (detailsIncoming.Id ? d.Id === detailsIncoming.Id : d.DetailId === detailsIncoming.DetailId) ||
-          (this.isReceh(d) && this.isReceh(detailsIncoming))
-      );
+      const idx = arr.findIndex((d) => {
+        const incomingDoc = (detailsIncoming as any).DocNum;
+        if (incomingDoc && this.selectedBON() && incomingDoc !== this.selectedBON() && incomingDoc !== this.docnum()) {
+          return false;
+        }
+
+        if (detailsIncoming.Id && detailsIncoming.Id > 0 && d.Id === detailsIncoming.Id) {
+          return true;
+        }
+        if (detailsIncoming.DetailId && d.DetailId && d.DetailId === detailsIncoming.DetailId) {
+          return true;
+        }
+        if (this.isReceh(d) && d.DetailId) {
+          const detailIdList = d.DetailId.split(',').map((x) => x.trim());
+          if (detailsIncoming.Id && detailIdList.includes(String(detailsIncoming.Id))) {
+            return true;
+          }
+          if (detailsIncoming.DetailId && detailIdList.includes(String(detailsIncoming.DetailId))) {
+            return true;
+          }
+        }
+        if (
+          incomingDoc &&
+          (incomingDoc === this.selectedBON() || incomingDoc === this.docnum()) &&
+          this.isReceh(d) &&
+          this.isReceh(detailsIncoming)
+        ) {
+          return true;
+        }
+        return false;
+      });
       if (idx !== -1) {
         const copy = [...arr];
-        copy[idx] = { ...copy[idx], ...detailsIncoming };
+        const currentItem = copy[idx];
+
+        let resolvedRemarks: string | null = detailsIncoming.Remarks ?? null;
+
+        // Jika HP ini sedang dalam proses simpan aktif untuk item ini, pertahankan PIC aktif
+        if (this.isLoading(currentItem.Id) && this.isCurrentPicInRemarks(currentItem.Remarks)) {
+          resolvedRemarks = this.mergeRemarks(detailsIncoming.Remarks, this.picName().trim().toUpperCase());
+        } else if (detailsIncoming.Remarks === undefined) {
+          // Jika server tidak mengirim field Remarks sama sekali, pertahankan nilai lokal
+          resolvedRemarks = currentItem.Remarks ?? null;
+        }
+
+        if (this.isReceh(currentItem)) {
+          copy[idx] = {
+            ...currentItem,
+            Remarks: resolvedRemarks,
+          };
+        } else {
+          copy[idx] = {
+            ...currentItem,
+            ...detailsIncoming,
+            Remarks: resolvedRemarks,
+          };
+        }
         return copy;
       }
       return arr;
@@ -619,19 +779,15 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   }
 
   getCardClass(item: Detail): string {
-    const remarkNames = item.Remarks
-      ? item.Remarks.replace('load by: ', '')
-        .split(',')
-        .map((name: string) => name.trim())
-        .filter(Boolean)
-      : [];
-
+    if (this.isRecehWithoutAlias(item)) {
+      return 'bg-gray-100 border-gray-300';
+    }
     if (!this.isReceh(item)) {
       if (item.sebagianValue > 0 && item.sebagianValue !== item.OpenQuantity) {
         return 'bg-gray-100 border-gray-300';
       }
     }
-    if (remarkNames.includes(this.picName())) {
+    if (this.isCurrentPicInRemarks(item.Remarks)) {
       return 'bg-emerald-300 border-emerald-400';
     }
     if (item.Remarks) {
@@ -657,30 +813,16 @@ export class LoadingChecklistComponent implements OnInit, OnDestroy {
   filterValidRemarks(data: Detail[]): Detail[] {
     return data.filter((item) => {
       if (!this.isReceh(item) && this.isItemLoaded(item)) return false;
-      const match = (item.Remarks || '').match(/load by:\s*([\w\s,]+)/i);
-      if (match) {
-        const names = match[1]
-          .split(',')
-          .map((n: string) => n.trim())
-          .filter(Boolean);
-        return names.length > 1;
-      }
-      return false;
+      const names = this.extractPicsFromRemarks(item.Remarks);
+      return names.length > 1;
     });
   }
 
   checkRemarks(data: Detail[]): boolean {
     return data.every((item) => {
       if (!item.Remarks || !item.Remarks.trim()) return true;
-      const match = item.Remarks.match(/load by:\s*([\w\s,]+)/i);
-      if (match) {
-        const names = match[1]
-          .split(',')
-          .map((n: string) => n.trim())
-          .filter(Boolean);
-        return names.length > 1;
-      }
-      return false;
+      const names = this.extractPicsFromRemarks(item.Remarks);
+      return names.length > 1;
     });
   }
 
